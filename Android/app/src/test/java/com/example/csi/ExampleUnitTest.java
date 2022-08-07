@@ -1,6 +1,6 @@
-package CSI-ManagementSystem-master.Android.app.src.main.java.com.example.csi;
+package com.example.csi;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
