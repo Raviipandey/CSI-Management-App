@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/refresher"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/minute_manager"
+        tools:context=".Manager">
+
+        <TextView
+            android:id="@+id/no_minute"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:background="@color/white"
+            android:gravity="center"
+            android:text="No Minutes to Display"
+            android:textColor="@color/colorAccent"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_RV"
+            android:layout_width="match_parent"
+            android:layout_height="672dp"
+            android:layout_below="@+id/search_bar"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="-2dp"
+            android:layout_marginBottom="1dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <!--
+        <EditText
+            android:id="@+id/enter_url"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="50dp"
+            android:layout_marginBottom="113dp"
+            android:hint="Enter URL" />
+        -->
+
+        <Button
+            android:id="@+id/url_button"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="42dp"
+            android:layout_marginBottom="26dp"
+            android:background="@drawable/circular_button"
+            android:text="URL"
+            android:visibility="gone"/>
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_baseline_add_24"/>
+        </android.support.design.widget.CoordinatorLayout>
+
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="search"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
+            android:drawablePadding="10dp"
+            android:paddingLeft="20dp"
+            android:drawableTint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"/>
+
+        <!--
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text="+"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:textColor="@color/white"
+            android:background="@drawable/circular_button"
+
+            />
+        -->
+
+    </RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

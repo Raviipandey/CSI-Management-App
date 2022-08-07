@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".mActivityManager.Proposal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="10dp"
+                android:text="EVENT DETAILS"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Name"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Name  "
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Theme"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/theme"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Theme"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Event Date"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Event Date "
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Speaker"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/speaker"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Speaker"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Venue"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/venue"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Venue"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Registration Fee"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CSI Member"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/fee_csi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0000"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Non CSI Member"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/fee_non_csi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0000"
+                        android:textColor="@color/colorPrimary" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Worth Prize"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/prize"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Worth Prize"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Description"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/desc_pd"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:justificationMode="inter_word"
+                android:paddingHorizontal="40dp"
+                android:text="Description "
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"
+            android:text="BUDGET DETAILS"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Creative Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Creative Budget."
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Publicity Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="publicity budget "
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Guest Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/gb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="guest budget:"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+
+            <LinearLayout
+                android:id="@+id/otherL1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/other1F"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/buts"
+                    android:hint="other"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/other1B"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/buts"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/otherL2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/other2F"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/buts"
+                    android:hint="other"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/other2B"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/buts"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/otherL3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/other3F"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/buts"
+                    android:hint="other"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/other3B"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/buts"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/buts"
+                    android:hint="other"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/other3"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/buts"
+                    android:inputType="number"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/upload_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="10dp"
+                android:text="Upload"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:orientation="horizontal">-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:textSize="20sp"-->
+            <!--                    android:text="MEETING DETAILS"-->
+            <!--                    android:textColor="@color/colorPrimary"-->
+            <!--                    android:textStyle="bold"/>-->
+            <!--            </LinearLayout>-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_marginTop="20dp">-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="fill_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:textSize="20sp"-->
+            <!--                    android:textStyle="bold"-->
+            <!--                    android:layout_marginLeft="5dp"-->
+            <!--                    android:textColor="@color/colorAccent"-->
+            <!--                    android:text="Event Date"-->
+            <!--                    android:id="@+id/meeting_date"/>-->
+            <!--            </LinearLayout>-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:orientation="horizontal"-->
+            <!--                android:layout_marginTop="20dp"-->
+            <!--                android:layout_marginLeft="5dp"-->
+            <!--                android:layout_marginRight="5dp">-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:textSize="20sp"-->
+            <!--                    android:textStyle="bold"-->
+            <!--                    android:text="Agenda:"-->
+            <!--                    android:textColor="@color/colorPrimary"/>-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_marginLeft="10dp"-->
+            <!--                    android:textSize="15dp"-->
+            <!--                    android:text="Agenda"-->
+            <!--                    android:id="@+id/agenda"-->
+            <!--                    android:textColor="@color/colorPrimary"/>-->
+
+            <!--            </LinearLayout>-->
+            <!--            <View-->
+            <!--                android:layout_width="10000dp"-->
+            <!--                android:layout_height="2dp"-->
+            <!--                android:layout_marginTop="10dp"-->
+            <!--                android:background="@color/colorPrimary" />-->
+
+
+            <Button
+                android:id="@+id/uploadImage"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ripple_effect"
+                android:clickable="true"
+                android:drawableStart="@drawable/ic_insert_photo_black_24dp"
+                android:drawableLeft="@drawable/ic_insert_photo_black_24dp"
+                android:drawablePadding="15dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:text="Upload Poster"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/upload_image_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Preview"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/image_preview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="10dp"
+                android:clickable="true"
+                android:src="@drawable/saurabh"
+                android:visibility="visible" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/warning_poster" />
+
+            <Button
+                android:id="@+id/uploadVideo"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/ripple_effect"
+                android:clickable="true"
+                android:drawableStart="@drawable/ic_videocam_black_24dp"
+                android:drawableLeft="@drawable/ic_videocam_black_24dp"
+                android:drawablePadding="15dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:text="Upload Video"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/upload_video_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Preview"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/video_preview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:paddingLeft="40dp"
+                android:text="Please Upload Video First" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/submit_praposal"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="251dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="20dp"
+                android:background="@drawable/ripple_effect"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Submit"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,12 @@
+creative/
+gallery/
+.env
+node_modules/
+images/
+report/
+sky.js
+upload.js
+uploads/
+viewagenda.js
+.env
+server.js
