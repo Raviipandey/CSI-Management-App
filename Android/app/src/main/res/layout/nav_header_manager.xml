@@ -17,20 +17,19 @@
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:maxHeight="50dp"
-        android:maxWidth="50dp"
         android:layout_marginTop="15dp"
         android:contentDescription="@string/nav_header_desc"
+        android:maxWidth="50dp"
+        android:maxHeight="50dp"
         android:paddingTop="1dp"
         android:scaleType="centerCrop"
+        app:srcCompat="@drawable/ic_person_black_24dp"
         app:sriv_left_bottom_corner_radius="50dp"
         app:sriv_left_top_corner_radius="50dp"
+        app:sriv_oval="true"
         app:sriv_right_bottom_corner_radius="50dp"
         app:sriv_right_top_corner_radius="50dp"
-        app:srcCompat="@drawable/ic_person_black_24dp"
-        tools:ignore="VectorDrawableCompat"
-        app:sriv_oval="true"
-        />
+        tools:ignore="VectorDrawableCompat" />
 
     <TextView
         android:id="@+id/uname_final"

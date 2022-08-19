@@ -100,7 +100,7 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://tayyabali.in:9091/images/'+files[i];
+        			link[i] = 'https://miro.medium.com/max/600/1*p6exlg2Jrl3pimjPy7R-sA.png'+files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);
