@@ -6,9 +6,9 @@ dotenv.config();
 // MySQL Connection
 var mysql=require('mysql');
 const connection=mysql.createConnection({
-    	host:'localhost',
-		user: "root",
-		password: "",
+    	host:'3.110.128.94',
+		user: "csi",
+		password: "csi",
     	database:'csiApp'
 });
 
