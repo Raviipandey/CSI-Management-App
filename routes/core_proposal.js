@@ -7,16 +7,16 @@ dotenv.config();
 // MySQL Connection
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: "root",
-    password: "",
-    database: 'csiApp'
+    host: '128.199.23.207',
+	user: "csi",
+	password: "csi",
+	database: 'csiApp2022'
 });
 connection.connect(function(err) {
     if (!err) {
-        console.log('Connected to MySql!Proposal.js');
+        console.log('Connected to new proposals');
     } else {
-        console.log("Not Connected To Mysql!Proposal.js");
+        console.log("Not Connected to new proposals");
     }
 });
 
@@ -29,6 +29,33 @@ var transporter = nodemailer.createTransport({
         pass: process.env.pass
     }
 });
+
+
+router.post('/addproposal' , (req , res) => {
+    var id = req.query.id;
+    var name = req.query.name;
+    var date = req.query.date;
+    var category = req.query.category;
+    var venue = req.query.venue;
+    var threetrack = req.query.threetrack;
+    var desc = req.query.desc;
+    var budget = req.query.budget;
+    var reg_fee_c = req.query.reg_fee_c;
+    var reg_fee_nc = req.query.reg_fee_nc;
+    var prize = req.query.prize;
+    
+    connection.query("INSERT INTO core_proposals_manager(cpm_id,proposals_event_name,proposals_event_date,proposals_event_category,proposals_venue,proposals_three_track, proposals_desc,proposals_total_budget,proposals_reg_fee_csi,proposals_reg_fee_noncsi,proposals_prize) VALUES (?,?,?,?,?,?,?,?,?,?,?)" , [id , name , date , category , venue , threetrack , desc , budget , reg_fee_c , reg_fee_nc , prize] , function(error){
+        if (error) {
+            console.log(error)
+            console.log("Failed to add proposal");
+            res.sendStatus(400);
+        } else {
+            console.log("Succesfully added");
+            res.sendStatus(200);
+        }
+    })
+})
+
 
 //Creating propsal
 router.post('/createproposal', (req, res) => {

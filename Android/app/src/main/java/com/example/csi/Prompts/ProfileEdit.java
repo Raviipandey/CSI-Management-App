@@ -47,13 +47,14 @@ public class ProfileEdit extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/edit";
         setContentView(R.layout.activity_profile_edit);
+        Log.i("url lelo", server_url);
 
         getSupportActionBar().setTitle("Edit Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         imageButton = findViewById(R.id.profile_photo_E);
 
-        //declaring varriables
+        //declaring variables
         Button save_button = findViewById(R.id.save_button);
         final TextView id = findViewById(R.id.id_E);
         final TextView name = findViewById(R.id.profile_name_E);
@@ -67,14 +68,13 @@ public class ProfileEdit extends AppCompatActivity {
         //getting data from profile
         UProfile = getIntent().getStringExtra("profilePic");
 
-        id.setText(getIntent().getStringExtra("id"));
-        name.setText(getIntent().getStringExtra("name"));
-        email.setText(getIntent().getStringExtra("email"));
-        phn.setText(getIntent().getStringExtra("phone"));
-        rol.setText(getIntent().getStringExtra("rollno"));
-        position_s = getIntent().getStringExtra("role");
-
-        String Year = getIntent().getStringExtra("year");
+        id.setText(getIntent().getStringExtra("core_id"));
+        name.setText(getIntent().getStringExtra("core_en_fname"));
+        email.setText(getIntent().getStringExtra("core_email"));
+        phn.setText(getIntent().getStringExtra("core_mobileno"));
+        rol.setText(getIntent().getStringExtra("core_rollno"));
+        position_s = getIntent().getStringExtra("core_role_id");
+        String Year = getIntent().getStringExtra("core_class");
         switch (Year) {
             case "FE":
                 RadioButton FE = findViewById(R.id.radio_FE);
@@ -94,47 +94,47 @@ public class ProfileEdit extends AppCompatActivity {
                 break;
         }
 
-        String Branch = getIntent().getStringExtra("branch");
-        switch (Branch) {
-            case "IT":
-                RadioButton IT = findViewById(R.id.radio_IT);
-                IT.setChecked(true);
-                break;
-            case "COMPS":
-                RadioButton Comps = findViewById(R.id.radio_comps);
-                Comps.setChecked(true);
-                break;
-            case "MECH":
-                RadioButton MECH = findViewById(R.id.radio_mech);
-                MECH.setChecked(true);
-                break;
-            default:
-                RadioButton EXTC = findViewById(R.id.radio_extc);
-                EXTC.setChecked(true);
-                break;
-        }
+//        String Branch = getIntent().getStringExtra("branch");
+//        switch (Branch) {
+//            case "IT":
+//                RadioButton IT = findViewById(R.id.radio_IT);
+//                IT.setChecked(true);
+//                break;
+//            case "COMPS":
+//                RadioButton Comps = findViewById(R.id.radio_comps);
+//                Comps.setChecked(true);
+//                break;
+//            case "MECH":
+//                RadioButton MECH = findViewById(R.id.radio_mech);
+//                MECH.setChecked(true);
+//                break;
+//            default:
+//                RadioButton EXTC = findViewById(R.id.radio_extc);
+//                EXTC.setChecked(true);
+//                break;
+//        }
 
-        String Batch = getIntent().getStringExtra("batch");
-        switch (Batch) {
-            case "A":
-                RadioButton batch_a = findViewById(R.id.radio_A);
-                batch_a.setChecked(true);
-                break;
-            case "B":
-                RadioButton batch_b = findViewById(R.id.radio_B);
-                batch_b.setChecked(true);
-                break;
-            case "C":
-                RadioButton batch_c = findViewById(R.id.radio_C);
-                batch_c.setChecked(true);
-                break;
-            default:
-                RadioButton batch_d = findViewById(R.id.radio_D);
-                batch_d.setChecked(true);
-                break;
-        }
+//        String Batch = getIntent().getStringExtra("batch");
+//        switch (Batch) {
+//            case "A":
+//                RadioButton batch_a = findViewById(R.id.radio_A);
+//                batch_a.setChecked(true);
+//                break;
+//            case "B":
+//                RadioButton batch_b = findViewById(R.id.radio_B);
+//                batch_b.setChecked(true);
+//                break;
+//            case "C":
+//                RadioButton batch_c = findViewById(R.id.radio_C);
+//                batch_c.setChecked(true);
+//                break;
+//            default:
+//                RadioButton batch_d = findViewById(R.id.radio_D);
+//                batch_d.setChecked(true);
+//                break;
+//        }
 //        Log.i("check data incoming", getIntent().getStringExtra("year") + " " + getIntent().getStringExtra("branch") + " " + getIntent().getStringExtra("batch"));
-        Log.i("volleyABC", "position value" + position_s + getIntent().getStringExtra("role"));
+        Log.i("volleyABC", "position value" + position_s + getIntent().getStringExtra("core_role_id"));
 
         loadImageUrl(UProfile);
 
@@ -173,6 +173,7 @@ public class ProfileEdit extends AppCompatActivity {
                 else batch_s = getIntent().getStringExtra("batch");
 
                 post_edited_info(id_s, name_s, email_s, phn_s, yr_s, branch_s, rol_s, batch_s);//posting data on server
+                Log.i("ID idhar ayega", id_s);
                 //profile_after_edit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 //startActivity(profile_after_edit);
                 //ProfileEdit.this.getSupportFragmentManager().beginTransaction().replace(R.id.containerID, Profile.newInstance()).commit();
@@ -209,13 +210,13 @@ public class ProfileEdit extends AppCompatActivity {
         try {
             jsonObject.put("id",id_s);
             jsonObject.put("name",name_s);
-            jsonObject.put("role",position_s); //actual value will get from loginpage
-            jsonObject.put("email",email_s);
-            jsonObject.put("phone",phn_s);
+//            jsonObject.put("core_role_id",position_s); //actual value will get from loginpage
+//            jsonObject.put("core_email",email_s);
+//            jsonObject.put("core_mobileno",phn_s);
             jsonObject.put("year",yr_s);
-            jsonObject.put("branch",branch_s);
+//            jsonObject.put("branch",branch_s);
             jsonObject.put("rollno",rol_s);
-            jsonObject.put("batch",batch_s);
+//            jsonObject.put("batch",batch_s);
             Log.i("volleyABC", "Created jason");
         }
         catch (JSONException e) {
@@ -224,7 +225,9 @@ public class ProfileEdit extends AppCompatActivity {
         }
 
         final String requestBody = jsonObject.toString();
-        Log.i("volleyABC", requestBody);
+        Log.i("final json", requestBody);
+        server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/edit/?id="+id_s+"&name="+name_s+"&year="+yr_s+"&rollno="+rol_s;
+        Log.i("Naya url", server_url);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, server_url, new Response.Listener<String>() {
             @Override

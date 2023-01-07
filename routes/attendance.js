@@ -6,9 +6,9 @@ dotenv.config();
 // MySQL Connection
 var mysql=require('mysql');
 const connection=mysql.createConnection({
-    	host:'3.110.128.94',
-		user: "csi",
-		password: "csi",
+    	host:'localhost',
+		user: "root",
+		password: "",
     	database:'csiApp'
 });
 
@@ -16,7 +16,7 @@ connection.connect(function(err){
     	if(!err){
         	console.log('Connected to MySql! Attendance');
     	}
-	else{
+	else{	
         	console.log("Not Connected To Mysql! Attendance");
     	}
 });
@@ -36,8 +36,9 @@ router.post('/request',(req,res)=>{
 
 	//fetching name from users table
 	connection.query('SELECT name,year FROM profile WHERE profile.id=?',[id],function(error,rest){
+		console.log(rest)
 		if (error){
-			//console.log("Error");
+			console.log(err);
 			res.sendStatus(400);
 		}
 		else{

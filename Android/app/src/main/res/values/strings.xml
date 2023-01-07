@@ -1,8 +1,8 @@
 <resources>
 <!--    <string name="server_url">http://165.232.181.152:9000</string>-->
 <!--    <string name="gallery_url">http://165.232.181.152:9091</string>-->
-    <string name="server_url">http://3.6.41.199:9000</string>
-    <string name="gallery_url">http://3.6.41.199:9091</string>
+    <string name="server_url">http://192.168.0.103:9000</string>
+    <string name="gallery_url">http://192.168.43.69:9091</string>
     <string name="app_name">CSI</string>
     <string name="title_activity_minutes_list">MinutesList</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -36,15 +36,29 @@
     <string-array name="csi_members_name">
         <item>Select</item>
         <item>Prasad Padalkar</item>
-        <item>Sushree Satapathy</item>
-        <item>Mushira Shaikh</item>
-        <item>Sanket Deshmukh</item>
-        <item>Gaurav Jain</item>
-        <item>Jevina Verghese</item>
-        <item>Afif Shaikh</item>
-        <item>Sanika Bhagwat</item>
-        <item>Saurabh Yadav</item>
-        <item>Viraj Tandel</item>
-        <item>Ishmeet Kaur</item>
+<!--        <item>Sushree Satapathy</item>-->
+<!--        <item>Mushira Shaikh</item>-->
+<!--        <item>Sanket Deshmukh</item>-->
+<!--        <item>Gaurav Jain</item>-->
+<!--        <item>Jevina Verghese</item>-->
+<!--        <item>Afif Shaikh</item>-->
+<!--        <item>Sanika Bhagwat</item>-->
+<!--        <item>Saurabh Yadav</item>-->
+<!--        <item>Viraj Tandel</item>-->
+<!--        <item>Ishmeet Kaur</item>-->
+        <item>Nilesh Ghavate</item>
+        <item>Vendra Sekar</item>
+        <item>Suhani Desale</item>
+        <item>Simar Kaur</item>
+        <item>Tushar Padhy</item>
+        <item>Ravi Pandey</item>
+        <item>Jasmit Rathod</item>
+        <item>Om Jannu</item>
+        <item>Anushka Engavle</item>
+        <item>Saanvi Naik</item>
+        <item>Sherine Sampath</item>
+        <item>Kevin Geejo</item>
+        <item>Shreyash Patil</item>
+        <item>Sneha Naphade</item>
     </string-array>
 </resources>

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".Manager">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -251,14 +251,15 @@
                         android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="@color/colorAccent"/>
+
                     <TextView
-                        android:id="@+id/membership"
+                        android:id="@+id/membershipLeft"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="40dp"
-                        android:text=""
-                        android:textSize="17sp"
-                        android:textColor="@color/colorAccent"/>
+                        android:text="membershipLeft"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="17sp" />
                 </LinearLayout>
                 <View
                     android:layout_width="match_parent"

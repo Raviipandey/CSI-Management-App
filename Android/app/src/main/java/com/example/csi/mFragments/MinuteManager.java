@@ -136,7 +136,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
         mExampleList.clear(); //We should clear our arraylist
         mExampleAdapter = new ExampleAdapter(getActivity(), mExampleList);
         //because we are calling this method is swipe refresh layout
-        //So every time we send request to server for getting agend... prev added agendas won't repeat again.
+        //So every time we send request to server for getting agenda... prev added agendas won't repeat again.
 
         StringRequest stringRequest =new StringRequest(Request.Method.POST,server_url,new Response.Listener<String>(){
             @Override
@@ -159,12 +159,12 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
                     for(int i=0; i< jsonArray.length(); i++) {
                         JSONObject minutes = jsonArray.getJSONObject(i);
 
-                        String agenda = minutes.getString("agenda");
-                        String date = minutes.getString("da_te");
-                        String time = minutes.getString("ti_me");
+                        String agenda = minutes.getString("minute_objective");
+                        String date = minutes.getString("minute_date");
+                        String time = minutes.getString("minute_time");
                         String creator = minutes.getString("creator");
-                        String points = minutes.getString("minute");
-                        String work = minutes.getString("work");
+                        String points = minutes.getString("minute_details");
+                        String work = minutes.getString("minute_work");
 
                         JSONObject obj = new JSONObject(work);
                         JSONArray obj1 = obj.getJSONArray("minutes");

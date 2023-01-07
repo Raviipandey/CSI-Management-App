@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,10 +67,13 @@ public class Profile extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
         rootView = inflater.inflate(R.layout.activity_profile,container,false);
-        server_url = rootView.getResources().getString(R.string.server_url) + "/profile/";
+//        Log.i("id print hogi", UID);
+        UID = this.getArguments().getString("id");
+        server_url = rootView.getResources().getString(R.string.server_url) + "/profile/?id="+UID;
+        Log.i("naya",server_url);
         getActivity().setTitle("My Profile");
         Bundle bundle = getArguments();
-        UID = this.getArguments().getString("id");
+
         UProfile = this.getArguments().getString("profilePic");
         swipe();
         imageButton = rootView.findViewById(R.id.profile_photo);
@@ -103,19 +105,17 @@ public class Profile extends Fragment {
 
                 Intent edit_profile =new Intent(getActivity(), ProfileEdit.class);
 
-                //paasing data to edit intent so only required data will be changed else everything will remain same
-                edit_profile.putExtra("id",id.getText().toString());
-                edit_profile.putExtra("name",name.getText().toString());
-                edit_profile.putExtra("role",position_s);
-                edit_profile.putExtra("email",email.getText().toString());
-                edit_profile.putExtra("phone",phn.getText().toString());
-                edit_profile.putExtra("year",yr.getText().toString());
-                edit_profile.putExtra("branch",branch.getText().toString());
-                edit_profile.putExtra("rollno",roln.getText().toString());
-                edit_profile.putExtra("batch",batch.getText().toString());
-
+                //passing data to edit intent so only required data will be changed else everything will remain same
+                edit_profile.putExtra("core_id",id.getText().toString());
+                edit_profile.putExtra("core_en_fname",name.getText().toString());
+                edit_profile.putExtra("core_role_id",position_s);
+                edit_profile.putExtra("core_email",email.getText().toString());
+                edit_profile.putExtra("core_mobileno",phn.getText().toString());
+                edit_profile.putExtra("core_class",yr.getText().toString());
+                edit_profile.putExtra("core_branch",branch.getText().toString());
+                edit_profile.putExtra("core_rollno",roln.getText().toString());
+//                edit_profile.putExtra("batch",batch.getText().toString());
                 edit_profile.putExtra("profilePic", UProfile);
-
                 startActivity(edit_profile);
                 //finish();
             }
@@ -156,7 +156,7 @@ public class Profile extends Fragment {
         final String requestBody = jsonObject.toString();
         Log.i("volleyABC ", requestBody);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, server_url, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, server_url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -208,23 +208,23 @@ public class Profile extends Fragment {
         TextView roln = rootView.findViewById(R.id.rollNo);
         TextView batch = rootView.findViewById(R.id.batch);
         TextView  branch = rootView.findViewById(R.id.branch);
-        TextView membershipLeft = rootView.findViewById(R.id.membership);
+        TextView membershipLeft = rootView.findViewById(R.id.membershipLeft);
         JSONObject fetchedData ;
         try {
             fetchedData= new JSONObject(data);
 
-            id.setText(fetchedData.getString("id"));
-            name.setText(fetchedData.getString("name"));
-            position_s= fetchedData.getString("role");
+            id.setText(fetchedData.getString("core_id"));
+            name.setText(fetchedData.getString("core_en_fname"));
+            position_s= fetchedData.getString("core_role_id");
             Log.i("volleyABC", "position value in main"+position_s);
-            email.setText(fetchedData.getString("email"));
-            phn.setText(fetchedData.getString("phone"));
-            yr.setText(fetchedData.getString("year"));
-            branch.setText(fetchedData.getString("branch"));
-            roln.setText(fetchedData.getString("rollno"));
-            batch.setText(fetchedData.getString("batch"));
+            email.setText(fetchedData.getString("core_email"));
+            phn.setText(fetchedData.getString("core_mobileno"));
+            yr.setText(fetchedData.getString("core_class"));
+            branch.setText(fetchedData.getString("core_branch"));
+            roln.setText(fetchedData.getString("core_rollno"));
+//            batch.setText(fetchedData.getString("batch"));
             membershipLeft.setText(fetchedData.getString("membership_left"));
-            Log.i("volleyABC", "set_data: createdjason object all");
+            Log.i("volleyABC", "set_data: created json object all");
 
         } catch (JSONException e) {
             e.printStackTrace();

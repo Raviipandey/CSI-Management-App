@@ -17,33 +17,56 @@ var transporter = nodemailer.createTransport({
 var mysql = require('mysql');
 const { json } = require('body-parser');
 var connection = mysql.createConnection({
-    host: 'localhost',
-		user: "root",
-		password: "",
-    database: 'csiApp'
+  host: '128.199.23.207',
+	user: "csi",
+	password: "csi",
+	database: 'csiApp2022'
 });
 connection.connect(function(err) {
     if (!err) {
-      console.log('Connected to MySql!Profile');
+      console.log('Connected to MySql!Profileeee');
     } else {
       console.log('Not Connected To Mysql!Profile');
     }
 });
 
 router.get('/',(req,res)=>{
-	var id = req.body.id;
-
+	var id = req.query.id;
+  // console.log(id);
 	//fetching deatails from profile table
-	connection.query('SELECT id,name,role,email,phone,year,branch,rollno,batch,membership_left FROM profile where id=?',[id],function(error,results,fields){
-    console.log(results)
-	if(error)
-	{
-		console.log(error);
-		res.sendStatus(400);
-	}
-	else
-	res.send(results[0]);
-  console.log(results[0]);
+	connection.query('SELECT core_id,core_en_fname,core_role_id,core_email,core_mobileno,core_branch,core_rollno,core_class FROM core_details where core_id=?',[id],function(error,results,fields){
+    connection.query('Select role_name from core_role_master CR where EXISTS ( select core_role_id from core_details CD where CR.role_id=CD.core_role_id and CD.core_id=?)',[id],function(error2,result2){
+      
+      // console.log(results)
+      if(error)
+      {
+        console.log(error);
+        res.sendStatus(400);
+      }
+      else
+      var id = req.query.id;
+      connection.query('SELECT TIMESTAMPDIFF(year, membership_start_date, membership_end_date) AS Membership_left from core_membership where core_id=?',[id],function(error,result3,fields){
+        // res.send(results[0]);
+        res.status(200).send({
+          "name":result2[0].role_name,
+          "core_id":results[0].core_id,
+          "core_en_fname":results[0].core_en_fname,
+          "core_role_id":results[0].core_role_id,
+          "core_email":results[0].core_email,
+          "core_mobileno":results[0].core_mobileno,
+          "core_branch":results[0].core_branch,
+          "core_rollno":results[0].core_rollno,
+          "core_class":results[0].core_class,
+          "membership_left":result3[0].Membership_left
+           });
+        // res.send(result2[0])
+        // console.log(results[0]);
+        // console.log(result2[0]);
+        })
+
+    })
+    
+
 	});
 });
 
@@ -99,25 +122,23 @@ router.post('/view', (req,res) => {
 });
 
 router.post('/edit',(req,res)=>{
-	var id = req.body.id;
-	var name = req.body.name;
-	var role = req.body.role;
-	var email= req.body.email;
-	var phone = req.body.phone;
-	var year = req.body.year;
-	var branch = req.body.branch;
-	var rollno = req.body.rollno;
-	var batch = req.body.batch;
+  console.log(req.body);
+	var id = req.query.id;
+	var name = req.query.name;
+	var year = req.query.year;
+	var rollno = req.query.rollno;
 
 
 	//fetching creator from users table
-	connection.query('UPDATE profile SET name =?,email =?,role=?,phone =?,year =?,branch =?,rollno =?,batch =? WHERE id=?',[name,email,role,phone,year,branch,rollno,batch,id],function(error,fields){
+	connection.query('UPDATE core_details SET core_en_fname =?, core_class =?, core_rollno =? WHERE core_id=?',[name,year,rollno,id],function(error,result,fields){
+  // console.log()
 	if (error)
 	res.sendStatus(400);
 	else
 	{
 		res.sendStatus(200);
-		//console.log("Data Updated");
+		console.log("Data Updated");
+    console.log(result)
 	}
 	});
 });
