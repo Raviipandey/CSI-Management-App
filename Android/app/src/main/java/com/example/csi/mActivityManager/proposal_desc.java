@@ -134,7 +134,7 @@ public class proposal_desc extends AppCompatActivity {
         final String requestBody = jsonObject.toString();
         Log.i("volleyABC ", requestBody);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
