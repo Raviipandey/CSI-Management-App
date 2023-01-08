@@ -178,9 +178,9 @@ router.post('/status', (req, res) => {
 
 //View proposal details
 router.post('/viewproposal', (req, res) => {
-    var eid = req.body.eid;
-
-    connection.query('SELECT name, theme, CONVERT(description USING utf8) as  description,event_date,creative_budget, publicity_budget, guest_budget,CONVERT(comment USING utf8) as  comment from events where eid=?', [eid], function(error, results) {
+    var cpm_id = req.body.cpm_id;
+    connection.query('SELECT * from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
+        console.log(results)
         if (error) {
             console.log("Fail to view proposal");
             res.sendStatus(400);
@@ -194,7 +194,8 @@ router.post('/viewproposal', (req, res) => {
 //Listing All proposal
 router.get('/viewlistproposal', (req, res) => {
 
-    connection.query('SELECT eid,name,theme,status,p_date FROM events order by p_date DESC', function(error, results) {
+    connection.query('SELECT cpm_id, proposals_event_name, proposals_event_category ,proposals_status , proposals_event_date from core_proposals_manager order by proposals_event_date DESC ;', function(error, results) {
+        console.log(results)
         if (error) {
             console.log("Fail to list proposal");
             res.sendStatus(400);

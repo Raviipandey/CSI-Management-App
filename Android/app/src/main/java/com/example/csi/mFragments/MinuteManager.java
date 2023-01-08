@@ -147,7 +147,6 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
                 //Toast.makeText(getActivity(),response ,Toast.LENGTH_SHORT).show();
                 try {
                     JSONArray jsonArray = new JSONArray(response);
-
                     TextView no_minute_text = rootView.findViewById(R.id.no_minute);
                     if(jsonArray.length() > 0) {
                         rv.setVisibility(View.VISIBLE);
@@ -158,14 +157,12 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
                     }
                     for(int i=0; i< jsonArray.length(); i++) {
                         JSONObject minutes = jsonArray.getJSONObject(i);
-
                         String agenda = minutes.getString("minute_objective");
                         String date = minutes.getString("minute_date");
                         String time = minutes.getString("minute_time");
                         String creator = minutes.getString("creator");
                         String points = minutes.getString("minute_details");
                         String work = minutes.getString("minute_work");
-
                         JSONObject obj = new JSONObject(work);
                         JSONArray obj1 = obj.getJSONArray("minutes");
 
@@ -174,7 +171,6 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
 
                         for (int j=0;j<obj1.length();j++) {
                             JSONObject obj2 = obj1.getJSONObject(j);
-
                             tasks.add(obj2.getString("task"));
                             person.add(obj2.getString("person"));
                         }
@@ -196,6 +192,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.i("Idhr ayega" , "error");
                 }
             }
         },new Response.ErrorListener()  {
