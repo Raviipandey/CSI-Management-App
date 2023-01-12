@@ -3,7 +3,6 @@ package com.example.csi.Prompts;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import com.example.csi.R;
 
 import java.util.ArrayList;
 
+import static com.example.csi.mFragments.MinuteManager.EXTRA_ABSENTEE;
 import static com.example.csi.mFragments.MinuteManager.EXTRA_AGENDA;
 import static com.example.csi.mFragments.MinuteManager.EXTRA_CREATOR;
 import static com.example.csi.mFragments.MinuteManager.EXTRA_DATE;
@@ -27,8 +27,8 @@ import static com.example.csi.mFragments.MinuteManager.EXTRA_TIME;
 
 
 public class DetailActivity extends Fragment {
-    TextView mAgenda, mDate, mTime, mCreator, mPoints;
-    String agenda, date, time, creator, points;
+    TextView mAgenda, mDate, mTime, mCreator, mPoints, mAbsentee;
+    String agenda, date, time, creator, points, absentee;
     ArrayList<String> task, person;
     TableLayout tableLayout;
 
@@ -45,6 +45,7 @@ public class DetailActivity extends Fragment {
         mTime = rootView.findViewById(R.id.final_time);
         mCreator = rootView.findViewById(R.id.final_creator);
         mPoints = rootView.findViewById(R.id.final_points);
+        mAbsentee = rootView.findViewById(R.id.absentee);
         tableLayout = rootView.findViewById(R.id.display_table);
 
         Bundle bundle = getArguments();
@@ -54,6 +55,7 @@ public class DetailActivity extends Fragment {
         time = bundle.getString(EXTRA_TIME);
         creator = bundle.getString(EXTRA_CREATOR);
         points = bundle.getString(EXTRA_POINTS);
+        absentee = bundle.getString(EXTRA_ABSENTEE);
         task = bundle.getStringArrayList(EXTRA_TASK);
         person = bundle.getStringArrayList(EXTRA_PERSON);
         Log.i("sankey123", task.toString() + " " + person.toString());
@@ -65,6 +67,7 @@ public class DetailActivity extends Fragment {
         mTime.setText("Time: "+time);
         mCreator.setText("Creator: "+creator);
         mPoints.setText("Points: "+points);
+        mAbsentee.setText("Absentee members: "+absentee);
 
         for (int i=0; i<task.size(); i++) {
             TableRow tableRow = new TableRow(getContext());

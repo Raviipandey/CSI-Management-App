@@ -194,7 +194,7 @@ public class Proposal extends AppCompatActivity {
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.i("info123", "eroor in extractingf");
+                Log.i("info123", "error in extracting");
 
             }
         }

@@ -39,8 +39,8 @@ public class AddMinute extends AppCompatActivity {
 
     AutoCompleteTextView mCreateAgenda;
     Button mAddMinute, mAddTask;
-    String Agenda, Points, Creator, server_url;
-    EditText  mCreatePoints, mTask;
+    String Agenda, Points, Creator, Absentee, server_url;
+    EditText  mCreatePoints, mTask, mAbsentee;
     Spinner spinner;
     TableLayout tableLayout;
 
@@ -156,6 +156,7 @@ public class AddMinute extends AppCompatActivity {
 
         mCreateAgenda = findViewById(R.id.create_agenda);
         mCreatePoints = findViewById(R.id.create_points);
+        mAbsentee = findViewById(R.id.absentee);
         mCreatePoints.setMaxLines(10);
         mCreatePoints.setVerticalScrollBarEnabled(true);
         mCreatePoints.setMovementMethod(new ScrollingMovementMethod());
@@ -167,6 +168,7 @@ public class AddMinute extends AppCompatActivity {
                 Log.i("i234","Add Minute");
                 Agenda = mCreateAgenda.getText().toString();
                 Points = mCreatePoints.getText().toString();
+                Absentee = mAbsentee.getText().toString();
 
                 //createMinuteTesting();
                 createNewMinute(); //sending new created minute to server
@@ -217,6 +219,7 @@ public class AddMinute extends AppCompatActivity {
             jsonObject.put("id",Creator);
             jsonObject.put("agenda", Agenda);
             jsonObject.put("points", Points);
+            jsonObject.put("absentee", Absentee);
             jsonObject.put("work", jsonObject1);
         } catch (JSONException e) {
             e.printStackTrace();
