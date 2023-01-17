@@ -1,7 +1,7 @@
 <resources>
 <!--    <string name="server_url">http://165.232.181.152:9000</string>-->
 <!--    <string name="gallery_url">http://165.232.181.152:9091</string>-->
-    <string name="server_url">http://192.168.0.102:9000</string>
+    <string name="server_url">http://192.168.0.104:9000</string>
     <string name="gallery_url">http://192.168.43.69:9091</string>
     <string name="app_name">CSI</string>
     <string name="title_activity_minutes_list">MinutesList</string>
@@ -60,5 +60,11 @@
         <item>Kevin Geejo</item>
         <item>Shreyash Patil</item>
         <item>Sneha Naphade</item>
+    </string-array>
+    <string-array name="threetrackarray">
+        <item>Select Category</item>
+        <item>Academics</item>
+        <item>Aspiration</item>
+        <item>Wellness</item>
     </string-array>
 </resources>

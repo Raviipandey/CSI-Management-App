@@ -53,6 +53,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
     public static final String EXTRA_TIME = "time";
     public static final String EXTRA_CREATOR = "creator";
     public static final String EXTRA_POINTS = "points";
+    public static final String EXTRA_ABSENTEE = "absentee";
     public static final String EXTRA_TASK = "task";
     public static final String EXTRA_PERSON = "person";
 
@@ -79,7 +80,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
         getActivity().setTitle("Minute Manager");
         Bundle bundle = getArguments();
         UID = this.getArguments().getString("id");
-        //SerachBar
+        //SearchBar
         SearchInput = rootView.findViewById(R.id.search_bar);
         //We are getting User ID from navigation manager to this fragment
 
@@ -162,6 +163,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
                         String time = minutes.getString("minute_time");
                         String creator = minutes.getString("creator");
                         String points = minutes.getString("minute_details");
+                        String absentee = minutes.getString("core_ab_mem_name");
                         String work = minutes.getString("minute_work");
                         JSONObject obj = new JSONObject(work);
                         JSONArray obj1 = obj.getJSONArray("minutes");
@@ -182,7 +184,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
                         String date1 = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
 
                         Log.i("finaltesting", tasks.toString() + " " + person.toString());
-                        mExampleList.add(new ExampleItem(agenda, date1, time, creator, points, tasks, person));
+                        mExampleList.add(new ExampleItem(agenda, date1, time, creator, points, absentee ,tasks, person));
                         Log.i("displaying", mExampleList.get(0).getTime() + " " +mExampleList.get(0).getTask().toString() + " " + mExampleList.get(0).getPerson().toString());
                     }
 
@@ -192,7 +194,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.i("Idhr ayega" , "error");
+                    Log.i("Idhar aayega" , "error");
                 }
             }
         },new Response.ErrorListener()  {
@@ -230,6 +232,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
         bundle.putString(EXTRA_TIME,clickedItem.getTime());
         bundle.putString(EXTRA_CREATOR,clickedItem.getCreator());
         bundle.putString(EXTRA_POINTS,clickedItem.getPoints());
+        bundle.putString(EXTRA_ABSENTEE,clickedItem.getAbsentee());
         bundle.putStringArrayList(EXTRA_TASK, clickedItem.getTask());
         bundle.putStringArrayList(EXTRA_PERSON, clickedItem.getPerson());
         //Toast.makeText(getContext(), clickedItem.getTask().toString() + " " + clickedItem.getPerson().toString(), Toast.LENGTH_SHORT).show();

@@ -29,6 +29,7 @@ router.post('/create',(req,res)=>{
 	// var e_time = req.query.e_time;
 	var points = req.body.points;
 	var work=JSON.stringify(req.body.work);
+	var absentee = req.body.absentee;
 
 	//fetching creator from users table
 	// connection.query('SELECT core_en_fname FROM core_details where core_id=?',[id],function(error,creator){
@@ -61,7 +62,7 @@ router.post('/create',(req,res)=>{
 		}
 		else{
 			//pushing into minute table 
-			connection.query('INSERT INTO core_minute_manager(minute_by_core_id, minute_objective,minute_details,minute_work,creator) VALUES (?, ?, ?, ?, ?);',[id, agenda, points,  work, creator[0].core_en_fname],function(err,result){
+			connection.query('INSERT INTO core_minute_manager(minute_by_core_id, minute_objective,minute_details,core_ab_mem_name,minute_work,creator) VALUES (?, ?, ?, ?, ?, ?);',[id, agenda, points, absentee, work, creator[0].core_en_fname],function(err,result){
 				if(err){
 					console.log(err);
 					res.sendStatus(400);
@@ -70,6 +71,7 @@ router.post('/create',(req,res)=>{
 					//console.log("Data Inserted");
 					res.sendStatus(200);
 				}
+				
 			});
 		}
 	});
@@ -80,7 +82,7 @@ router.post('/list', (req, res) =>{
 	var id = req.body.id;
 
 	//fetching from minute table
-	connection.query('SELECT minute_by_core_id,minute_objective,minute_date,minute_time,creator, minute_details, CONVERT(minute_work USING utf8) as minute_work FROM core_minute_manager order by minute_date desc',function(error,result){
+	connection.query('SELECT minute_by_core_id,minute_objective,minute_date,minute_time,creator, minute_details,core_ab_mem_name, CONVERT(minute_work USING utf8) as minute_work FROM core_minute_manager order by minute_date desc',function(error,result){
 		if (error){
 			//console.log("Error");
 			res.sendStatus(400);
@@ -97,7 +99,7 @@ router.post('/viewminute',(req,res)=>{
 	var time = req.body.time;
 
 	//fetching from minute table
-	connection.query('SELECT minute_by_core_id,minute_objective,minute_date,minute_time,creator, CONVERT(minute_details USING utf8) as minute_details, CONVERT(minute_work USING utf8) as minute_work FROM core_minute_manager WHERE minute_date=? and minute_time=?;',[date,time],function(error,result){
+	connection.query('SELECT minute_by_core_id,minute_objective,minute_date,minute_time,creator, CONVERT(minute_details USING utf8) as minute_details, core_ab_mem_name, CONVERT(minute_work USING utf8) as minute_work FROM core_minute_manager WHERE minute_date=? and minute_time=?;',[date,time],function(error,result){
 		if (error){
 			//console.log("Error");
 			res.sendStatus(400);
@@ -108,5 +110,22 @@ router.post('/viewminute',(req,res)=>{
 		}
 	});
 });	
+
+router.get('/members', (req, res) => {
+    // var date = req.body.date;
+
+    connection.query('SELECT core_en_fname FROM core_details where(core_en_fname!="Nilesh" && core_en_fname!="Prasad")', function(error, results) {
+        if (error) {
+            console.log("Fail to view core member names");
+            res.sendStatus(400);
+        } else {
+            for (var i = 0; i < results.length; i++) {
+                results[i] = results[i].core_en_fname;
+            }
+            console.log("Successfully viewed core member names");
+            res.status(200).send({ "members": results });
+        }
+    });
+});
 
 module.exports = router;

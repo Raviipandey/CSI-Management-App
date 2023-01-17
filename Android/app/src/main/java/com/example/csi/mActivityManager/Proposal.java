@@ -46,11 +46,19 @@ public class Proposal extends AppCompatActivity {
     String date = null;
     String edate = null;
     EditText description;
+    String selectedoption;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proposal);
 
+
+        Spinner threetrackspinner;
+        threetrackspinner = findViewById(R.id.threetrackspinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        R.array.threetrackarray, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        threetrackspinner.setAdapter(adapter);
         description = findViewById(R.id.pdescription);
         description.setMaxLines(5);
         description.setVerticalScrollBarEnabled(true);
@@ -115,6 +123,20 @@ public class Proposal extends AppCompatActivity {
                     addF.setVisibility(View.GONE);
                     // done.setVisibility(View.VISIBLE);
                 }
+            }
+        });
+        threetrackspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // store the selected option as text
+//                String selectedOption = parent.getItemAtPosition(position).toString();
+                selectedoption = parent.getItemAtPosition(position).toString();
+                Log.i("spinner ka input" , selectedoption);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // do nothing
             }
         });
     }
@@ -194,7 +216,7 @@ public class Proposal extends AppCompatActivity {
 
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.i("info123", "eroor in extractingf");
+                Log.i("info123", "error in extracting");
 
             }
         }
@@ -286,6 +308,8 @@ public class Proposal extends AppCompatActivity {
         EditText pguest= findViewById(R.id.guestp);
         String pguests = pguest.getText().toString();
 
+        int total = Integer.valueOf(pcbs) + Integer.valueOf(ppbs) + Integer.valueOf(pguests);
+
 //        21sep
         EditText speaker_e= findViewById(R.id.speaker_p);
         String speaker_s = speaker_e.getText().toString();
@@ -374,41 +398,43 @@ public class Proposal extends AppCompatActivity {
 
             JSONObject jsonobject = new JSONObject();
             try {
-                jsonobject.put("name",pnames);
+                jsonobject.put("proposals_event_name",pnames);
                 preview+="Name : "+pnames;
 //                21sep
 
 
                 preview+="\nSpeaker : "+speaker_s;jsonobject.put("speaker",speaker_s);
 
-                preview+="\nVenue : "+venue_s;jsonobject.put("venue",venue_s);
+                preview+="\nVenue : "+venue_s;jsonobject.put("proposals_venue",venue_s);
 
-                preview+="\nRegistration Fee \n CSI Member : "+csi_s;jsonobject.put("reg_fee_c",csi_s);
+                preview+="\nRegistration Fee \n CSI Member : "+csi_s;jsonobject.put("proposals_reg_fee_csi",csi_s);
 
-                preview+="\nNon-CSI member : "+ncsi_s;jsonobject.put("reg_fee_p",ncsi_s);
+                preview+="\nNon-CSI member : "+ncsi_s;jsonobject.put("proposals_reg_fee_noncsi",ncsi_s);
 
-                preview+="\nWorth Prize : "+prize_s;jsonobject.put("prize",prize_s);
+                preview+="\nWorth Prize : "+prize_s;jsonobject.put("proposals_prize",prize_s);
 
 
-                jsonobject.put("theme",pthemes);
+                jsonobject.put("proposals_event_category",pthemes);
                 preview+="\nTheme : "+pthemes;
-                jsonobject.put("e_date",edate);
+                jsonobject.put("proposals_three_track",selectedoption);
+                preview+="\nTheme : "+pthemes;
+                jsonobject.put("proposals_event_date",edate);
                 preview+="\nEvent date : "+edate;
-                jsonobject.put("description",pdescs);
+                jsonobject.put("proposals_desc",pdescs);
                 preview+="\nDescription : "+pdescs;
                 jsonobject.put("agenda",agendas);
                 preview+="\nAgenda : "+agendas;
-                jsonobject.put("date",date);
-                preview+="\nDate : "+date;
-                jsonobject.put("cb",pcbs);
-                preview+="\nCreative Budget : "+pcbs;
-                jsonobject.put("pb",ppbs);
-                preview+="\nPublicity Budget : "+ppbs;
-                jsonobject.put("gb",pguests);
-                preview+="\nGuests : "+pguests;
-                Log.i("i123",jsonobject.toString());
-                jsonobject.put("ob",jsub);
-                preview+="\nOther Field : "+preSub;
+//                jsonobject.put("date",date);
+//                preview+="\nDate : "+date;
+                jsonobject.put("proposals_total_budget",total);
+                preview+="\nCreative Budget : "+total;
+//                jsonobject.put("pb",ppbs);
+//                preview+="\nPublicity Budget : "+ppbs;
+//                jsonobject.put("gb",pguests);
+//                preview+="\nGuests : "+pguests;
+//                Log.i("i123",jsonobject.toString());
+//                jsonobject.put("ob",jsub);
+//                preview+="\nOther Field : "+preSub;
                 Log.i("i123",jsonobject.toString());
 
                 customDialog(preview,jsonobject);

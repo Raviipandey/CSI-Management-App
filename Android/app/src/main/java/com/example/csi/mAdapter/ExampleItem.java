@@ -9,10 +9,11 @@ public class ExampleItem {
     private String mTime;
     private String mCreator;
     private String mPoints;
+    private String mAbsentee;
     private ArrayList<String> mTask;
     private ArrayList<String> mPerson;
 
-    public ExampleItem(String agenda, String date, String time, String creator, String points, ArrayList<String> task, ArrayList<String> person) {
+    public ExampleItem(String agenda, String date, String time, String creator, String points, String absentee,ArrayList<String> task, ArrayList<String> person) {
 
         mAgenda = agenda;
         mDate = date;
@@ -21,6 +22,7 @@ public class ExampleItem {
         mPoints = points;
         mTask = task;
         mPerson = person;
+        mAbsentee = absentee;
     }
 
     public String getAgenda() {
@@ -43,6 +45,10 @@ public class ExampleItem {
         return mPoints;
     }
 
+    public String getAbsentee() {
+        return mAbsentee;
+    }
+
     public ArrayList<String> getTask() {
         return mTask;
     }
@@ -50,4 +56,5 @@ public class ExampleItem {
     public ArrayList<String> getPerson() {
         return mPerson;
     }
+
 }
