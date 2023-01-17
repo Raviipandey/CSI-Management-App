@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,6 +69,44 @@ public class AddMinute extends AppCompatActivity {
         mAddTask = findViewById(R.id.add_task);
         mCreatePoints = findViewById(R.id.create_points);
         mTask = findViewById(R.id.task);
+
+        RequestQueue mQueue;
+        Spinner spinner;
+
+        mQueue = Volley.newRequestQueue(getApplicationContext());
+        spinner = findViewById(R.id.members);
+//                String url = "http://yourserver.com/data.json";
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/minutes/members";
+        Log.i("queue ke andar aaya" , url);
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("response aaya" , response);
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            JSONArray array = json.getJSONArray("members");
+                            ArrayList<String> list = new ArrayList<>();
+                            for (int i = 0; i < array.length(); i++) {
+                                list.add(array.getString(i));
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, list);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinner.setAdapter(adapter);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                    }
+                });
+
+        mQueue.add(request);
+
 
         mAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +214,7 @@ public class AddMinute extends AppCompatActivity {
 
                 finish();
             }
+
         });
     }
 

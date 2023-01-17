@@ -159,12 +159,21 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/task" />
 
+    <Spinner
+        android:id="@+id/members"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/task" />
+
     <Button
         android:id="@+id/add_task"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="251dp"
         android:layout_height="49dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="80dp"
         android:background="@drawable/ripple_effect"
         android:text="Insert"
         android:textColor="@color/white"

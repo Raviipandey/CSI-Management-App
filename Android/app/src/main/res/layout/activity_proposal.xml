@@ -58,6 +58,7 @@
                     android:textSize="15dp"
                     android:text="THEME"
                     android:textColor="@color/colorPrimary"/>
+
                 <EditText
                     android:id="@+id/ptheme"
                     android:layout_width="match_parent"
@@ -65,7 +66,14 @@
                     android:background="@drawable/buts"
                     android:textColor="@color/colorPrimary"
                     android:paddingLeft="10dp"/>
+
             </LinearLayout>
+
+            <Spinner
+                android:id="@+id/threetrackspinner"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/spinner_border"/>
 
             <LinearLayout
                 android:layout_height="wrap_content"

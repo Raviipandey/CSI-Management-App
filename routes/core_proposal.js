@@ -59,24 +59,28 @@ router.post('/addproposal' , (req , res) => {
 
 //Creating propsal
 router.post('/createproposal', (req, res) => {
-    var name = req.body.name;
-    var theme = req.body.theme;
+    var cpm_id = req.body.cpm_id;
+    var proposals_event_name = req.body.proposals_event_name;
+    var proposals_event_category = req.body.proposals_event_category;
+    var proposals_three_track = req.body.proposals_three_track;
+    var proposals_event_date = req.body.proposals_event_date;
     var speaker = req.body.speaker;
-    var venue = req.body.venue;
-    var reg_fee_c = req.body.reg_fee_c;
-    var reg_fee_p = req.body.reg_fee_p;
-    var prize = req.body.prize;
-    var description = req.body.description;
+    var proposals_venue = req.body.proposals_venue;
+    var proposals_reg_fee_csi = req.body.proposals_reg_fee_csi;
+    var proposals_reg_fee_noncsi = req.body.proposals_reg_fee_noncsi;
+    var proposals_prize = req.body.proposals_prize;
+    var proposals_desc = req.body.proposals_desc;
+    var proposals_total_budget = req.body.proposals_total_budget;
     var agenda = req.body.agenda;
-    var date = req.body.date;
-    var creative_budget = req.body.cb;
-    var publicity_budget = req.body.pb;
-    var guest_budget = req.body.gb;
-    var event_date = req.body.e_date;
-    var others_budget = JSON.stringify(req.body.ob);
-
-    connection.query('INSERT INTO events(eid,name,theme,description,event_date,M_agenda,M_date,creative_budget,publicity_budget,guest_budget,others_budget,p_date,speaker,venue,reg_fee_c,reg_fee_nc,prize) VALUES(?,?,?,?,?,?,?,?,?,?,?,CURDATE(),?,?,?,?,?)', [randomstring.generate(5), name, theme, description, event_date, agenda, date, creative_budget, publicity_budget, guest_budget, others_budget, speaker, venue, reg_fee_c, reg_fee_p, prize], function(error) {
+    // var date = req.body.date;
+    // var creative_budget = req.body.cb;
+    // var publicity_budget = req.body.pb;
+    // var guest_budget = req.body.gb;
+    // var event_date = req.body.e_date;
+    // var others_budget = JSON.stringify(req.body.ob);
+    connection.query('INSERT INTO core_proposals_manager(cpm_id , proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_total_budget ,agenda  ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)', [Math.random(4) ,proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_total_budget ,agenda ], function(error) {
         if (error) {
+            console.log(error)
             console.log("Fail to insert into events table");
             res.sendStatus(400);
         } else {
@@ -86,19 +90,24 @@ router.post('/createproposal', (req, res) => {
     });
 });
 
+
+// cpm_id, proposals_event_name, proposals_event_date, proposals_event_category, proposals_venue, 
+// proposals_three_track, proposals_desc, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, 
+// proposals_prize, proposals_meeting_id, proposals_status, proposals_comment, agenda, speaker
 //search for agenda
 router.post('/viewagenda', (req, res) => {
     var date = req.body.date;
-
-    connection.query('SELECT agenda FROM minute WHERE minute.da_te=?', [date], function(error, results) {
+    console.log(date);
+    connection.query('SELECT minute_objective FROM core_minute_manager where minute_date = ?', [date], function(error, results) {
         if (error) {
             console.log("Fail to view agenda");
             res.sendStatus(400);
         } else {
             for (var i = 0; i < results.length; i++) {
-                results[i] = results[i].agenda;
+                results[i] = results[i].minute_objective;
             }
             console.log("Successfully viewed agenda");
+            console.log(results);
             res.status(200).send({ "agenda": results });
         }
     });
@@ -106,12 +115,13 @@ router.post('/viewagenda', (req, res) => {
 
 //modify status
 router.post('/status', (req, res) => {
-    var eid = req.body.eid;
-    var status = req.body.status;
-    var comment = req.body.comment;
+    var cpm_id = req.body.cpm_id;
+    var status = req.body.proposals_status;
+    var comment = req.body.proposals_comment;
 
-    connection.query('UPDATE events SET status=?,comment=? WHERE eid=?', [status, comment, eid], function(error) {
+    connection.query('UPDATE core_proposals_manager SET proposals_status=?, proposals_comment=? WHERE cpm_id=?', [status, comment, cpm_id], function(error) {
         if (error) {
+            console.log(error);
             console.log("Fail to update status");
             res.sendStatus(400);
         } else {
@@ -180,7 +190,7 @@ router.post('/status', (req, res) => {
 router.post('/viewproposal', (req, res) => {
     var cpm_id = req.body.cpm_id;
     connection.query('SELECT * from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
-        console.log(results)
+        // console.log(results)
         if (error) {
             console.log("Fail to view proposal");
             res.sendStatus(400);
@@ -195,7 +205,7 @@ router.post('/viewproposal', (req, res) => {
 router.get('/viewlistproposal', (req, res) => {
 
     connection.query('SELECT cpm_id, proposals_event_name, proposals_event_category ,proposals_status , proposals_event_date from core_proposals_manager order by proposals_event_date DESC ;', function(error, results) {
-        console.log(results)
+        // console.log(results)
         if (error) {
             console.log("Fail to list proposal");
             res.sendStatus(400);

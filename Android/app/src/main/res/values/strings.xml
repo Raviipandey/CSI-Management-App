@@ -61,4 +61,10 @@
         <item>Shreyash Patil</item>
         <item>Sneha Naphade</item>
     </string-array>
+    <string-array name="threetrackarray">
+        <item>Select Category</item>
+        <item>Academics</item>
+        <item>Aspiration</item>
+        <item>Wellness</item>
+    </string-array>
 </resources>

@@ -119,10 +119,10 @@ public class proposal_desc extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("eid",eid); //actual value shud be id_s
+            jsonObject.put("cpm_id",eid); //actual value shud be id_s
             if(flag.equals("1")){
-                jsonObject.put("status",status);
-                jsonObject.put("comment",comment_e.getText().toString());
+                jsonObject.put("proposals_status",status);
+                jsonObject.put("proposals_comment",comment_e.getText().toString());
 
             }
 

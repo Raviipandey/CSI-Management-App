@@ -72,7 +72,7 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
 //        praposal add button
 
         add_praposal = (Button) findViewById(R.id.praposal_add);
-        if(urole1.equals("Technical Head")) {
+        if(urole1.equals("Tech Head")) {
             add_praposal.setVisibility(View.VISIBLE);
         }
         add_praposal.setOnClickListener(new View.OnClickListener() {

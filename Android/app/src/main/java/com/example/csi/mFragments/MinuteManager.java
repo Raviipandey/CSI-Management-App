@@ -80,7 +80,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
         getActivity().setTitle("Minute Manager");
         Bundle bundle = getArguments();
         UID = this.getArguments().getString("id");
-        //SerachBar
+        //SearchBar
         SearchInput = rootView.findViewById(R.id.search_bar);
         //We are getting User ID from navigation manager to this fragment
 

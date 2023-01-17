@@ -69,7 +69,7 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
         exampleViewHolder.mTextViewTime.setText(extra);
         Log.i("color status",status);
         if(status.equals("1"))
-        {exampleViewHolder.mTextViewE1.setText(AS); exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#3300FF00"));} //light green
+        {exampleViewHolder.mTextViewE1.setText(AS); exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#ffef00"));} //light green
         else if(status.equals("2"))
         {exampleViewHolder.mTextViewE1.setText(AH);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#D900FF00"));} //dark green
         else if(status.equals("-1"))

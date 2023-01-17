@@ -111,10 +111,10 @@ router.post('/viewminute',(req,res)=>{
 	});
 });	
 
-router.post('/core_mem_name', (req, res) => {
+router.get('/members', (req, res) => {
     // var date = req.body.date;
 
-    connection.query('SELECT core_en_fname FROM core_details', function(error, results) {
+    connection.query('SELECT core_en_fname FROM core_details where(core_en_fname!="Nilesh" && core_en_fname!="Prasad")', function(error, results) {
         if (error) {
             console.log("Fail to view core member names");
             res.sendStatus(400);
@@ -123,7 +123,7 @@ router.post('/core_mem_name', (req, res) => {
                 results[i] = results[i].core_en_fname;
             }
             console.log("Successfully viewed core member names");
-            res.status(200).send({ "core_member_name": results });
+            res.status(200).send({ "members": results });
         }
     });
 });
