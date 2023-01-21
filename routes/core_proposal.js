@@ -190,7 +190,7 @@ router.post('/status', (req, res) => {
 router.post('/viewproposal', (req, res) => {
     var cpm_id = req.body.cpm_id;
     connection.query('SELECT * from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
-        // console.log(results)
+        console.log(results)
         if (error) {
             console.log("Fail to view proposal");
             res.sendStatus(400);
@@ -218,17 +218,18 @@ router.get('/viewlistproposal', (req, res) => {
 
 //Edit proposal
 router.post('/editproposal', (req, res) => {
-    var eid = req.body.eid;
-    var name = req.body.name;
-    var theme = req.body.theme;
-    var description = req.body.description;
-    var date = req.body.date;
-    var creative_budget = req.body.cb;
-    var publicity_budget = req.body.pb;
-    var guest_budget = req.body.gb;
+    var cpm_id = req.body.cpm_id;
+    var proposals_event_name = req.body.proposals_event_name;
+    var proposals_event_category = req.body.proposals_event_category;
+    var proposals_desc = req.body.proposals_desc;
+    var proposals_event_date = req.body.proposals_event_date;
+    var proposals_total_budget = req.body.proposals_total_budget;
+    var proposals_reg_fee_csi = req.body.proposals_reg_fee_csi;
+    var proposals_reg_fee_noncsi = req.body.proposals_reg_fee_noncsi;
 
-    connection.query('UPDATE events SET name=?,theme=?,description=?,event_date=?,creative_budget=?,publicity_budget=?,guest_budget=?,status=0 WHERE eid=?', [name, theme, description, date, creative_budget, publicity_budget, guest_budget, eid], function(error) {
+    connection.query('UPDATE core_proposals_manager SET proposals_event_name=?, proposals_event_category=?, proposals_desc=?,proposals_event_date=?,proposals_total_budget=?,proposals_reg_fee_csi=?,proposals_reg_fee_noncsi=?,proposals_status=0 WHERE cpm_id=?', [proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, cpm_id], function(error) {
         if (error) {
+            console.log(error);
             console.log("Fail to edit proposal");
             res.sendStatus(400);
         } else {

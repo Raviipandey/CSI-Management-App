@@ -117,16 +117,16 @@ public class edit_proposal extends AppCompatActivity {
         JSONObject res = new JSONObject(response);
 
 
-        e_name.setText(res.getString("name"));
-        e_theme.setText(res.getString("theme"));
-         date=res.getString("event_date");
+        e_name.setText(res.getString("proposals_event_name"));
+        e_theme.setText(res.getString("proposals_event_category"));
+         date=res.getString("proposals_event_date");
         date = date.substring(0,4) + "-" + date.substring(5,7) + "-" + date.substring(8,10);
         e_edate.setText(date);
         edate_s.setText((String) date);
-        e_desc.setText(res.getString("description"));
-        e_cb.setText(res.getString("creative_budget"));
-        e_pb.setText(res.getString("publicity_budget"));
-        e_gb.setText(res.getString("guest_budget"));
+        e_desc.setText(res.getString("proposals_desc"));
+        e_cb.setText(res.getString("proposals_total_budget"));
+        e_pb.setText(res.getString("proposals_reg_fee_csi"));
+        e_gb.setText(res.getString("proposals_reg_fee_noncsi"));
 
 
     }

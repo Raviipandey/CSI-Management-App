@@ -74,7 +74,7 @@ public class proposal_desc extends AppCompatActivity {
             comment_e.setVisibility(View.VISIBLE);
             comment_t.setVisibility(View.GONE);
         }
-        else if(urole1.equals("Technical Head" ) ){
+        else if(urole1.equals("Tech Head" ) ){
             if((st.equals("0") || st.equals("-1") || st.equals("-2"))){
                 edit.setVisibility(View.VISIBLE);
             }
@@ -109,7 +109,7 @@ public class proposal_desc extends AppCompatActivity {
         edit.setOnClickListener(v -> {
             Intent edit_proposal = new Intent(proposal_desc.this,edit_proposal.class);
             edit_proposal.putExtra("data",extra);
-            edit_proposal.putExtra("eid",eid);
+            edit_proposal.putExtra("cpm_id",eid);
             edit_proposal.putExtra("status" , st);
             startActivity(edit_proposal);
         }
@@ -197,17 +197,17 @@ public class proposal_desc extends AppCompatActivity {
 
         JSONObject res = new JSONObject(response);
 
-        n.setText(res.getString("name"));
-        t.setText(res.getString("theme"));
-        String date=res.getString("event_date");
+        n.setText(res.getString("proposals_event_name"));
+        t.setText(res.getString("proposals_event_category"));
+        String date=res.getString("proposals_event_date");
         date = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
         ed.setText(date);
-        d.setText(res.getString("description"));
-        c.setText(res.getString("creative_budget"));
-        p.setText(res.getString("publicity_budget"));
-        g.setText(res.getString("guest_budget"));
-        comment_t.setText(res.getString("comment"));
-        getSupportActionBar().setTitle(res.getString("name"));
+        d.setText(res.getString("proposals_desc"));
+        c.setText(res.getString("proposals_total_budget"));
+        p.setText(res.getString("proposals_reg_fee_csi"));
+        g.setText(res.getString("proposals_reg_fee_noncsi"));
+        comment_t.setText(res.getString("proposals_comment"));
+        getSupportActionBar().setTitle(res.getString("proposals_event_name"));
 
     }
     @Override
