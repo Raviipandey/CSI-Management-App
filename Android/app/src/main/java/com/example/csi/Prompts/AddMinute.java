@@ -58,10 +58,10 @@ public class AddMinute extends AppCompatActivity {
         server_url=getApplicationContext().getResources().getString(R.string.server_url) + "/minutes/create";  //Main Server URL
         //server_url="http://192.168.43.84:8080/minutes/create";
 
-        spinner = findViewById(R.id.csi_members);
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.csi_members_name, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
+//        spinner = findViewById(R.id.csi_members);
+//        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.csi_members_name, android.R.layout.simple_spinner_item);
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(spinnerAdapter);
         //spinnerAdapter.add("Sanket Deshmukh");
         //spinnerAdapter.add("Afif Shaikh");
         //spinnerAdapter.notifyDataSetChanged();

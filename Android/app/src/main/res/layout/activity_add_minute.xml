@@ -31,8 +31,8 @@
 
     <EditText
         android:id="@+id/absentee"
-        android:layout_width="380dp"
-        android:layout_height="56dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="152dp"
         android:background="@drawable/buts"
         android:focusable="true"
@@ -42,7 +42,7 @@
         android:isScrollContainer="true"
         android:paddingStart="15dp"
         android:paddingLeft="15dp"
-        android:paddingTop="10dp"
+        android:paddingTop="15dp"
         android:paddingRight="15dp"
         android:scrollbarSize="5dp"
         android:scrollbarStyle="insideOverlay"
@@ -135,7 +135,7 @@
         android:id="@+id/task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="112dp"
+        android:layout_marginTop="108dp"
         android:background="@drawable/buts"
         android:focusable="true"
         android:hint="Task"
@@ -151,19 +151,10 @@
         app:layout_constraintTop_toBottomOf="@id/create_points" />
 
     <Spinner
-        android:id="@+id/csi_members"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/task" />
-
-    <Spinner
         android:id="@+id/members"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/task" />
@@ -173,13 +164,13 @@
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="251dp"
         android:layout_height="49dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="76dp"
         android:background="@drawable/ripple_effect"
         android:text="Insert"
         android:textColor="@color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/csi_members" />
+        app:layout_constraintTop_toBottomOf="@+id/members" />
 
     <TableLayout
         android:id="@+id/table"
