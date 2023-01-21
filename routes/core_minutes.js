@@ -25,6 +25,7 @@ connection.connect(function(err) {
 router.post('/create',(req,res)=>{
 	var id=req.body.id;
 	var agenda = req.body.agenda;
+	console.log(agenda);
 	// var s_time = req.query.s_time;
 	// var e_time = req.query.e_time;
 	var points = req.body.points;
