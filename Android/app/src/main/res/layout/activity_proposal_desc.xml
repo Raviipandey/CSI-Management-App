@@ -211,20 +211,22 @@
         android:layout_height="1dp"
         android:layout_margin="0dp"
         android:background="#EDEDED" />
-    <LinearLayout
+
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/white"
         android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Guest Budget"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:layout_width="399dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Guest Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -239,12 +241,45 @@
             android:layout_height="1dp"
             android:layout_margin="0dp"
             android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Total Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tb_pd"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="total budget:"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@color/white"
             android:padding="5dp">
+
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -290,7 +325,8 @@
                 android:layout_marginEnd="20dp"
                 />
         </LinearLayout>
-    <LinearLayout
+
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"

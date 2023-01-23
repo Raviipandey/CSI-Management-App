@@ -194,6 +194,7 @@ public class proposal_desc extends AppCompatActivity {
         TextView c = findViewById(R.id.cb_pd);
         TextView p = findViewById(R.id.pb_pd);
         TextView g = findViewById(R.id.gb_pd);
+        TextView tot = findViewById(R.id.tb_pd);
 
         JSONObject res = new JSONObject(response);
 
@@ -203,9 +204,10 @@ public class proposal_desc extends AppCompatActivity {
         date = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
         ed.setText(date);
         d.setText(res.getString("proposals_desc"));
-        c.setText(res.getString("proposals_total_budget"));
-        p.setText(res.getString("proposals_reg_fee_csi"));
-        g.setText(res.getString("proposals_reg_fee_noncsi"));
+        c.setText(res.getString("proposals_creative_budget"));
+        p.setText(res.getString("proposals_publicity_budget"));
+        g.setText(res.getString("proposals_guest_budget"));
+        tot.setText(res.getString("proposals_total_budget"));
         comment_t.setText(res.getString("proposals_comment"));
         getSupportActionBar().setTitle(res.getString("proposals_event_name"));
 

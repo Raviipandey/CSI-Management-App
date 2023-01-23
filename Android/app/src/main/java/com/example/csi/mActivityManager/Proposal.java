@@ -426,8 +426,18 @@ public class Proposal extends AppCompatActivity {
                 preview+="\nAgenda : "+agendas;
 //                jsonobject.put("date",date);
 //                preview+="\nDate : "+date;
+                jsonobject.put("cb",pcbs);
+                preview+="\nCreative Budget : "+pcbs;
+                jsonobject.put("pb",ppbs);
+                preview+="\nPublicity Budget : "+ppbs;
+                jsonobject.put("gb",pguests);
+                preview+="\nGuests : "+pguests;
+                Log.i("i123",jsonobject.toString());
+                jsonobject.put("ob",jsub);
+                preview+="\nOther Field : "+preSub;
                 jsonobject.put("proposals_total_budget",total);
-                preview+="\nCreative Budget : "+total;
+                preview+="\nTotal Budget : "+total;
+
 //                jsonobject.put("pb",ppbs);
 //                preview+="\nPublicity Budget : "+ppbs;
 //                jsonobject.put("gb",pguests);

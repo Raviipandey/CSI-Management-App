@@ -124,9 +124,10 @@ public class edit_proposal extends AppCompatActivity {
         e_edate.setText(date);
         edate_s.setText((String) date);
         e_desc.setText(res.getString("proposals_desc"));
-        e_cb.setText(res.getString("proposals_total_budget"));
-        e_pb.setText(res.getString("proposals_reg_fee_csi"));
-        e_gb.setText(res.getString("proposals_reg_fee_noncsi"));
+        e_cb.setText(res.getString("proposals_creative_budget"));
+        e_pb.setText(res.getString("proposals_publicity_budget"));
+        e_gb.setText(res.getString("proposals_guest_budget"));
+        Log.i("response" , response);
 
 
     }
@@ -135,14 +136,14 @@ public class edit_proposal extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("eid",eid);
-            jsonObject.put("name",e_name.getText().toString());
-            jsonObject.put("date", date);
-            jsonObject.put("theme",e_theme.getText().toString());
-            jsonObject.put("description", e_desc.getText().toString());
-            jsonObject.put("cb", e_cb.getText().toString());
-            jsonObject.put("pb", e_pb.getText().toString());
-            jsonObject.put("gb", e_gb.getText().toString());
+            jsonObject.put("cpm_id",eid);
+            jsonObject.put("proposals_event_name",e_name.getText().toString());
+            jsonObject.put("proposals_event_date", date);
+            jsonObject.put("proposals_event_category",e_theme.getText().toString());
+            jsonObject.put("proposals_desc", e_desc.getText().toString());
+            jsonObject.put("proposals_creative_budget", e_cb.getText().toString());
+            jsonObject.put("proposals_publicity_budget", e_pb.getText().toString());
+            jsonObject.put("proposals_guest_budget", e_gb.getText().toString());
 
         }
         catch (JSONException e) {

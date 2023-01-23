@@ -31,30 +31,34 @@ var transporter = nodemailer.createTransport({
 });
 
 
-router.post('/addproposal' , (req , res) => {
-    var id = req.query.id;
-    var name = req.query.name;
-    var date = req.query.date;
-    var category = req.query.category;
-    var venue = req.query.venue;
-    var threetrack = req.query.threetrack;
-    var desc = req.query.desc;
-    var budget = req.query.budget;
-    var reg_fee_c = req.query.reg_fee_c;
-    var reg_fee_nc = req.query.reg_fee_nc;
-    var prize = req.query.prize;
+// router.post('/addproposal' , (req , res) => {
+//     var id = req.query.id;
+//     var name = req.query.name;
+//     var date = req.query.date;
+//     var category = req.query.category;
+//     var venue = req.query.venue;
+//     var threetrack = req.query.threetrack;
+//     var desc = req.query.desc;
+//     var budget = req.query.budget;
+//     var reg_fee_c = req.query.reg_fee_c;
+//     var reg_fee_nc = req.query.reg_fee_nc;
+//     var prize = req.query.prize;
+//     var publicity = req.body.pb;
+//     var creative = req.body.cb;
+//     var guest = req.body.gb;
+//     var others = JSON.stringify(req.body.ob);
     
-    connection.query("INSERT INTO core_proposals_manager(cpm_id,proposals_event_name,proposals_event_date,proposals_event_category,proposals_venue,proposals_three_track, proposals_desc,proposals_total_budget,proposals_reg_fee_csi,proposals_reg_fee_noncsi,proposals_prize) VALUES (?,?,?,?,?,?,?,?,?,?,?)" , [id , name , date , category , venue , threetrack , desc , budget , reg_fee_c , reg_fee_nc , prize] , function(error){
-        if (error) {
-            console.log(error)
-            console.log("Failed to add proposal");
-            res.sendStatus(400);
-        } else {
-            console.log("Succesfully added");
-            res.sendStatus(200);
-        }
-    })
-})
+//     connection.query("INSERT INTO core_proposals_manager(cpm_id,proposals_event_name,proposals_event_date,proposals_event_category,proposals_venue,proposals_three_track, proposals_desc,proposals_total_budget,proposals_reg_fee_csi,proposals_reg_fee_noncsi,proposals_prize) VALUES (?,?,?,?,?,?,?,?,?,?,?)" , [id , name , date , category , venue , threetrack , desc , budget , reg_fee_c , reg_fee_nc , prize] , function(error){
+//         if (error) {
+//             console.log(error)
+//             console.log("Failed to add proposal");
+//             res.sendStatus(400);
+//         } else {
+//             console.log("Succesfully added");
+//             res.sendStatus(200);
+//         }
+//     })
+// })
 
 
 //Creating propsal
@@ -71,6 +75,10 @@ router.post('/createproposal', (req, res) => {
     var proposals_prize = req.body.proposals_prize;
     var proposals_desc = req.body.proposals_desc;
     var proposals_total_budget = req.body.proposals_total_budget;
+    var proposals_creative_budget = req.body.cb;
+    var proposals_publicity_budget = req.body.pb;
+    var proposals_guests_budget = req.body.gb;
+    var proposals_others_budget = JSON.stringify(req.body.ob);
     var agenda = req.body.agenda;
     // var date = req.body.date;
     // var creative_budget = req.body.cb;
@@ -78,7 +86,7 @@ router.post('/createproposal', (req, res) => {
     // var guest_budget = req.body.gb;
     // var event_date = req.body.e_date;
     // var others_budget = JSON.stringify(req.body.ob);
-    connection.query('INSERT INTO core_proposals_manager(cpm_id , proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_total_budget ,agenda  ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)', [Math.random(4) ,proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_total_budget ,agenda ], function(error) {
+    connection.query('INSERT INTO core_proposals_manager(cpm_id , proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget, proposals_others_budget, proposals_total_budget ,agenda) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [Math.random(4) ,proposals_event_name , proposals_event_category , proposals_three_track , proposals_event_date, speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc,  proposals_creative_budget , proposals_publicity_budget, proposals_guests_budget,  proposals_others_budget ,proposals_total_budget ,agenda ], function(error) {
         if (error) {
             console.log(error)
             console.log("Fail to insert into events table");
@@ -189,7 +197,7 @@ router.post('/status', (req, res) => {
 //View proposal details
 router.post('/viewproposal', (req, res) => {
     var cpm_id = req.body.cpm_id;
-    connection.query('SELECT * from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
+    connection.query('SELECT proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date,proposals_creative_budget,proposals_publicity_budget,proposals_guest_budget,proposals_total_budget,proposals_comment from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
         console.log(results)
         if (error) {
             console.log("Fail to view proposal");
@@ -223,11 +231,14 @@ router.post('/editproposal', (req, res) => {
     var proposals_event_category = req.body.proposals_event_category;
     var proposals_desc = req.body.proposals_desc;
     var proposals_event_date = req.body.proposals_event_date;
-    var proposals_total_budget = req.body.proposals_total_budget;
-    var proposals_reg_fee_csi = req.body.proposals_reg_fee_csi;
-    var proposals_reg_fee_noncsi = req.body.proposals_reg_fee_noncsi;
+    // var proposals_total_budget = req.body.proposals_total_budget;
+    // var proposals_reg_fee_csi = req.body.proposals_reg_fee_csi;
+    // var proposals_reg_fee_noncsi = req.body.proposals_reg_fee_noncsi;
+    var proposals_creative_budget = req.body.cb;
+    var proposals_publicity_budget = req.body.pb;
+    var proposals_guest_budget = req.body.gb;
 
-    connection.query('UPDATE core_proposals_manager SET proposals_event_name=?, proposals_event_category=?, proposals_desc=?,proposals_event_date=?,proposals_total_budget=?,proposals_reg_fee_csi=?,proposals_reg_fee_noncsi=?,proposals_status=0 WHERE cpm_id=?', [proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, cpm_id], function(error) {
+    connection.query('UPDATE core_proposals_manager SET proposals_event_name=?, proposals_event_category=?, proposals_desc=?,proposals_event_date=?,proposals_creative_budget=?,proposals_publicity_budget=?,proposals_guest_budget=?,proposals_status=0 WHERE cpm_id=?', [proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date, proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget, cpm_id], function(error) {
         if (error) {
             console.log(error);
             console.log("Fail to edit proposal");
