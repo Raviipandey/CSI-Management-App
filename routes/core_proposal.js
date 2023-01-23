@@ -226,25 +226,24 @@ router.get('/viewlistproposal', (req, res) => {
 
 //Edit proposal
 router.post('/editproposal', (req, res) => {
-    var cpm_id = req.body.cpm_id;
-    var proposals_event_name = req.body.proposals_event_name;
-    var proposals_event_category = req.body.proposals_event_category;
-    var proposals_desc = req.body.proposals_desc;
-    var proposals_event_date = req.body.proposals_event_date;
-    // var proposals_total_budget = req.body.proposals_total_budget;
-    // var proposals_reg_fee_csi = req.body.proposals_reg_fee_csi;
-    // var proposals_reg_fee_noncsi = req.body.proposals_reg_fee_noncsi;
-    var proposals_creative_budget = req.body.cb;
-    var proposals_publicity_budget = req.body.pb;
-    var proposals_guest_budget = req.body.gb;
+    
+    var eid = req.body.eid;
+    var name = req.body.name;
+    var theme = req.body.theme;
+    var description = req.body.description;
+    var date = req.body.date;
+    var creative_budget = req.body.cb;
+    var publicity_budget = req.body.pb;
+    var guest_budget = req.body.gb;
 
-    connection.query('UPDATE core_proposals_manager SET proposals_event_name=?, proposals_event_category=?, proposals_desc=?,proposals_event_date=?,proposals_creative_budget=?,proposals_publicity_budget=?,proposals_guest_budget=?,proposals_status=0 WHERE cpm_id=?', [proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date, proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget, cpm_id], function(error) {
+    connection.query('UPDATE core_proposals_manager SET proposals_event_name=?, proposals_event_category=?, proposals_desc=?,proposals_event_date=?,proposals_creative_budget=?,proposals_publicity_budget=?,proposals_guest_budget=?,proposals_status=0 WHERE cpm_id=?;', [name, theme, description, date, creative_budget, publicity_budget, guest_budget, eid], function(error, result) {
         if (error) {
             console.log(error);
             console.log("Fail to edit proposal");
             res.sendStatus(400);
         } else {
             console.log("Succesfully edited proposal");
+            console.log(result);
             res.sendStatus(200);
         }
     });
