@@ -73,7 +73,7 @@ public class Technical_form extends AppCompatActivity {
 
 
         Button edit = findViewById(R.id.updateTech);
-        if(urole1.equals("Technical Head" )){
+        if(urole1.equals("Tech Head" )){
             edit.setVisibility(View.VISIBLE);
 
         }
@@ -96,12 +96,12 @@ public class Technical_form extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                    comments_layout.setVisibility(View.VISIBLE);
-                    question.setEnabled(false);
-                    internet.setEnabled(false);
-                    software.setEnabled(false);
-                    Log.i("volleyABC4985" ,"update text");
-                    volley_send();
+                comments_layout.setVisibility(View.VISIBLE);
+                question.setEnabled(false);
+                internet.setEnabled(false);
+                software.setEnabled(false);
+                Log.i("volleyABC4985" ,"update text");
+                volley_send();
             }
         });
 
@@ -145,40 +145,44 @@ public class Technical_form extends AppCompatActivity {
                     try {
                         JSONObject jsonObject1 = new JSONObject(response);
                         // Log.i("tracking uid","main Activity "+UID);
-                        name.setText(jsonObject1.getString("name"));
-                        theme.setText(jsonObject1.getString("theme"));
+                        name.setText(jsonObject1.getString("proposals_event_name"));
+                        theme.setText(jsonObject1.getString("proposals_event_category"));
                         speaker.setText(jsonObject1.getString("speaker"));
-                        csi_f.setText(jsonObject1.getString("reg_fee_c"));
-                        ncsi_f.setText(jsonObject1.getString("reg_fee_nc"));
-                        worth_prize.setText(jsonObject1.getString("prize"));
-                        description.setText(jsonObject1.getString("description"));
+                        csi_f.setText(jsonObject1.getString("proposals_reg_fee_csi"));
+                        ncsi_f.setText(jsonObject1.getString("proposals_reg_fee_noncsi"));
+                        worth_prize.setText(jsonObject1.getString("proposals_prize"));
+                        description.setText(jsonObject1.getString("proposals_desc"));
+
+                        cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
+                        pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
+                        guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
+
+                        String eventDate=jsonObject1.getString("proposals_event_date");
+                        if(eventDate!=null)
+                            eventDate = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
+                        e_date.setText(eventDate);
+                        getSupportActionBar().setTitle(jsonObject1.getString("proposals_event_name"));
+                        //Send data to Manager.java starts
+                        // Call manager.java file i.e. Activity with navigation drawer activity
+
+
                         if((int)jsonObject1.get("qs_set")==1){
-                          question.setChecked(true);
+                            question.setChecked(true);
                         }else{
                             question.setChecked(false);
                         }
                         if((int)jsonObject1.get("internet")==1){
-                          internet.setChecked(true);
+                            internet.setChecked(true);
                         }else{
                             internet.setChecked(false);
                         }
                         if((int)jsonObject1.get("software_install")==1){
-                          software.setChecked(true);
+                            software.setChecked(true);
                         }else{
                             software.setChecked(false);
                         }
 
-                        cr_budget.setText(jsonObject1.getString("creative_budget"));
-                        pub_budget.setText(jsonObject1.getString("publicity_budget"));
-                        guest_budget.setText(jsonObject1.getString("guest_budget"));
 
-                        String eventDate=jsonObject1.getString("event_date");
-                        if(eventDate!=null)
-                        eventDate = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
-                        e_date.setText(eventDate);
-                        getSupportActionBar().setTitle(jsonObject1.getString("name"));
-                        //Send data to Manager.java starts
-                        // Call manager.java file i.e. Activity with navigation drawer activity
                     }
                     catch (JSONException e) {
                         e.printStackTrace();
@@ -234,7 +238,7 @@ public class Technical_form extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("eid", eid);
-            jsonObject.put("comment",comments.getText().toString());
+            jsonObject.put("tech_comment",comments.getText().toString());
             if(question.isChecked()){
                 jsonObject.put("qs_set",1);
             }else{

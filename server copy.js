@@ -15,9 +15,9 @@ var profile=require('./routes/core_profile');
 var attendance=require('./routes/attendance');
 var feedback=require("./routes/feedback");
 var proposal=require('./routes/core_proposal');
-var creative=require('./routes/creative');
-var publicity=require('./routes/publicity');
-var technical=require("./routes/technical");
+var creative=require('./routes/core_creative');
+var publicity=require('./routes/core_publicity');
+var technical=require("./routes/core_technical");
 var report=require("./routes/report.js");
 
 app.use('/login',login);

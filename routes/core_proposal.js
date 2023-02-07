@@ -135,51 +135,28 @@ router.post('/status', (req, res) => {
         } else {
             //Mail to Creative-head/PR-head/Tech-head
             if (status == 2) {
-                connection.query("SELECT email,name FROM profile WHERE (role='PR Head' or role='Technical Head' or role='Creative Head')", function(err, result) {
-                    if (err)
-                        console.log("Proposal Email Extraction Error");
-                    else {
-                        for (var i = 0; i < 3; i++) {
-                            var mailOptions = {
-                                from: 'csi.managementapp@gmail.com',
-                                to: result[i].email,
-                                subject: 'CSI-App Event',
-                                html: '<p><span style="font-size: 17px;">Greetings <strong>' + result[i].name + '</strong>,</span></p><p>A new event has been created. Please fill your required details!</p><br><br><br>Regards,<br><strong>CSI-Management APP development team.</strong>'
-                                    //text: "Hello There!!!!! An event has been created pls fill your respective details"
-                            }
-                            transporter.sendMail(mailOptions, function(error, info) {
-                                if (error) {
-                                    console.log("Email Error");
-                                    // res.sendStatus(400);
-                                } else
-                                    console.log('Email sent:' + info.response);
-                            });
-                        }
-
-                        //Creating events into creative/publicity/technical table
-                        connection.query("INSERT INTO creative(eid) VALUES(?)", [eid], function(error) {
+                connection.query("INSERT INTO core_creative_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
+                    if (error) {
+                        console.log("Fail To Insert Into Creative Table");
+                        res.sendStatus(400);
+                    } else {
+                        console.log("Succesfully Inserted Into Creative Table");
+                        connection.query("INSERT INTO core_pr_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
                             if (error) {
-                                console.log("Fail To Insert Into Creative Table");
+                                console.log(error);
+                                console.log("Fail To Insert Into Publicity Table");
                                 res.sendStatus(400);
                             } else {
-                                console.log("Succesfully Inserted Into Creative Table");
-                                connection.query("INSERT INTO publicity(eid) VALUES(?)", [eid], function(error) {
+                                console.log("Succesfully Inserted Into Publicity Table");
+                                connection.query("INSERT INTO core_technical_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
                                     if (error) {
-                                        console.log("Fail To Insert Into Publicity Table");
+                                        console.log("Fail To Insert Into Technical Table");
                                         res.sendStatus(400);
                                     } else {
-                                        console.log("Succesfully Inserted Into Publicity Table");
-                                        connection.query("INSERT INTO technical(eid) VALUES(?)", [eid], function(error) {
-                                            if (error) {
-                                                console.log("Fail To Insert Into Technical Table");
-                                                res.sendStatus(400);
-                                            } else {
-                                                console.log("Succesfully Inserted Into Technical Table");
-                                                res.sendStatus(200);
-                                            }
-
-                                        });
+                                        console.log("Succesfully Inserted Into Technical Table");
+                                        res.sendStatus(200);
                                     }
+
                                 });
                             }
                         });
@@ -193,6 +170,7 @@ router.post('/status', (req, res) => {
         }
     });
 });
+
 
 //View proposal details
 router.post('/viewproposal', (req, res) => {

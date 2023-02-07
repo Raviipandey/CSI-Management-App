@@ -146,33 +146,39 @@ public class Publicity extends AppCompatActivity {
                         JSONObject jsonObject1 = new JSONObject(response);
                         // Log.i("tracking uid","main Activity "+UID);
 
-                        eventName.setText(jsonObject1.getString("name"));
-                        eventTheme.setText(jsonObject1.getString("theme"));
+                        eventName.setText(jsonObject1.getString("proposals_event_name"));
+                        eventTheme.setText(jsonObject1.getString("proposals_event_category"));
 
                         speaker.setText(jsonObject1.getString("speaker"));
-                        venue.setText(jsonObject1.getString("venue"));
-                        fee_csi.setText(jsonObject1.getString("reg_fee_c"));
-                        fee_non_csi.setText(jsonObject1.getString("reg_fee_nc"));
-                        prize.setText(jsonObject1.getString("prize"));
-                        eventDescription.setText(jsonObject1.getString("description"));
-                        if((int) jsonObject1.get("desk")==1)
-                            reg_desk.setChecked(true);
-                        else reg_desk.setChecked(false);
-                        if((int) jsonObject1.get("in_class")==1)
-                            inclass_pub.setChecked(true);
-                        else inclass_pub.setChecked(false);
-                        target_aud.setText(jsonObject1.getString("target"));
-                        comments.setText(jsonObject1.getString("comment"));
-                        money_c.setText(jsonObject1.getString("collected"));
-                        money_s.setText(jsonObject1.getString("spent"));
-                        cr_budget.setText(jsonObject1.getString("creative_budget"));
-                        pub_budget.setText(jsonObject1.getString("publicity_budget"));
-                        guest_budget.setText(jsonObject1.getString("guest_budget"));
+                        venue.setText(jsonObject1.getString("proposals_venue"));
+                        fee_csi.setText(jsonObject1.getString("proposals_reg_fee_csi"));
+                        fee_non_csi.setText(jsonObject1.getString("proposals_reg_fee_noncsi"));
+                        prize.setText(jsonObject1.getString("proposals_prize"));
+                        eventDescription.setText(jsonObject1.getString("proposals_desc"));
 
-                        String eventDate=jsonObject1.getString("event_date");
+                        if((int) jsonObject1.get("pr_desk_publicity")==1) {
+                            reg_desk.setChecked(true);
+                        }
+                        else reg_desk.setChecked(false);
+                        if((int) jsonObject1.get("pr_class_publicity")==1){
+                            inclass_pub.setChecked(true);
+                        }
+                        else inclass_pub.setChecked(false);
+                        
+                        target_aud.setText(jsonObject1.getString("pr_member_count"));
+                        comments.setText(jsonObject1.getString("pr_comment"));
+                        money_c.setText(jsonObject1.getString("pr_rcd_amount"));
+                        money_s.setText(jsonObject1.getString("pr_spent"));
+                        cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
+                        pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
+                        guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
+
+                        String eventDate=jsonObject1.getString("proposals_event_date");
                         String date = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
                         event_date.setText(date);
                         getSupportActionBar().setTitle(jsonObject1.getString("name"));
+
+
                         //Send data to Manager.java starts
                         // Call manager.java file i.e. Activity with navigation drawer activity
                     }
@@ -180,8 +186,6 @@ public class Publicity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
-
             }
         },new Response.ErrorListener()  {
             @Override
@@ -224,23 +228,21 @@ public class Publicity extends AppCompatActivity {
 
     }
     public void volley_send(){
-
-
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("eid", eid);
-            jsonObject.put("target", target_aud.getText().toString());
+            jsonObject.put("pr_member_count", target_aud.getText().toString());
 //            jsonObject.put("in_class", inclass_pub.getText().toString());
-            jsonObject.put("collected", money_c.getText().toString());
-            jsonObject.put("spent", money_s.getText().toString());
-            jsonObject.put("comment",comments.getText().toString());
+            jsonObject.put("pr_rcd_amount", money_c.getText().toString());
+            jsonObject.put("pr_spent", money_s.getText().toString());
+            jsonObject.put("pr_comment",comments.getText().toString());
             if(reg_desk.isChecked())
-                jsonObject.put("desk",1);
-            else jsonObject.put("desk",0);
+                jsonObject.put("pr_desk_publicity",1);
+            else jsonObject.put("pr_desk_publicity",0);
 
             if(inclass_pub.isChecked())
-                jsonObject.put("in_class",1);
-            else jsonObject.put("in_class",0);
+                jsonObject.put("pr_class_publicity",1);
+            else jsonObject.put("pr_class_publicity",0);
 
         }
         catch (JSONException e) {

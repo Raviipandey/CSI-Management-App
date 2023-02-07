@@ -2,7 +2,9 @@ package com.example.csi.mActivityManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -36,6 +38,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.example.csi.Gallery.Activities.DisplayImage;
 import com.example.csi.Gallery.ImageFilePath;
 import com.example.csi.Prompts.MainActivity;
@@ -61,31 +64,40 @@ public class Creative_form extends AppCompatActivity {
 
     String poster_url = "";
     String video_url = "";
+    String file_url = "";
     String uRole;
 
     ImageView imagePreview;
 
     public String mediaType = "Image", eid;
     public String server_url;
+
+    private static final int SELECT_PHOTO = 1;
+    private static final int SELECT_VIDEO = 2;
+    private ImageView uploadedImageView;
+
+
     String name, theme, eventDate, description, creativeBudget, date1;
     String dSpeaker, dVenue, dFeeCSI, dFeeNonCSI, dPrize, dPublicityBudget, dGuestBudget;
 
     TextView eventName, eventTheme, event_date, eventDescription, creative_budget;
     TextView speaker, venue, fee_csi, fee_non_csi, prize, publicity_budget, guest_budget, video_preview;
 
-    Button uploadImage, uploadVideo, submit;
+    Button uploadImage, uploadVideo, submit , uploadFile;
     Uri selectedImage;
     OkHttpClient client;
     RequestBody request_body;
     ArrayList<RequestBody> images;
     ProgressDialog progress;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/creative/viewpropdetail";
         setContentView(R.layout.activity_creative_form);
-
+        uploadedImageView = findViewById(R.id.uploaded_image_view);
         Log.i("sanket testing", "entered");
         //Toast.makeText(this, "creative form", Toast.LENGTH_SHORT).show();
         eventName = (TextView)findViewById(R.id.name);
@@ -101,12 +113,12 @@ public class Creative_form extends AppCompatActivity {
         publicity_budget = (TextView) findViewById(R.id.pb);
         guest_budget = (TextView) findViewById(R.id.gb);
         video_preview = (TextView) findViewById(R.id.video_preview);
-        imagePreview = (ImageView) findViewById(R.id.image_preview);
+//        imagePreview = (ImageView) findViewById(R.id.image_preview);
 
         Intent intent = getIntent();
         eid = intent.getStringExtra(Creative.EXTRA_EID);
         uRole = intent.getStringExtra("uRole");
-        Log.i("eid",eid);
+        Log.i("cpm_id",eid);
 
         insertSrv();
 
@@ -117,11 +129,14 @@ public class Creative_form extends AppCompatActivity {
         uploadImage = (Button) findViewById(R.id.uploadImage);
         uploadVideo = (Button) findViewById(R.id.uploadVideo);
         submit = (Button) findViewById(R.id.submit_praposal);
+        uploadFile = (Button) findViewById(R.id.upload_button);
 
         if(!uRole.equals("Creative Head")) {
             uploadImage.setVisibility(View.GONE);
             uploadVideo.setVisibility(View.GONE);
             submit.setVisibility(View.GONE);
+            uploadFile.setVisibility(View.GONE);
+
 
             TextView upload_text = findViewById(R.id.upload_text);
             upload_text.setVisibility(View.GONE);
@@ -163,9 +178,9 @@ public class Creative_form extends AppCompatActivity {
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("eid", eid);
-            jsonObject.put("poster", poster_url);
-            jsonObject.put("video", video_url);
+            jsonObject.put("cpm_id", eid);
+            jsonObject.put("creative_url", poster_url);
+            jsonObject.put("creative_url", video_url);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -227,7 +242,7 @@ public class Creative_form extends AppCompatActivity {
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("eid", eid);
+            jsonObject.put("cpm_id", eid);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -243,7 +258,7 @@ public class Creative_form extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
 
-                Log.i("volleyABC4985" ,"got response    "+response);
+                Log.i("volleyABC4985" ,"got response"+response);
                 //Toast.makeText(Creative_form.this, "Logged IN", Toast.LENGTH_SHORT).show();
 
                 Intent manager = new Intent(Creative_form.this, Manager.class);
@@ -251,20 +266,20 @@ public class Creative_form extends AppCompatActivity {
                 try {
                     JSONObject jsonObject1 = new JSONObject(response);
                     // Log.i("tracking uid","main Activity "+UID);
-                    name = jsonObject1.getString("name");
-                    theme = jsonObject1.getString("theme");
-                    eventDate = jsonObject1.getString("event_date");
+                    name = jsonObject1.getString("proposals_event_name");
+                    theme = jsonObject1.getString("proposals_event_category");
+                    eventDate = jsonObject1.getString("proposals_event_date");
                     dSpeaker = jsonObject1.getString("speaker");
-                    dVenue = jsonObject1.getString("venue");
-                    dFeeCSI = jsonObject1.getString("reg_fee_c");
-                    dFeeNonCSI = jsonObject1.getString("reg_fee_nc");
-                    dPrize = jsonObject1.getString("prize");
-                    description = jsonObject1.getString("description");
-                    creativeBudget = jsonObject1.getString("creative_budget");
-                    dPublicityBudget = jsonObject1.getString("publicity_budget");
-                    dGuestBudget = jsonObject1.getString("guest_budget");
-                    poster_url = jsonObject1.getString("poster_link");
-                    video_url = jsonObject1.getString("video_link");
+                    dVenue = jsonObject1.getString("proposals_venue");
+                    dFeeCSI = jsonObject1.getString("proposals_reg_fee_csi");
+                    dFeeNonCSI = jsonObject1.getString("proposals_reg_fee_noncsi");
+                    dPrize = jsonObject1.getString("proposals_prize");
+                    description = jsonObject1.getString("proposals_desc");
+                    creativeBudget = jsonObject1.getString("proposals_creative_budget");
+                    dPublicityBudget = jsonObject1.getString("proposals_publicity_budget");
+                    dGuestBudget = jsonObject1.getString("proposals_guest_budget");
+                    poster_url = jsonObject1.getString("creative_url");
+                    video_url = jsonObject1.getString("creative_url");
                     if(poster_url.equals("")) {
                         imagePreview.setEnabled(false);
                     }
@@ -273,7 +288,7 @@ public class Creative_form extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Intent creative_form = new Intent(Creative_form.this, CreativePosterFull.class);
-                                creative_form.putExtra("poster_url", poster_url);
+                                creative_form.putExtra("creative_url", poster_url);
                                 startActivity(creative_form);
                             }
                         });
@@ -441,10 +456,72 @@ public class Creative_form extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Video"), 1);
 
     }
-
+//    public void uploadFile(View view) {
+//        // show dialog to select photo or video
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Select file type");
+//        builder.setItems(new CharSequence[]{"Photo", "Video"}, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                switch (which) {
+//                    case 0:
+//                        // choose photo
+//                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+//                        photoPickerIntent.setType("image/*");
+//                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+//                        break;
+//                    case 1:
+//                        // choose video
+//                        Intent videoPickerIntent = new Intent(Intent.ACTION_PICK);
+//                        videoPickerIntent.setType("video/*");
+//                        startActivityForResult(videoPickerIntent, SELECT_VIDEO);
+//                        break;
+//                }
+//            }
+//        });
+//        builder.show();
+//    }
+//    private void uploadToServer(Uri fileUri) {
+//        // use Node.js and a library like multer or express-fileupload to handle the file upload
+//        // and then insert the file into the MySQL database
+//    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+//        if (resultCode == RESULT_OK) {
+//            switch (requestCode) {
+//                case SELECT_PHOTO:
+//                    // photo selected, upload to server
+//                    Uri selectedImageUri = data.getData();
+//                    uploadToServer(selectedImageUri);
+//                    break;
+//                case SELECT_VIDEO:
+//                    // video selected, upload to server
+//                    Uri selectedVideoUri = data.getData();
+//                    uploadToServer(selectedVideoUri);
+//                    break;
+//            }
+//        }
+
+//        if (resultCode == RESULT_OK) {
+//            switch (requestCode) {
+//                case SELECT_PHOTO:
+//                    // photo selected, upload to server
+//                    Uri selectedImageUri = data.getData();
+//                    uploadToServer(selectedImageUri);
+//                    // load image into ImageView
+//                    Glide.with(this)
+//                            .load(selectedImageUri)
+//                            .into(uploadedImageView);
+//                    break;
+//                case SELECT_VIDEO:
+//                    // video selected, upload to server
+//                    Uri selectedVideoUri = data.getData();
+//                    uploadToServer(selectedVideoUri);
+//                    break;
+//            }
+//        }
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
 
             progress.setTitle("Uploading");
@@ -606,6 +683,8 @@ public class Creative_form extends AppCompatActivity {
             t.start();
         }
     }
+
+
 
     private String getMimeType(String path) {
 

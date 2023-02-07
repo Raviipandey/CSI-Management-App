@@ -122,12 +122,11 @@ public class publcity_recycler extends AppCompatActivity implements  PraposalAda
                     for(int i=0; i< jsonArray.length(); i++) {
                         JSONObject minutes = jsonArray.getJSONObject(i);
 
-                        eid = minutes.getString("eid");
-                        String date = minutes.getString("event_date");
-                        String Name = minutes.getString("name");
+                        eid = minutes.getString("cpm_id");
+                        String date = minutes.getString("proposals_event_date");
+                        String Name = minutes.getString("proposals_event_name");
 //                        String status = minutes.getString("status");
-                        String theme =minutes.getString("theme");
-                        //String points = minutes.getString("minute");
+                        String theme =minutes.getString("proposals_event_category");
 
                         //in the above variable date we are not getting date in DD:MM:YYYY
                         //so we are creating new variable date1 to get our desire format

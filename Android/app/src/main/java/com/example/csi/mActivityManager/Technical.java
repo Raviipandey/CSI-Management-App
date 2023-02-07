@@ -108,11 +108,11 @@ public class Technical extends AppCompatActivity implements  PraposalAdapter.OnI
                     for(int i=0; i< jsonArray.length(); i++) {
                         JSONObject minutes = jsonArray.getJSONObject(i);
 
-                        String eid = minutes.getString("eid");
-                        String date = minutes.getString("event_date");
-                        String Name = minutes.getString("name");
+                        String eid = minutes.getString("cpm_id");
+                        String date = minutes.getString("proposals_event_date");
+                        String Name = minutes.getString("proposals_event_name");
                         //String status = minutes.getString("status");
-                        String theme =minutes.getString("theme");
+                        String theme =minutes.getString("proposals_event_category");
                         //String points = minutes.getString("minute");
 
                         //in the above variable date we are not getting date in DD:MM:YYYYY
