@@ -175,7 +175,7 @@ router.post('/status', (req, res) => {
 //View proposal details
 router.post('/viewproposal', (req, res) => {
     var cpm_id = req.body.cpm_id;
-    connection.query('SELECT proposals_event_name, proposals_event_category, proposals_desc, proposals_event_date,proposals_creative_budget,proposals_publicity_budget,proposals_guest_budget,proposals_total_budget,proposals_comment from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
+    connection.query('SELECT proposals_event_name, proposals_event_category,proposals_three_track, proposals_desc, proposals_event_date,proposals_creative_budget,proposals_publicity_budget,proposals_guest_budget,proposals_total_budget,proposals_comment from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
         console.log(results)
         if (error) {
             console.log("Fail to view proposal");

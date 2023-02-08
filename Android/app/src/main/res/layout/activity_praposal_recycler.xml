@@ -34,7 +34,6 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
             android:visibility="gone">
-
         </android.support.v7.widget.RecyclerView>
 
         <Button

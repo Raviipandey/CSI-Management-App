@@ -199,6 +199,7 @@ public class proposal_desc extends AppCompatActivity {
         TextView t = findViewById(R.id.theme_pd);
         TextView d = findViewById(R.id.desc_pd);
         TextView ed = findViewById(R.id.ed_pd);
+        TextView threetrack = findViewById(R.id.pd_threetrack);
         TextView c = findViewById(R.id.cb_pd);
         TextView p = findViewById(R.id.pb_pd);
         TextView g = findViewById(R.id.gb_pd);
@@ -211,6 +212,7 @@ public class proposal_desc extends AppCompatActivity {
         String date=res.getString("proposals_event_date");
         date = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
         ed.setText(date);
+        threetrack.setText(res.getString("proposals_three_track"));
         d.setText(res.getString("proposals_desc"));
         c.setText(res.getString("proposals_creative_budget"));
         p.setText(res.getString("proposals_publicity_budget"));
