@@ -62,19 +62,25 @@ public class proposal_desc extends AppCompatActivity {
         get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/viewproposal","0","0");
 
 
-        if(urole1.equals("HOD") && st.equals("1")){
+        if(urole1.equals("HOD") && st.equals("2")){
             ap.setVisibility(View.VISIBLE);
             rej.setVisibility(View.VISIBLE);
             comment_e.setVisibility(View.VISIBLE);
             comment_t.setVisibility(View.GONE);
         }
-        else if(urole1.equals("SBC") && st.equals("0")){
+        else if(urole1.equals("SBC") && st.equals("1")){
             ap.setVisibility(View.VISIBLE);
             rej.setVisibility(View.VISIBLE);
             comment_e.setVisibility(View.VISIBLE);
             comment_t.setVisibility(View.GONE);
         }
-        else if(urole1.equals("Tech Head" ) ){
+        else if(urole1.equals("Chairperson") && st.equals("0")){
+            ap.setVisibility(View.VISIBLE);
+            rej.setVisibility(View.VISIBLE);
+            comment_e.setVisibility(View.VISIBLE);
+            comment_t.setVisibility(View.GONE);
+        }
+        else if(urole1.equals("Tech Head") || urole1.equals("Event Head") ){
             if((st.equals("0") || st.equals("-1") || st.equals("-2"))){
                 edit.setVisibility(View.VISIBLE);
             }
@@ -86,22 +92,24 @@ public class proposal_desc extends AppCompatActivity {
                                   @Override
                                   public void onClick(View v) {
                                       if(urole1.equals("HOD")) {
-                                          customDialog("The Proposal will be Submitted","2");
+                                          customDialog("The Proposal will be Submitted","3");
 
-//                                          //if sbc then 1 if hod 2
+//                                          //if sbc then 2 if hod 3
                                       }
-                                      else if(urole1.equals("SBC")) customDialog("The Proposal will be Forwarded to HOD","1");
-//                                          //if sbc then 1 if hod 2
+                                      else if(urole1.equals("SBC")) customDialog("The Proposal will be Forwarded to HOD","2");
+//                                          //if sbc then 2 if hod 3
+                                      else if(urole1.equals("Chairperson")) customDialog("The Proposal will be Forwarded to SBC","1");
 
                                   }
                               });
 
 
         rej.setOnClickListener(v -> {
-                    if(urole1.equals("HOD")) customDialog("The Proposal will be Removed","-2");
+                    if(urole1.equals("HOD")) customDialog("The Proposal will be Removed","-3");
 //                        //if sbc then 1 if hod 2
-                    else if(urole1.equals("SBC")) customDialog("The Proposal will be Removed","-1");
+                    else if(urole1.equals("SBC")) customDialog("The Proposal will be Removed","-2");
 //                        //if sbc then 1 if hod 2
+                    else if(urole1.equals("Chairperson")) customDialog("The Proposal will be Removed","-1");
 //            finish();
         }
         );

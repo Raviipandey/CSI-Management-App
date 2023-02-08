@@ -148,14 +148,17 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
                             //so we are creating new variable date1 to get our desire format
                            String date1 = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
 
-                            if(urole1.equals("HOD") && (status.equals("1") || status.equals("2"))){ //for hod
+                            if(urole1.equals("HOD") && (status.equals("2") || status.equals("3"))){ //for hod, only sbc approved and self approved will be shown
                                     mPraposalList.add(new PraposalItem(eid,"Date: "+date1, Name, status,"Theme: "+ theme));
 
                             }
-                            else if(urole1.equals("SBC") && (status.equals("1") || status.equals("0")|| status.equals("2"))) {
+                            else if(urole1.equals("SBC") && (status.equals("1") || status.equals("2") || status.equals("3"))) { //for sbc, only chairperson approved, self approved and hod approved will be shown
                                 mPraposalList.add(new PraposalItem(eid,"Date: "+date1, Name, status,"Theme: "+ theme));
                             }
-                            else if(!urole1.equals("HOD") && !urole1.equals("SBC") ) {
+                            else if(urole1.equals("Chairperson") && (status.equals("1") || status.equals("0") || status.equals("2") || status.equals("3"))) { //for chairperson, fresh proposal, sbc approved, self approved and hod approved will be shown
+                                mPraposalList.add(new PraposalItem(eid,"Date: "+date1, Name, status,"Theme: "+ theme));
+                            }
+                            else if(!urole1.equals("HOD") && !urole1.equals("SBC") && !urole1.equals("Chairperson")) {
                                 mPraposalList.add(new PraposalItem(eid,"Date: "+date1, Name, status,"Theme: "+ theme));
                             }
 
