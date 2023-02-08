@@ -71,13 +71,13 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
         exampleViewHolder.mTextViewTime.setText(extra);
         Log.i("color status",status);
         if(status.equals("1"))
-        {exampleViewHolder.mTextViewE1.setText(AC); exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#ffef00"));} //accepted by chairperson
+        {exampleViewHolder.mTextViewE1.setText(AC); exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#CF9FFF"));} //accepted by chairperson
         else if(status.equals("2"))
-        {exampleViewHolder.mTextViewE1.setText(AS);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#D900FF00"));} //accepted by sbc
+        {exampleViewHolder.mTextViewE1.setText(AS);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#FFFF8F"));} //accepted by sbc
         else if(status.equals("3"))
         {exampleViewHolder.mTextViewE1.setText(AH);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#D900FF00"));} //accepted by hod
         else if(status.equals("-1"))
-        {exampleViewHolder.mTextViewE1.setText(RC);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#33FF0000")); }//rejected by chairperson
+        {exampleViewHolder.mTextViewE1.setText(RC);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#FF7F50")); }//rejected by chairperson
         else if(status.equals("-2"))
         {exampleViewHolder.mTextViewE1.setText(RS);exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#D9FF0000"));} //rejected by sbc
         else if(status.equals("-3"))
