@@ -45,6 +45,7 @@ import java.util.List;
 public class Proposal extends AppCompatActivity {
     String date = null;
     String edate = null;
+    String three_track = null;
     EditText description;
     String selectedoption;
     @Override
@@ -131,6 +132,18 @@ public class Proposal extends AppCompatActivity {
                 // store the selected option as text
 //                String selectedOption = parent.getItemAtPosition(position).toString();
                 selectedoption = parent.getItemAtPosition(position).toString();
+                if(selectedoption.equals("Select Category")){
+                    three_track = "";
+                }
+                if(selectedoption.equals("Academics")){
+                    three_track = "1";
+                }
+                if(selectedoption.equals("Aspiration")){
+                    three_track = "2";
+                }
+                if(selectedoption.equals("Wellness")){
+                    three_track = "3";
+                }
                 Log.i("spinner ka input" , selectedoption);
             }
 
@@ -395,7 +408,9 @@ public class Proposal extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }}
-
+            if(three_track == null){
+                {Toast.makeText(Proposal.this,"3 Track cannot be empty",Toast.LENGTH_SHORT).show();}
+            }
             JSONObject jsonobject = new JSONObject();
             try {
                 jsonobject.put("proposals_event_name",pnames);
@@ -413,10 +428,9 @@ public class Proposal extends AppCompatActivity {
 
                 preview+="\nWorth Prize : "+prize_s;jsonobject.put("proposals_prize",prize_s);
 
-
                 jsonobject.put("proposals_event_category",pthemes);
                 preview+="\nTheme : "+pthemes;
-                jsonobject.put("proposals_three_track",selectedoption);
+                jsonobject.put("proposals_three_track",three_track);
                 preview+="\nTheme : "+pthemes;
                 jsonobject.put("proposals_event_date",edate);
                 preview+="\nEvent date : "+edate;

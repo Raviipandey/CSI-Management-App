@@ -212,7 +212,17 @@ public class proposal_desc extends AppCompatActivity {
         String date=res.getString("proposals_event_date");
         date = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
         ed.setText(date);
-        threetrack.setText(res.getString("proposals_three_track"));
+        String num_three_track = res.getString("proposals_three_track");
+        if(num_three_track.equals("1")){
+            threetrack.setText("Academics");
+        }
+        if(num_three_track.equals("2")){
+            threetrack.setText("Aspiration");
+        }
+        if(num_three_track.equals("3")){
+            threetrack.setText("Wellness");
+        }
+//        threetrack.setText(res.getString("proposals_three_track"));
         d.setText(res.getString("proposals_desc"));
         c.setText(res.getString("proposals_creative_budget"));
         p.setText(res.getString("proposals_publicity_budget"));
