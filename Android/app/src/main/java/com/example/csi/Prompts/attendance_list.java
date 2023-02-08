@@ -85,8 +85,8 @@ public class attendance_list extends AppCompatActivity {
                         TableRow tableRow = new TableRow(attendance_list.this);
                         TextView tv1 = new TextView(attendance_list.this);
                         TextView tv2 = new TextView(attendance_list.this);
-                        TextView tv3 = new TextView(attendance_list.this);
-
+                        //     TextView tv3 = new TextView(attendance_list.this);
+                        TextView tv4 = new TextView(attendance_list.this);
                         tv1.setText(students.getString("Name"));
                         tv1.setGravity(Gravity.CENTER);
                         tv1.setBackgroundColor(getResources().getColor(R.color.white));
@@ -99,8 +99,8 @@ public class attendance_list extends AppCompatActivity {
                         );
                         param.setMargins(1, 0, 1, 1);
                         tv1.setLayoutParams(param);
-
-                        tv2.setText(students.getString("total"));
+                        //     tv2.setText(students.getString("total"));
+                        tv2.setText(students.getString("hours_spent"));
                         tv2.setGravity(Gravity.CENTER);
                         tv2.setBackgroundColor(getResources().getColor(R.color.white));
                         tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -113,22 +113,33 @@ public class attendance_list extends AppCompatActivity {
                         param1.setMargins(1, 0, 1, 1);
                         tv2.setLayoutParams(param1);
 
-                        tv3.setText(students.getString("percent"));
-                        tv3.setGravity(Gravity.CENTER);
-                        tv3.setBackgroundColor(getResources().getColor(R.color.white));
-                        tv3.setTextColor(getResources().getColor(R.color.colorPrimary));
+//                        tv3.setText(students.getString("percent"));
+//                        tv3.setGravity(Gravity.CENTER);
+//                        tv3.setBackgroundColor(getResources().getColor(R.color.white));
+//                        tv3.setTextColor(getResources().getColor(R.color.colorPrimary));
+//                        TableRow.LayoutParams param2 = new TableRow.LayoutParams(
+//                                TableRow.LayoutParams.WRAP_CONTENT,
+//                                TableRow.LayoutParams.WRAP_CONTENT,
+//                                1.0f
+//                        );
+//                        param2.setMargins(1, 0, 1, 1);
+//                        tv3.setLayoutParams(param2);
+
+                        tv4.setText(students.getString("Class"));
+                        tv4.setGravity(Gravity.CENTER);
+                        tv4.setBackgroundColor(getResources().getColor(R.color.white));
+                        tv4.setTextColor(getResources().getColor(R.color.colorPrimary));
                         TableRow.LayoutParams param2 = new TableRow.LayoutParams(
                                 TableRow.LayoutParams.WRAP_CONTENT,
                                 TableRow.LayoutParams.WRAP_CONTENT,
                                 1.0f
                         );
                         param2.setMargins(1, 0, 1, 1);
-                        tv3.setLayoutParams(param2);
-
+                        tv4.setLayoutParams(param2);
                         tableRow.addView(tv1);
                         tableRow.addView(tv2);
-                        tableRow.addView(tv3);
-
+                        //    tableRow.addView(tv3);
+                        tableRow.addView(tv4);
                         tableLayout.addView(tableRow);
                     }
                 } catch (JSONException e) {

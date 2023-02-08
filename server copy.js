@@ -12,7 +12,7 @@ app.use(cors());
 var login=require('./routes/core_login');
 var minutes=require('./routes/core_minutes');
 var profile=require('./routes/core_profile');
-var attendance=require('./routes/attendance');
+var attendance=require('./routes/core_attendance');
 var feedback=require("./routes/feedback");
 var proposal=require('./routes/core_proposal');
 var creative=require('./routes/core_creative');
