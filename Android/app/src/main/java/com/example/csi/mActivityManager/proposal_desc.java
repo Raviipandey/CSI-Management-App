@@ -80,7 +80,7 @@ public class proposal_desc extends AppCompatActivity {
             comment_e.setVisibility(View.VISIBLE);
             comment_t.setVisibility(View.GONE);
         }
-        else if(urole1.equals("Tech Head") || urole1.equals("Event Head") ){
+        else if(urole1.equals("Tech Head") || urole1.equals("Event Head") || urole1.equals("Vice Chairperson") ){
             if((st.equals("0") || st.equals("-1") || st.equals("-2"))){
                 edit.setVisibility(View.VISIBLE);
             }
