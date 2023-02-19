@@ -95,7 +95,7 @@
                           //  console.log(data.data.length);
                           for (var count = 0; count < data.data.length; count++) {
 
-                            if (data.data[count].status == 3) {
+                            if (data.data[count].tech_req_status == 3) {
                               status_message = "Checked";
                               color_type = 'chartreuse';
                             }
@@ -138,7 +138,7 @@
                                     <td style="vertical-align: middle; text-align: center;color: black;">`+ internet_message + `</td>
                                     <td style="vertical-align: middle; text-align: center;color: black;">`+ software_message + `</td>
                                     <td style="vertical-align: middle; text-align: center;"> <span class="badge badge-sm" style="background-color:`+ color_type + `; color: black;">` + status_message + `</span></td>
-                                    <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].comment + `</td>
+                                    <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].tech_comment + `</td>
                                   </tr>
                                   `;
                           }

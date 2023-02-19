@@ -60,14 +60,14 @@ module.exports = {
 
     confirmall : (request, response) => {
 
-        connection.query("SELECT * FROM core_proposal_manager where status = 3 ORDER BY cpm_id DESC",function(error,results,fields){
+        connection.query("SELECT * FROM core_proposals_manager where proposals_status = 3 ORDER BY cpm_id DESC",function(error,results,fields){
             if (results.length > 0) {
                     console.log(results);
                         response.json({
                 data:results
             });
             } else {
-                console.log(error)
+                console.log("confirmed error",error)
                 // response.redirect("/error");
             }
             response.end();

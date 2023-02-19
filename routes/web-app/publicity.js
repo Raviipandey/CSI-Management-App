@@ -8,7 +8,7 @@ module.exports = {
     get: (request, response) => {
         var session = request.session;
         var PublicityPath = path.join(__dirname, "..", "..", "views", "pages", "publicity.ejs");
-        if (session.userid != null && (session.userrole == "SBC" || session.userrole == "Admin")) {
+        if (session.userid != null && (session.userrole == 1)) {
             response.render(PublicityPath, {role : session.userrole});
           } else {
             response.redirect('/');

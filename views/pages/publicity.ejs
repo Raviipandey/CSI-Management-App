@@ -90,7 +90,7 @@
                           //  console.log(data.data.length);
                           for (var count = 0; count < data.data.length; count++) {
 
-                            if (data.data[count].status == 3) {
+                            if (data.data[count].pr_status == 3) {
                               status_message = "Checked";
                               color_type = 'chartreuse';
                             }
@@ -100,11 +100,11 @@
                             }
                             html += `
                                     <tr>
-                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].collected + `</td>
-                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].spent + `</td>
-                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].desk + `</td>
-                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].target + `</td>
-                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].comment + `</td>
+                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].pr_rcd_amount + `</td>
+                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].pr_spent + `</td>
+                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].pr_desk_publicity + `</td>
+                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].pr_member_count + `</td>
+                                        <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].pr_comment + `</td>
                                         <td style="vertical-align: middle; text-align: center;"> <span class="badge badge-sm" style="background-color:`+ color_type + `; color: black;">` + status_message + `</span></td>
                                     </tr>
                                     `;
