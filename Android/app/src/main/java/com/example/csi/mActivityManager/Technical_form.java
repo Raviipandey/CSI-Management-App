@@ -1,33 +1,46 @@
 package com.example.csi.mActivityManager;
 
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.csi.Prompts.MainActivity;
 import com.example.csi.Prompts.Manager;
 import com.example.csi.R;
 import com.example.csi.SharedPreferenceConfig;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Technical_form extends AppCompatActivity {
     private String urole1,eid;
@@ -36,6 +49,10 @@ public class Technical_form extends AppCompatActivity {
     CheckBox question , internet , software;
     EditText comments;
     LinearLayout comments_layout;
+    private LinearLayout checkboxContainer;
+    private ArrayList<String> checkboxNames = new ArrayList<>();
+    private List<CheckBox> checkBoxList = new ArrayList<>();
+    private List<CheckBox> checkedboxes = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +61,7 @@ public class Technical_form extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         urole1=preferenceConfig.readRoleStatus();
+//        linearLayout = (LinearLayout) findViewById(R.id.linear_layout);
 
         name =findViewById(R.id.name_tf);
         theme  =findViewById(R.id.theme_tf);
@@ -57,7 +75,7 @@ public class Technical_form extends AppCompatActivity {
         pub_budget=findViewById(R.id.pb);
         guest_budget=findViewById(R.id.gb);
         tech_req = findViewById(R.id.tech_req);
-
+        checkboxContainer = findViewById(R.id.checkbox_container);
         Bundle extras = getIntent().getExtras();
         if(extras == null) {
 
@@ -74,40 +92,75 @@ public class Technical_form extends AppCompatActivity {
 
 
         Button edit = findViewById(R.id.updateTech);
+        Button add_checkbox_button = findViewById(R.id.add_checkbox_button);
         if(urole1.equals("Tech Head" )){
             edit.setVisibility(View.VISIBLE);
-
         }
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                add_checkbox_button.setVisibility(View.VISIBLE);
                 comments_layout.setVisibility(View.VISIBLE);
                 question.setEnabled(true);
                 internet.setEnabled(true);
                 software.setEnabled(true);
                 edit.setVisibility(View.GONE);
+
                 Log.i("volleyABC4985" ,"edit text");
             }
         });
-
 
         Button update = findViewById(R.id.Send_Tech_form);
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 comments_layout.setVisibility(View.VISIBLE);
                 question.setEnabled(false);
                 internet.setEnabled(false);
                 software.setEnabled(false);
-                Log.i("volleyABC4985" ,"update text");
+
+//                StringBuilder checkedCheckboxes = new StringBuilder();
+//                for (int i = 0; i < checkBoxList.size(); i++) {
+//                    View test = checkBoxList.get(i);
+//                    CheckBox testbox = (CheckBox) test;
+//                    if (testbox.isChecked()) {
+//                        checkedCheckboxes.append(testbox.getText().toString() + ",");
+//                    }
+//                    String checkedCheckboxesString = checkedCheckboxes.toString();
+//                    Log.i("stringg" ,checkedCheckboxesString);
+//                }
+                // Create a string array to store the checked checkboxes
+//                ArrayList<String> checkedCheckboxes = new ArrayList<>();
+//
+//// Add the checked checkboxes to the string array
+//                for (int i = 0; i < checkBoxList.size(); i++) {
+//                    View view = checkBoxList.get(i);
+//                    CheckBox checkBox = (CheckBox) view;
+//                    if (checkBox.isChecked()) {
+//                        checkedCheckboxes.add(checkBox.getText().toString());
+//                    }
+//                    Log.i("array" , checkedCheckboxes.toString());
+//                }
+
                 volley_send();
             }
         });
 
 
         volley_get();
+
+
+
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_technical_form);
+
+        Button addCheckboxButton = findViewById(R.id.add_checkbox_button);
+        addCheckboxButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNamePrompt();
+            }
+        });
 
     }
     @Override
@@ -119,6 +172,54 @@ public class Technical_form extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//
+//    }
+    private void showNamePrompt() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Name");
+
+        final View inputView = getLayoutInflater().inflate(R.layout.name_prompt, null);
+        builder.setView(inputView);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String name = ((EditText) inputView.findViewById(R.id.name_edit_text)).getText().toString();
+                if (!TextUtils.isEmpty(name)) {
+                    addCheckbox(name);
+                    Log.i("checkboxx" , name);
+                } else {
+                    Toast.makeText(Technical_form.this, "Name cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        builder.show();
+    }
+
+    public void addCheckbox(String name) {
+//        LinearLayout checkboxContainer;
+
+
+        CheckBox checkBox = new CheckBox(this);
+        checkBox.setText(name);
+        checkboxContainer.addView(checkBox);
+        checkBoxList.add(checkBox);
+
+
+        Log.i("listt",checkBoxList.get(0).getText().toString());
+//        CheckBox checkBox = new CheckBox(this);
+//        checkBox.setText(name);
+//        checkboxContainer.addView(checkBox);
+    }
+
 
     public void volley_get(){
 
@@ -166,6 +267,7 @@ public class Technical_form extends AppCompatActivity {
                         getSupportActionBar().setTitle(jsonObject1.getString("proposals_event_name"));
                         //Send data to Manager.java starts
                         // Call manager.java file i.e. Activity with navigation drawer activity
+
 
 
                         if((int)jsonObject1.get("qs_set")==1){
@@ -235,10 +337,12 @@ public class Technical_form extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void volley_send(){
 
         JSONObject jsonObject = new JSONObject();
         try {
+
             jsonObject.put("eid", eid);
             jsonObject.put("tech_comment",comments.getText().toString());
             if(question.isChecked()){
@@ -264,6 +368,50 @@ public class Technical_form extends AppCompatActivity {
         final String requestBody = jsonObject.toString();
         Log.i("volleyABC ", requestBody);
 
+
+
+        // Create a RequestQueue to handle the API request
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        // Create a string array to store the checked checkboxes
+        ArrayList<String> checkedCheckboxes = new ArrayList<>();
+
+        // Add the checked checkboxes to the string array
+        for (int i = 0; i < checkBoxList.size(); i++) {
+            View view = checkBoxList.get(i);
+            CheckBox checkBox = (CheckBox) view;
+            if (checkBox.isChecked()) {
+                checkedCheckboxes.add(checkBox.getText().toString());
+                Log.i("arrayss" , checkedCheckboxes.toString());
+            }
+        }
+
+        // Create a JSON object to store the data to be sent to the server
+        JSONObject jsonObjectnew = new JSONObject();
+
+        try {
+            // Add the checkedCheckboxes list to the JSON object
+            jsonObjectnew.put("checkedCheckboxes", new JSONArray(checkedCheckboxes));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Create a POST request to the server with the data
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url) + "/technical/addcheckbox", jsonObjectnew,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("Volley Response", response.toString());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("Volley Error", error.toString());
+            }
+        });
+
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST,getApplicationContext().getResources().getString(R.string.server_url) + "/technical/editEvents ", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -275,6 +423,7 @@ public class Technical_form extends AppCompatActivity {
                 Intent manager = new Intent(Technical_form.this, Manager.class);
                 startActivity(manager);
                 finish();
+
 
             }
         },new Response.ErrorListener()  {
@@ -293,7 +442,9 @@ public class Technical_form extends AppCompatActivity {
 //                finish();
 
             }
-        }){
+        })
+
+        {
             //sending JSONOBJECT String to server starts
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -312,8 +463,10 @@ public class Technical_form extends AppCompatActivity {
         };
         //sending JSONOBJECT String to server ends
 
-        RequestQueue requestQueue= Volley.newRequestQueue(this);
+//        RequestQueue requestQueue= Volley.newRequestQueue(this);
         requestQueue.add(stringRequest); // get response from server
+        // Add the request to the RequestQueue
+        requestQueue.add(jsonObjectRequest);
 //        return ret[0];
 
 

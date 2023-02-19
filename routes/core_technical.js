@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
+const bodyParser = require("body-parser");
+const app = express();
+app.use(bodyParser.json());
 
 
 // MySQL Connection
@@ -30,22 +33,51 @@ router.post('/viewEvents', (req, res) =>{
 		}
 		else
 		{
-			console.log(eid);	
-			console.log(results);	
+			// console.log(eid);	
+			// console.log(results);	
 			console.log("Sucessfully viewed Technical events");
 			res.status(200).send(results[0]);	
 		}
 	});
 });
+//Adding checkboxes
 
-//Edit Technical
-router.post('/editEvents',(req,res)=>{
+router.post('/addcheckbox',(req,res)=>{
 	var eid = req.body.eid;
+	console.log(res);
 	var qs_set = req.body.qs_set;	
 	var internet = req.body.internet;	
 	var comment = req.body.comment;
 	var software_install = req.body.software_install;	
+	var checkedCheckboxes = req.body.checkedCheckboxes;
+	lenghtofarray = Object.keys(checkedCheckboxes || {}).length
+	console.log(lenghtofarray);
+	// Store the checkedCheckboxes list in the MySQL database
+	for (let i = 0; i < lenghtofarray; i++) {
+		
+		const checked = 1;
+		const checkbox = checkedCheckboxes[i];
+		
+		connection.query("INSERT INTO technical_tasks (task, status , cpm_id) VALUES (?, ? , ?)", [checkbox, checked , eid], (error, results) => {
+		  if (error) {
+			console.error("Error aa raha hai" , error);
+			res.sendStatus(500);
+			return;
+		  }
+		  else{
+			console.log("Ho gai entryy" ,results);
+		  }
+		});
+	  }
+});
 
+//Edit Technical
+router.post('/editEvents' , (req,res)=>{
+	var eid = req.body.eid;
+	var qs_set = req.body.qs_set;	
+	var internet = req.body.internet;	
+	var comment = req.body.comment;
+	var software_install = req.body.software_install;
 
 	connection.query('UPDATE core_technical_manager SET qs_set=?, internet=?, software_install=?,tech_comment=?,tech_req_status=3 WHERE cpm_id=?',[qs_set, internet,software_install,comment,eid],function(err, result){
 		if(err){
@@ -58,6 +90,24 @@ router.post('/editEvents',(req,res)=>{
 					res.sendStatus(200);
 			}
 		});
+});
+
+
+//Fetching added checkboxes
+
+router.get('/checkboxes', function(req, res) {
+    const status = 1;
+    const sql = 'SELECT task FROM `technical_tasks` WHERE status = 1';
+    connection.query(sql, [status], function(error, results, fields) {
+        if (error) {
+            console.error(error);
+            res.status(500).send('Error retrieving checkboxes');
+        } else {
+			console.log(results);
+            const checkboxes = results.map(result => result.name);
+            res.json(checkboxes);
+        }
+    });
 });
 	
 module.exports = router;
