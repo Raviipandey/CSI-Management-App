@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/cards.css">
+
+    <style>
+        table {
+          width:100%;
+          border:2px solid #4f4f4f;
+          border-collapse:collapse;
+          padding:5px;
+        }
+        table th {
+          border:2px solid #4f4f4f;
+          padding:5px;
+          background: #f0f0f0;
+          color: #313030;
+        }
+        table td {
+          border:2px solid #4f4f4f;
+          text-align:center;
+          padding:5px;
+          background: #ffffff;
+          color: #313030;
+        }
+  
+        details {
+      border: 1px solid rgb(0, 0, 0);
+      padding: .5em .5em 0;
+  }
+  
+  summary {
+      font-weight: bold;
+      margin: -.5em -.5em 0;
+      padding: 1.5em;
+      font-size: 108%;
+  }
+  
+  details[open] {
+      padding: .5em;
+  }
+  
+  details[open] summary {
+      border-bottom: 1px solid rgb(0, 0, 0);
+      margin-bottom: .5em;
+  }
+  
+  a{  
+      color: black;
+      text-decoration:none;
+      
+  }
+      </style>
+    
+</head>
+<body>
+    <div id="project-container" class="project-container">
+        <div id="tabs" class="tabs-container">
+    
+            <div class="tabs">
+                <a id="tab1" data-tab="1" class="tab" style="min-width: fit-content;margin-right: 30px;     background: #6de4ff;
+                color: black;">CSI-Workshops</a>
+            </div>
+    
+            <div class="content">
+                <div id="tabcontent1" data-tab="1" class="tabcontent" style="
+                width: 680px;
+                background: linear-gradient(100deg, #6de4ff, #f9f0f0);" >
+                  <details>
+                      <summary style="color:black">Git & GitHub Workshop</summary>
+                      <p style="color:black">A two-day hands-on workshop for beginners to learn Git & GitHub.<br><br><a href="https://drive.google.com/uc?export=download&id=1NBJRSyKOSGxVVpmQyJq3wzYJHXHL25aN" ><i class="fa-solid fa-cloud-arrow-down"></i> Download report</a></p>
+                  </details>
+                  <details>
+                      <summary style="color:black">Yet to come</summary>
+                      <p style="color:black">Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta, assumenda iste voluptates commodi facere nostrum error cumque porro. Cumque magni impedit totam, incidunt placeat voluptatem minus laboriosam aut tenetur quod!</p>
+                  </details>
+                  <details>
+                      <summary style="color:black">Yet to come</summary>
+                      <p style="color:black">Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque eveniet fuga eius laboriosam aperiam ex impedit praesentium eos quam nisi omnis quasi reprehenderit odio, tenetur ea mollitia dolore illo molestias!</p>
+                  </details>
+                </div>
+            </div>
+    
+        </div>
+      
+        <div class="dark-mode-switch">
+            <label class="switch-label" for="dark-mode-switch"></label>
+            <label class="switch">
+                <input type="checkbox" id="dark-mode-switch">
+                <!-- <span class="slider round"></span> -->
+            </label>
+        </div>
+      
+    </div>
+    
+    
+    
+    
+    
+    <!-- ---------------------- -->
+    
+    <div class="small-screen">
+        <div class="small-screen-content tabcontent">
+            <p>The contents won't be visible at this limit!</p>
+        </div>
+    </div>
+    <script src="../js/cards.js"></script>
+    <script src="https://kit.fontawesome.com/cdb8f414fe.js"></script>
+</body>
+</html>
