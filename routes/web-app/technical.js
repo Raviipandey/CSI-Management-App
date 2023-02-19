@@ -9,7 +9,7 @@ module.exports = {
         var session = request.session;
         var TechnicalPath = path.join(__dirname, "..", "..", "views", "pages", "technical.ejs");
 
-        if (session.userid != null && (session.userrole == "SBC" || session.userrole == "Admin")) {
+        if (session.userid != null && (session.userrole == 1)) {
             response.render(TechnicalPath, {role : session.userrole});
           } else {
             response.redirect('/');
