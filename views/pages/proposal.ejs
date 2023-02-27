@@ -58,7 +58,7 @@
                       <tr style="vertical-align: middle; text-align: center; color: black;">
                         <th>Event Name</th>
                         <th>Theme</th>
-                        <th>Agenda</th>
+                        <th>Description</th>
                         <th>Venue</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -160,7 +160,7 @@
             console.log("fetched");
             var html = '';
             var status_message = '';
-            console.log(data.data[0].name)
+            console.log(data.data[0].proposals_event_name)
 
             if (data.data.length > 0) {
 
@@ -171,20 +171,32 @@
                 // console.log(Buffer.from(desc_data["data"]).toString());
 
 
-                if (data.data[count].status == 0) {
+                if (data.data[count].proposals_status == 0) {
                   status_message = "Approval Pending";
                   color_type = 'yellow';
                 }
-                else if (data.data[count].status == 1) {
-                  status_message = "Approved by SBC";
+                else if (data.data[count].proposals_status == 1) {
+                  status_message = "Approved by Chairperson";
                   color_type = "cyan";
                 }
-                else if (data.data[count].status == 2) {
+                else if (data.data[count].proposals_status == 2) {
+                  status_message = "Approved by SBC";
+                  color_type = 'chartreuse';
+                }
+                else if (data.data[count].proposals_status == 3) {
                   status_message = "Approved by HOD";
                   color_type = 'chartreuse';
                 }
-                else if (data.data[count].status == -1) {
-                  status_message = "Rejected";
+                else if (data.data[count].proposals_status == -1) {
+                  status_message = "Rejected by Chairperson";
+                  color_type = 'red';
+                }
+                else if (data.data[count].proposals_status == -2) {
+                  status_message = "Rejected by SBC";
+                  color_type = 'red';
+                }
+                else if (data.data[count].proposals_status == -3) {
+                  status_message = "Rejected by HOD";
                   color_type = 'red';
                 }
 
@@ -207,13 +219,13 @@
                 html += `
                                   <tr>
                                       
-                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].name + `</td>
-                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].theme + `</td>
-                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].M_agenda + `</td>
-                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].venue + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_name + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_category + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_desc + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_venue + `</td>
                                       
                                       <td style="vertical-align: middle; text-align: center;"> <span class="badge badge-sm" style="background-color:`+ color_type + `; color: black;">` + status_message + `</span></td>
-                                      <td style="vertical-align: middle; text-align: center;"><button type="button" class="btn btn-warning btn-sm edit" data-id="`+ data.data[count].eid + `">View</button></td>
+                                      <td style="vertical-align: middle; text-align: center;"><button type="button" class="btn btn-warning btn-sm edit" data-id="`+ data.data[count].cpm_id + `">View</button></td>
                                   </tr>
                                   `;
               }
@@ -254,18 +266,18 @@
           dataType: "JSON",
           success: function (data) {
             console.log(data);
-            $('#first_name').val(data.name);
-            $('#last_name').val(data.theme);
-            $('#gender').val(data.M_agenda);
-            $('#age').val(data.venue);
+            $('#first_name').val(data.proposals_event_name);
+            $('#last_name').val(data.proposals_event_category);
+            $('#gender').val(data.proposals_desc);
+            $('#age').val(data.proposals_venue);
             // $('#date').val(data.event_date);
             $('#speaker').val(data.speaker);
-            $('#cb').val(data.creative_budget);
-            $('#pb').val(data.publicity_budget);
+            $('#cb').val(data.proposals_creative_budget);
+            $('#pb').val(data.proposals_publicity_budget);
             // $('#tb').val(data.total_budget);
             // $('#rf').val(data.reg_fee_c);
-            $('#prize').val(data.prize);
-            $('#id').val(data.eid);
+            $('#prize').val(data.proposals_prize);
+            $('#id').val(data.cpm_id);
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
             console.log("inside AJAX function: Err");

@@ -43,6 +43,7 @@ module.exports = {
         // WHERE eid = "${id}"`;
         
         connection.query(query, function(error, data){
+            console.log(data[0]);
     
             response.json(data[0]);
     

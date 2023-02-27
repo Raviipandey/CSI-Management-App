@@ -21,7 +21,7 @@ module.exports = {
 
         connection.query("SELECT * FROM core_proposals_manager ORDER BY cpm_id DESC", function (error, results, fields) {
             if (results.length > 0) {
-                console.log(results);
+                // console.log(results);
                 response.json({
                     data: results
                 });
@@ -35,7 +35,7 @@ module.exports = {
     fetchsingle: (request, response) => {
 
         var id = request.query.id;
-        console.log(id);
+        // console.log(id);
         var query = `SELECT * FROM core_proposals_manager WHERE cpm_id = "${id}"`;
 
         connection.query(query, function (error, data) {
@@ -51,7 +51,7 @@ module.exports = {
         // var status = request.query.status;
     //    console.log("test: "+id);
         var query = `UPDATE core_proposals_manager 
-        SET status = 3 
+        SET proposals_status = 3 
         WHERE cpm_id = "${id}"`;
         
         connection.query(query, function(error, data){
@@ -67,10 +67,11 @@ module.exports = {
         // var status = request.query.status;
     //    console.log("test: "+id);
         var query = `UPDATE core_proposals_manager 
-        SET status = -3
+        SET proposals_status = -3
         WHERE cpm_id = "${id}"`;
         
         connection.query(query, function(error, data){
+            console.log(data);
     
             response.json(data);
     
