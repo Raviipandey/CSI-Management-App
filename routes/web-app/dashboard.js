@@ -67,7 +67,7 @@ module.exports = {
                 data:results
             });
             } else {
-                console.log(error)
+                console.log("confirmed error",error)
                 // response.redirect("/error");
             }
             response.end();
