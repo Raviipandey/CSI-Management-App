@@ -480,12 +480,32 @@
             android:orientation="vertical">
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/tasks_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"/>
+
+
         <Button
             android:id="@+id/add_checkbox_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:visibility="gone"
-            android:text="Add Checkbox" />
+            android:text="Add New Task"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="20dp"
+            android:background="@drawable/ripple_effect"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:focusable="true"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

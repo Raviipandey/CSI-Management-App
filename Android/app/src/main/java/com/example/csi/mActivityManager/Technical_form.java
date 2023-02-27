@@ -112,6 +112,7 @@ public class Technical_form extends AppCompatActivity {
 
         Button update = findViewById(R.id.Send_Tech_form);
         update.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 comments_layout.setVisibility(View.VISIBLE);
@@ -235,6 +236,7 @@ public class Technical_form extends AppCompatActivity {
         Log.i("volleyABC ", requestBody);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST,getApplicationContext().getResources().getString(R.string.server_url) + "/technical/viewEvents", new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onResponse(String response) {
 //                ret[0]=response;
@@ -259,6 +261,21 @@ public class Technical_form extends AppCompatActivity {
                         pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
                         guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
                         tech_req.setText(jsonObject1.getString("tech_comment"));
+//                        addCheckbox(jsonObject1.getString("tasks"));
+
+
+                        LinearLayout tasksContainer = findViewById(R.id.tasks_container);
+                        String tasksString = jsonObject1.getString("tasks");
+                        JSONArray tasksArray = new JSONArray(tasksString);
+
+                        for (int i = 0; i < tasksArray.length(); i++) {
+                            String taskName = tasksArray.getString(i);
+                            Log.i("server se aaya array", taskName );
+                            CheckBox checkBox = new CheckBox(getApplicationContext());
+                            checkBox.setText(taskName);
+                            tasksContainer.addView(checkBox);
+                        }
+
 
                         String eventDate=jsonObject1.getString("proposals_event_date");
                         if(eventDate!=null)
@@ -392,6 +409,7 @@ public class Technical_form extends AppCompatActivity {
         try {
             // Add the checkedCheckboxes list to the JSON object
             jsonObjectnew.put("checkedCheckboxes", new JSONArray(checkedCheckboxes));
+            jsonObjectnew.put("eid", eid);
 
         } catch (JSONException e) {
             e.printStackTrace();
