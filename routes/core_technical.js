@@ -51,7 +51,8 @@ router.post('/viewEvents', (req, res) =>{
 
 router.post('/addcheckbox',(req,res)=>{
     var eid = req.body.eid;
-    console.log(eid);
+    var status = req.body.status;
+    console.log(status);
     var qs_set = req.body.qs_set;    
     var internet = req.body.internet;    
     var comment = req.body.comment;
@@ -76,7 +77,7 @@ router.post('/addcheckbox',(req,res)=>{
                     console.log("Checkbox already present");
                     return;
                 } else {
-                    connection.query("INSERT INTO technical_tasks (task, status , cpm_id) VALUES (?, ? , ?)", [checkbox, checked , eid], (error, results) => {
+                    connection.query("INSERT INTO technical_tasks (task, status , cpm_id) VALUES (?, ? , ?)", [checkbox, status , eid], (error, results) => {
                         if (error) {
                             console.error("Error aa raha hai" , error);
                             res.sendStatus(500);

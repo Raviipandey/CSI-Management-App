@@ -394,12 +394,17 @@ public class Technical_form extends AppCompatActivity {
         ArrayList<String> checkedCheckboxes = new ArrayList<>();
 
         // Add the checked checkboxes to the string array
+        String BoxStatus = "";
         for (int i = 0; i < checkBoxList.size(); i++) {
             View view = checkBoxList.get(i);
             CheckBox checkBox = (CheckBox) view;
+            checkedCheckboxes.add(checkBox.getText().toString());
+            Log.i("arrayss" , checkedCheckboxes.toString());
             if (checkBox.isChecked()) {
-                checkedCheckboxes.add(checkBox.getText().toString());
-                Log.i("arrayss" , checkedCheckboxes.toString());
+                BoxStatus = "1";
+            }
+            else{
+                BoxStatus = "0";
             }
         }
 
@@ -410,7 +415,7 @@ public class Technical_form extends AppCompatActivity {
             // Add the checkedCheckboxes list to the JSON object
             jsonObjectnew.put("checkedCheckboxes", new JSONArray(checkedCheckboxes));
             jsonObjectnew.put("eid", eid);
-
+            jsonObjectnew.put("status", BoxStatus);
         } catch (JSONException e) {
             e.printStackTrace();
         }
