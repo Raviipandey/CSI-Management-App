@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Technical_form extends AppCompatActivity {
-    private String urole1,eid;
+    private String urole1,eid , BoxStatus;
     private SharedPreferenceConfig preferenceConfig;
     private TextView name , theme , e_date,speaker,csi_f,ncsi_f,worth_prize , description, cr_budget, pub_budget, guest_budget , tech_req;
     CheckBox question , internet , software;
@@ -53,6 +53,8 @@ public class Technical_form extends AppCompatActivity {
     private ArrayList<String> checkboxNames = new ArrayList<>();
     private List<CheckBox> checkBoxList = new ArrayList<>();
     private List<CheckBox> checkedboxes = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -273,6 +275,9 @@ public class Technical_form extends AppCompatActivity {
                             Log.i("server se aaya array", taskName );
                             CheckBox checkBox = new CheckBox(getApplicationContext());
                             checkBox.setText(taskName);
+                            if(!urole1.equals("Tech Head")){
+                                checkBox.setClickable(false);
+                            }
                             tasksContainer.addView(checkBox);
                         }
 
@@ -393,19 +398,15 @@ public class Technical_form extends AppCompatActivity {
         // Create a string array to store the checked checkboxes
         ArrayList<String> checkedCheckboxes = new ArrayList<>();
 
+        // Create a string array to store the status of checkboxes
+        ArrayList<Integer> checkboxStatus = new ArrayList<>();
+
         // Add the checked checkboxes to the string array
-        String BoxStatus = "";
         for (int i = 0; i < checkBoxList.size(); i++) {
             View view = checkBoxList.get(i);
             CheckBox checkBox = (CheckBox) view;
             checkedCheckboxes.add(checkBox.getText().toString());
             Log.i("arrayss" , checkedCheckboxes.toString());
-            if (checkBox.isChecked()) {
-                BoxStatus = "1";
-            }
-            else{
-                BoxStatus = "0";
-            }
         }
 
         // Create a JSON object to store the data to be sent to the server
@@ -415,7 +416,7 @@ public class Technical_form extends AppCompatActivity {
             // Add the checkedCheckboxes list to the JSON object
             jsonObjectnew.put("checkedCheckboxes", new JSONArray(checkedCheckboxes));
             jsonObjectnew.put("eid", eid);
-            jsonObjectnew.put("status", BoxStatus);
+            jsonObjectnew.put("checkboxStatus", new JSONArray(checkboxStatus));
         } catch (JSONException e) {
             e.printStackTrace();
         }

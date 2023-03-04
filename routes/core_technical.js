@@ -51,20 +51,19 @@ router.post('/viewEvents', (req, res) =>{
 
 router.post('/addcheckbox',(req,res)=>{
     var eid = req.body.eid;
-    var status = req.body.status;
-    console.log(status);
     var qs_set = req.body.qs_set;    
     var internet = req.body.internet;    
     var comment = req.body.comment;
     var software_install = req.body.software_install;    
     var checkedCheckboxes = req.body.checkedCheckboxes;
+    var checkboxStatus = req.body.checkboxStatus;
     lenghtofarray = Object.keys(checkedCheckboxes || {}).length
-    console.log(lenghtofarray);
     // Store the checkedCheckboxes list in the MySQL database
     for (let i = 0; i < lenghtofarray; i++) {
         
         const checked = 1;
         const checkbox = checkedCheckboxes[i];
+        const boxstatus = checkboxStatus[i];
 
         // Check if the checkbox is already present in the table
         connection.query("SELECT * FROM technical_tasks WHERE task=? AND cpm_id=?", [checkbox, eid], (error, results) => {
@@ -77,7 +76,7 @@ router.post('/addcheckbox',(req,res)=>{
                     console.log("Checkbox already present");
                     return;
                 } else {
-                    connection.query("INSERT INTO technical_tasks (task, status , cpm_id) VALUES (?, ? , ?)", [checkbox, status , eid], (error, results) => {
+                    connection.query("INSERT INTO technical_tasks (task, status , cpm_id) VALUES (?, ? , ?)", [checkbox, boxstatus , eid], (error, results) => {
                         if (error) {
                             console.error("Error aa raha hai" , error);
                             res.sendStatus(500);
