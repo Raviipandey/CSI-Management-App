@@ -102,7 +102,7 @@ public class Publicity extends AppCompatActivity {
 
         if(urole1.equals("PR Head")){
             edit_pr.setVisibility(View.VISIBLE);
-            pub_add_checkbox.setVisibility(View.VISIBLE);
+            pub_add_checkbox.setVisibility(View.GONE);
         }
         else {
             pr_lay.setVisibility(View.VISIBLE);
@@ -120,6 +120,7 @@ public class Publicity extends AppCompatActivity {
             public void onClick(View v) {
 
                 edit_pr.setVisibility(View.GONE);
+                pub_add_checkbox.setVisibility(View.VISIBLE);
                 pr_lay.setVisibility(View.VISIBLE);
             }
         });
