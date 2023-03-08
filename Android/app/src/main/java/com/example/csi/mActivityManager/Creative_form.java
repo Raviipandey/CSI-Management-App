@@ -2,19 +2,20 @@ package com.example.csi.mActivityManager;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -28,8 +29,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,7 +41,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.example.csi.Gallery.Activities.DisplayImage;
 import com.example.csi.Gallery.ImageFilePath;
 import com.example.csi.Prompts.MainActivity;
@@ -50,8 +52,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -64,26 +70,25 @@ public class Creative_form extends AppCompatActivity {
 
     String poster_url = "";
     String video_url = "";
-    String file_url = "";
     String uRole;
+    private static final int REQUEST_CODE_FILE_PICKER = 1;
+    private static final int REQUEST_IMAGE = 1;
+    private static final int REQUEST_VIDEO = 1;
 
+    private File mSelectedFile;
+//    private String filePath;
+    private LinearLayout mPreviewLayout;
     ImageView imagePreview;
 
     public String mediaType = "Image", eid;
     public String server_url;
-
-    private static final int SELECT_PHOTO = 1;
-    private static final int SELECT_VIDEO = 2;
-    private ImageView uploadedImageView;
-
-
     String name, theme, eventDate, description, creativeBudget, date1;
     String dSpeaker, dVenue, dFeeCSI, dFeeNonCSI, dPrize, dPublicityBudget, dGuestBudget;
 
     TextView eventName, eventTheme, event_date, eventDescription, creative_budget;
     TextView speaker, venue, fee_csi, fee_non_csi, prize, publicity_budget, guest_budget, video_preview;
 
-    Button uploadImage, uploadVideo, submit , uploadFile;
+    Button uploadImage, uploadVideo, submit;
     Uri selectedImage;
     OkHttpClient client;
     RequestBody request_body;
@@ -91,13 +96,20 @@ public class Creative_form extends AppCompatActivity {
     ProgressDialog progress;
 
 
+    public void onClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(intent, 1);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/creative/viewpropdetail";
         setContentView(R.layout.activity_creative_form);
-        uploadedImageView = findViewById(R.id.uploaded_image_view);
+        mPreviewLayout = findViewById(R.id.preview_layout);
+
         Log.i("sanket testing", "entered");
         //Toast.makeText(this, "creative form", Toast.LENGTH_SHORT).show();
         eventName = (TextView)findViewById(R.id.name);
@@ -113,7 +125,7 @@ public class Creative_form extends AppCompatActivity {
         publicity_budget = (TextView) findViewById(R.id.pb);
         guest_budget = (TextView) findViewById(R.id.gb);
         video_preview = (TextView) findViewById(R.id.video_preview);
-//        imagePreview = (ImageView) findViewById(R.id.image_preview);
+        imagePreview = (ImageView) findViewById(R.id.image_preview);
 
         Intent intent = getIntent();
         eid = intent.getStringExtra(Creative.EXTRA_EID);
@@ -129,14 +141,13 @@ public class Creative_form extends AppCompatActivity {
         uploadImage = (Button) findViewById(R.id.uploadImage);
         uploadVideo = (Button) findViewById(R.id.uploadVideo);
         submit = (Button) findViewById(R.id.submit_praposal);
-        uploadFile = (Button) findViewById(R.id.upload_button);
+
+
 
         if(!uRole.equals("Creative Head")) {
             uploadImage.setVisibility(View.GONE);
             uploadVideo.setVisibility(View.GONE);
             submit.setVisibility(View.GONE);
-            uploadFile.setVisibility(View.GONE);
-
 
             TextView upload_text = findViewById(R.id.upload_text);
             upload_text.setVisibility(View.GONE);
@@ -147,6 +158,18 @@ public class Creative_form extends AppCompatActivity {
             TextView video_text = findViewById(R.id.upload_video_text);
             video_text.setText("Video Url");
         }
+
+
+
+        Button browsefile = findViewById(R.id.browse_file_button);
+        browsefile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBrowseFileButtonClick(view);
+            }
+        });
+
+
 
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,15 +195,27 @@ public class Creative_form extends AppCompatActivity {
                 submitProposal();
             }
         });
+
+
     }
+
+
+
+    public void onBrowseFileButtonClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(Intent.createChooser(intent, "Select file"), REQUEST_CODE_FILE_PICKER);
+    }
+
+
 
     private void submitProposal() {
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("cpm_id", eid);
-            jsonObject.put("creative_url", poster_url);
-            jsonObject.put("creative_url", video_url);
+            jsonObject.put("poster", poster_url);
+            jsonObject.put("video", video_url);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -237,6 +272,8 @@ public class Creative_form extends AppCompatActivity {
         requestQueue.add(stringRequest); // get response from server
     }
 
+
+
     private void insertSrv()
     {
         //creating jsonobject starts
@@ -258,7 +295,7 @@ public class Creative_form extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
 
-                Log.i("volleyABC4985" ,"got response"+response);
+                Log.i("volleyABC4985" ,"got response    "+response);
                 //Toast.makeText(Creative_form.this, "Logged IN", Toast.LENGTH_SHORT).show();
 
                 Intent manager = new Intent(Creative_form.this, Manager.class);
@@ -428,6 +465,14 @@ public class Creative_form extends AppCompatActivity {
         enable_video_button();
     }
 
+
+
+
+
+
+
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == 100 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)){
@@ -456,235 +501,220 @@ public class Creative_form extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Video"), 1);
 
     }
-//    public void uploadFile(View view) {
-//        // show dialog to select photo or video
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Select file type");
-//        builder.setItems(new CharSequence[]{"Photo", "Video"}, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                switch (which) {
-//                    case 0:
-//                        // choose photo
-//                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-//                        photoPickerIntent.setType("image/*");
-//                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-//                        break;
-//                    case 1:
-//                        // choose video
-//                        Intent videoPickerIntent = new Intent(Intent.ACTION_PICK);
-//                        videoPickerIntent.setType("video/*");
-//                        startActivityForResult(videoPickerIntent, SELECT_VIDEO);
-//                        break;
-//                }
-//            }
-//        });
-//        builder.show();
-//    }
-//    private void uploadToServer(Uri fileUri) {
-//        // use Node.js and a library like multer or express-fileupload to handle the file upload
-//        // and then insert the file into the MySQL database
-//    }
-    @Override
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Spinner videoTypeSpinner = findViewById(R.id.video_type_spinner);
+        Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
+        photoTypeSpinner.setVisibility(View.GONE);
+        videoTypeSpinner.setVisibility(View.GONE);
         super.onActivityResult(requestCode, resultCode, data);
+        Uri uri = data.getData();
 
-//        if (resultCode == RESULT_OK) {
-//            switch (requestCode) {
-//                case SELECT_PHOTO:
-//                    // photo selected, upload to server
-//                    Uri selectedImageUri = data.getData();
-//                    uploadToServer(selectedImageUri);
-//                    break;
-//                case SELECT_VIDEO:
-//                    // video selected, upload to server
-//                    Uri selectedVideoUri = data.getData();
-//                    uploadToServer(selectedVideoUri);
-//                    break;
-//            }
-//        }
+        DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+        String displayName = documentFile.getName();
+        String mimeType = documentFile.getType();
 
-//        if (resultCode == RESULT_OK) {
-//            switch (requestCode) {
-//                case SELECT_PHOTO:
-//                    // photo selected, upload to server
-//                    Uri selectedImageUri = data.getData();
-//                    uploadToServer(selectedImageUri);
-//                    // load image into ImageView
-//                    Glide.with(this)
-//                            .load(selectedImageUri)
-//                            .into(uploadedImageView);
-//                    break;
-//                case SELECT_VIDEO:
-//                    // video selected, upload to server
-//                    Uri selectedVideoUri = data.getData();
-//                    uploadToServer(selectedVideoUri);
-//                    break;
-//            }
-//        }
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+        try {
+            InputStream inputStream = this.getContentResolver().openInputStream(documentFile.getUri());
+            File outputFile = new File(this.getCacheDir(), displayName);
+            OutputStream outputStream = new FileOutputStream(outputFile);
 
-            progress.setTitle("Uploading");
-            progress.setMessage("Please wait...");
-            progress.show();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
 
-            Thread t = new Thread(new Runnable() {
+            inputStream.close();
+            outputStream.close();
+
+            String filePath = outputFile.getAbsolutePath();
+            Log.i("uri file path" , filePath);
+
+            if (requestCode == REQUEST_CODE_FILE_PICKER && resultCode == RESULT_OK) {
+                mSelectedFile = new File(filePath);
+//                String mimeType = getContentResolver().getType(uri);
+                if (mimeType != null && mimeType.startsWith("image/")) {
+                    // Photo file selected, hide the second Spinner
+                    photoTypeSpinner.setVisibility(View.VISIBLE);
+                } else if (mimeType != null && mimeType.startsWith("video/")) {
+                    // Video file selected, show the second Spinner
+                    videoTypeSpinner.setVisibility(View.VISIBLE);
+                }
+            }
+
+            Button uploadButton = findViewById(R.id.upload_button);
+            // Set a click listener for the button
+            uploadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void run() {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        if (data.getClipData() != null) {
-
-                            int Count = data.getClipData().getItemCount();
-                            Log.i("Total Count", String.valueOf(Count));
-                            Log.i("data", String.valueOf(data));
-
-                            MultipartBody.Builder buildernew = new MultipartBody.Builder()
-                                    .setType(MultipartBody.FORM);
-
-                            for (int i = 0; i < Count; i++) {
-                                Log.i("checkingLoop", "This is loop " + i);
-                                selectedImage = data.getClipData().getItemAt(i).getUri();
-
-                                Log.i("sanket", String.valueOf(selectedImage));
-
-                                String realPath = ImageFilePath.getPath(Creative_form.this, data.getClipData().getItemAt(i).getUri());
-                                Log.i("finalPathReal", realPath);
-
-                                File f = new File(realPath);
-                                String content_type = getMimeType(realPath);
-                                //String content_type = "image/*";
-                                Log.i("content_type", "CT :- " + content_type);
-
-                                client = new OkHttpClient();
-                                RequestBody file_body;
-                                if(mediaType.equals("image")) {
-                                    file_body = RequestBody.create(MediaType.parse("image/*"), f);
-                                }
-                                else {
-                                    file_body = RequestBody.create(MediaType.parse("video/*"), f);
-                                }
-                                Log.i("file_body", String.valueOf(file_body));
-                                Log.i("file_path substring", realPath.substring(realPath.lastIndexOf("/") + 1));
-
-                                images = new ArrayList<>();
-                                images.add(request_body);
-
-                                buildernew.addFormDataPart("file", realPath.substring(realPath.lastIndexOf("/")), file_body);
-                            }
-
-                            RequestBody requestBody = buildernew.build();
-
-                            request_body = new MultipartBody.Builder()
-                                    .setType(MultipartBody.FORM)
-                                    //.addFormDataPart("type",content_type)
-                                    .addFormDataPart("", images.toString())
-                                    //.addFormDataPart("file", realPath.substring(realPath.lastIndexOf("/") + 1), file_body)
-                                    .build();
-                            Log.i("requesting body", request_body.toString());
-
-                            okhttp3.Request request = new okhttp3.Request.Builder()
-                                    //.url("http://192.168.43.84:8080/pic")
-                                    .url(getApplicationContext().getResources().getString(R.string.server_url) + "/creative/upload")    //Main Server URL)
-                                    //.url("http://192.168.42.156:8080/upload")
-                                    .post(requestBody)
-                                    .build();
-
-                            Log.i("request", String.valueOf(request));
-
-                            try {
-                                okhttp3.Response response = client.newCall(request).execute();
-                                Log.i("response on upload", "Response" + response);
-                                //Toast.makeText(Creative_form.this, "Images Uploaded Succefully", Toast.LENGTH_SHORT).show();
-
-                                if (!response.isSuccessful()) {
-                                    throw new IOException("Error : " + response);
-                                }
-
-                                progress.dismiss();
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                Log.i("MultiPart", "Something went wrong");
-                            }
-                        } else {
-
-                            selectedImage = data.getData();
-
-                            Log.i("sanket", String.valueOf(selectedImage));
-
-                            String realPath = ImageFilePath.getPath(Creative_form.this, data.getData());
-                            Log.i("finalPathReal", realPath);
-
-                            File f = new File(realPath);
-                            String content_type = getMimeType(realPath);
-                            //String content_type = "image/*";
-                            Log.i("content_type2", "CT :- " + content_type);
-
-                            OkHttpClient client = new OkHttpClient.Builder()
-                                    .connectTimeout(100, TimeUnit.SECONDS)
-                                    .writeTimeout(100, TimeUnit.SECONDS)
-                                    .readTimeout(300, TimeUnit.SECONDS)
-                                    .build();
-
-                            RequestBody file_body;
-                            if(mediaType.equals("image")) {
-                                file_body = RequestBody.create(MediaType.parse("image/*"), f);
-                            }
-                            else {
-                                file_body = RequestBody.create(MediaType.parse("video/*"), f);
-                            }
-                            Log.i("file_body", String.valueOf(file_body));
-                            Log.i("file_path substring", realPath.substring(realPath.lastIndexOf("/") + 1));
-
-                            RequestBody request_body = new MultipartBody.Builder()
-                                    .setType(MultipartBody.FORM)
-                                    //.addFormDataPart("type",content_type)
-                                    .addFormDataPart("file", realPath.substring(realPath.lastIndexOf("/") + 1), file_body)
-                                    .build();
-
-                            okhttp3.Request request = new okhttp3.Request.Builder()
-                                    //.url("http://192.168.43.84:8080/pic")
-                                    .url(getApplicationContext().getResources().getString(R.string.server_url) + "/creative/upload")
-                                    //.url("http://192.168.42.156:8080/upload")
-                                    .post(request_body)
-                                    .build();
-
-                            Log.i("request", String.valueOf(request));
-
-                            try {
-                                okhttp3.Response response = client.newCall(request).execute();
-                                Log.i("response", "Response" + response);
-                                //Toast.makeText(Creative_form.this, mediaType + " Uploaded Successfully", Toast.LENGTH_SHORT).show();
-
-                                Log.i("sanket", mediaType);
-                                if (mediaType.equals("Image")) {
-                                    poster_url = "http://tayyabali.in:9091/images/" + realPath.substring(realPath.lastIndexOf("/") + 1);
-                                    loadImageUrl();
-                                } else {
-                                    video_url = "http://tayyabali.in:9091/images/" + realPath.substring(realPath.lastIndexOf("/") + 1);
-                                    loadVideoUrl();
-                                }
-
-                                if (!response.isSuccessful()) {
-                                    throw new IOException("Error : " + response);
-                                }
-
-                                progress.dismiss();
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                Log.i("MultiPart", "Something went wrong", e);
-                            }
-                        }
-                    }
+                public void onClick(View view) {
+                    // Call the uploadFile() function
+                    Log.i("filepath", filePath);
+                    uploadFile(filePath);
                 }
             });
-            t.start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
+
+
+
     }
 
 
+
+    public void uploadFile(String filePath) {
+        Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
+        String fileheader = photoTypeSpinner.getSelectedItem().toString();
+        progress.setTitle("Uploading");
+        progress.setMessage("Please wait...");
+        progress.show();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                File file = new File(filePath);
+//                String content_type = getMimeType(filePath);
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(100, TimeUnit.SECONDS)
+                        .writeTimeout(100, TimeUnit.SECONDS)
+                        .readTimeout(300, TimeUnit.SECONDS)
+                        .build();
+
+                RequestBody file_body;
+                if(mediaType.equals("image")) {
+                    file_body = RequestBody.create(MediaType.parse("image/*"), file);
+                } else {
+                    file_body = RequestBody.create(MediaType.parse("video/*"), file);
+                }
+
+                RequestBody request_body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("eid", eid)
+                        .addFormDataPart("fileheader", fileheader)
+                        .addFormDataPart("file", file.getName(), file_body)
+                        .build();
+
+                okhttp3.Request request = new okhttp3.Request.Builder()
+                        .url(getApplicationContext().getResources().getString(R.string.server_url) + "/creative/upload")    //Main Server URL)
+                        .post(request_body)
+                        .build();
+
+                try {
+                    okhttp3.Response response = client.newCall(request).execute();
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Error : " + response);
+                    }
+                    // Do something with the response
+                    Log.i("response on upload", "Response" + response);
+
+                    progress.dismiss();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.i("MultiPart", "Something went wrong");
+                }
+            }
+        });
+        t.start();
+    }
+
+
+
+
+
+
+
+//    private void uploadFile(File file) throws IOException {
+//        OkHttpClient client = new OkHttpClient();
+//
+//        String filePath = file.getAbsolutePath();
+//        Log.i("file path", filePath);
+//        String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
+//        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+//        MediaType mediaType = MediaType.parse(mimeType);
+//
+//        if (mediaType != null) {
+//            Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
+//            String fileheader = photoTypeSpinner.getSelectedItem().toString();
+//
+//            // Construct new file name
+//            String newFileName = "proposals_event_name_" + fileheader + getFileExtension(file.getName());
+//
+//            RequestBody requestBody = new MultipartBody.Builder()
+//                    .setType(MultipartBody.FORM)
+//                    .addFormDataPart("file", newFileName, RequestBody.create(mediaType, file))
+//                    .build();
+//            okhttp3.Request request = new okhttp3.Request.Builder()
+//                    .url(getResources().getString(R.string.server_url) + "/creative/upload")
+//                    .post(requestBody)
+//                    .build();
+//            okhttp3.Response response = client.newCall(request).execute();
+//            if (!response.isSuccessful()) {
+//                throw new IOException("Unexpected code " + response);
+//            } else {
+//                // Rename file
+//                File renamedFile = new File(file.getParent(), newFileName);
+//                if (file.renameTo(renamedFile)) {
+//                    Log.i("file renamed", renamedFile.getAbsolutePath());
+//                } else {
+//                    Log.e("file not renamed", file.getAbsolutePath());
+//                }
+//            }
+//        }
+//    }
+
+//    public void onUploadButtonClick(View view) {
+//        if (mSelectedFile != null) {
+//            try {
+//                // rename the file based on the selected option in the spinner
+//                Spinner videoTypeSpinner = findViewById(R.id.video_type_spinner);
+//                Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
+//                String fileheader = photoTypeSpinner.getSelectedItem().toString();
+//                Log.i("spinner header" , fileheader);
+//                String fileExtension = getFileExtension(mSelectedFile.getName());
+//                String newFileName = name + fileheader + "." + fileExtension;
+//                File newFile = new File(mSelectedFile.getParent(), newFileName);
+//                mSelectedFile.renameTo(newFile);
+//
+//                // upload the renamed file to the database
+//                uploadFile(newFile);
+//
+////                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+////                        MimeTypeMap.getFileExtensionFromUrl(mSelectedFile.getPath()));
+////                if (mimeType.startsWith("image/")) {
+////                    // handle image file
+////                    ImageView preview = new ImageView(this);
+////                    preview.setImageURI(Uri.fromFile(newFile));
+////                    mPreviewLayout.addView(preview);
+////                } else if (mimeType.startsWith("video/")) {
+////                    // handle video file
+////                    VideoView preview = new VideoView(this);
+////                    preview.setVideoURI(Uri.fromFile(newFile));
+////                    preview.start();
+////                    mPreviewLayout.addView(preview);
+////                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(this, "Please select a file to upload", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+
+
+    private String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+            return fileName.substring(dotIndex + 1);
+        }
+        return "";
+    }
 
     private String getMimeType(String path) {
 

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -98,6 +99,7 @@ public class Technical_form extends AppCompatActivity {
         if(urole1.equals("Tech Head" )){
             edit.setVisibility(View.VISIBLE);
         }
+
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,6 +109,8 @@ public class Technical_form extends AppCompatActivity {
                 internet.setEnabled(true);
                 software.setEnabled(true);
                 edit.setVisibility(View.GONE);
+
+
 
                 Log.i("volleyABC4985" ,"edit text");
             }
@@ -121,29 +125,6 @@ public class Technical_form extends AppCompatActivity {
                 question.setEnabled(false);
                 internet.setEnabled(false);
                 software.setEnabled(false);
-
-//                StringBuilder checkedCheckboxes = new StringBuilder();
-//                for (int i = 0; i < checkBoxList.size(); i++) {
-//                    View test = checkBoxList.get(i);
-//                    CheckBox testbox = (CheckBox) test;
-//                    if (testbox.isChecked()) {
-//                        checkedCheckboxes.append(testbox.getText().toString() + ",");
-//                    }
-//                    String checkedCheckboxesString = checkedCheckboxes.toString();
-//                    Log.i("stringg" ,checkedCheckboxesString);
-//                }
-                // Create a string array to store the checked checkboxes
-//                ArrayList<String> checkedCheckboxes = new ArrayList<>();
-//
-//// Add the checked checkboxes to the string array
-//                for (int i = 0; i < checkBoxList.size(); i++) {
-//                    View view = checkBoxList.get(i);
-//                    CheckBox checkBox = (CheckBox) view;
-//                    if (checkBox.isChecked()) {
-//                        checkedCheckboxes.add(checkBox.getText().toString());
-//                    }
-//                    Log.i("array" , checkedCheckboxes.toString());
-//                }
 
                 volley_send();
             }
@@ -241,6 +222,8 @@ public class Technical_form extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onResponse(String response) {
+
+
 //                ret[0]=response;
                 Log.i("volleyABC4985" ,"got response    "+response);
                 //Toast.makeText(Creative_form.this, "Logged IN", Toast.LENGTH_SHORT).show();
@@ -268,17 +251,46 @@ public class Technical_form extends AppCompatActivity {
 
                         LinearLayout tasksContainer = findViewById(R.id.tasks_container);
                         String tasksString = jsonObject1.getString("tasks");
+                        String statusString = jsonObject1.getString("status");
+
+                        // Split the comma-separated string into an array of individual status values
+                        String[] statusValues = statusString.split(",");
+                        Log.i("status ki values", statusValues[1] );
+
+
+
+
                         JSONArray tasksArray = new JSONArray(tasksString);
+                        JSONArray statusArray = new JSONArray(statusValues);
+//                        Log.i("taskstatussss" , String.valueOf(tasksArray.length()));
 
                         for (int i = 0; i < tasksArray.length(); i++) {
                             String taskName = tasksArray.getString(i);
+                            String taskstatus = statusArray.getString(i);
                             Log.i("server se aaya array", taskName );
                             CheckBox checkBox = new CheckBox(getApplicationContext());
                             checkBox.setText(taskName);
-                            if(!urole1.equals("Tech Head")){
-                                checkBox.setClickable(false);
+                            checkBox.setTextColor(getResources().getColor(R.color.DarkBlue));
+                            checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+
+//                            if(!urole1.equals("Tech Head")){
+//                                checkBox.setClickable(false);
+//                            }
+                            if(urole1.equals("Tech Head")){
+                                checkBox.setEnabled(true);
+                            }
+                            else {
+                                checkBox.setEnabled(false);
+                            }
+                            if(taskstatus.equals("1")){
+                                checkBox.setChecked(true);
+                                Log.i("checked" , taskstatus);
+                            }
+                            else{
+                                checkBox.setChecked(false);
                             }
                             tasksContainer.addView(checkBox);
+
                         }
 
 
@@ -307,6 +319,8 @@ public class Technical_form extends AppCompatActivity {
                         }else{
                             software.setChecked(false);
                         }
+
+
 
 
                     }
@@ -359,6 +373,8 @@ public class Technical_form extends AppCompatActivity {
     }
 
 
+
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void volley_send(){
 
@@ -382,6 +398,8 @@ public class Technical_form extends AppCompatActivity {
             }else{
                 jsonObject.put("software_install",0);
             }
+
+
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -406,8 +424,23 @@ public class Technical_form extends AppCompatActivity {
             View view = checkBoxList.get(i);
             CheckBox checkBox = (CheckBox) view;
             checkedCheckboxes.add(checkBox.getText().toString());
+            if(checkBox.isChecked()){
+                checkboxStatus.add(1);
+//                checkedCheckboxes.add("1");
+            }
+            else{
+                checkboxStatus.add(0);
+//                checkedCheckboxes.add("0");
+//                checkedCheckboxes.add((checkBox.getText()+"0"));
+            }
+
             Log.i("arrayss" , checkedCheckboxes.toString());
         }
+
+
+
+
+
 
         // Create a JSON object to store the data to be sent to the server
         JSONObject jsonObjectnew = new JSONObject();
@@ -417,6 +450,7 @@ public class Technical_form extends AppCompatActivity {
             jsonObjectnew.put("checkedCheckboxes", new JSONArray(checkedCheckboxes));
             jsonObjectnew.put("eid", eid);
             jsonObjectnew.put("checkboxStatus", new JSONArray(checkboxStatus));
+            Log.i("statusarray", String.valueOf(checkboxStatus));
         } catch (JSONException e) {
             e.printStackTrace();
         }

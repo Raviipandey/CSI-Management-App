@@ -2,6 +2,7 @@ var express=require('express');
 var router=express.Router();
 var dotenv = require('dotenv');
 dotenv.config();
+const path = require('path')
 
 //Mysql Connection
 var mysql = require('mysql');
@@ -22,7 +23,7 @@ connection.connect(function(err){
 
 //Listing All events
 router.get('/listcreative',(req,res)=>{
-	connection.query('SELECT cpm_id,proposals_event_name,proposals_event_category,proposals_event_date FROM core_proposals_manager where proposals_status=2',function(err,result){
+	connection.query('SELECT cpm_id,proposals_event_name,proposals_event_category,proposals_event_date FROM core_proposals_manager where proposals_status=3',function(err,result){
 		if(err){
 			console.log(err);
 			console.log("Failed to  List All creative events");
@@ -30,6 +31,7 @@ router.get('/listcreative',(req,res)=>{
 		}
 		else{
 			console.log("Succesfully Listed All creative events");
+			console.log(result);
 			res.status(200).send(result);
 		}
 	});
@@ -48,7 +50,7 @@ router.post('/viewpropdetail',(req,res)=>{
 		}
 		else{
 			console.log("Succesfully viewed creative event detail");
-			console.log(result[0]);
+			console.log(result);
 			res.status(200).send(result[0]);
 		}
 	});
@@ -109,30 +111,52 @@ var multer=require('multer');
 
 // set up file storage
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'creative/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    }
-});
+	destination: (req, file, cb) => {
+	  cb(null, 'creative/');
+	},
+	filename: (req, file, cb) => {
+	  // Fetch data from database and update filename
+	  const eid = req.body.eid; // get event ID from request body
+	  const fileheader = req.body.fileheader;
+	  console.log(fileheader);
+	  connection.query('SELECT proposals_event_name FROM core_proposals_manager WHERE cpm_id = ?', [eid], (err, results) => {
+		if (err) {
+		  console.log(err);
+		  return cb(err);
+		}
+		const proposalName = results[0].proposals_event_name; // get proposal name from database results
+		const filename = `${proposalName}_${fileheader}_${path.extname(file.originalname)}`;
+		cb(null, filename);
+	  });
+	}
+  });
 const upload = multer({ storage });
 
 
 router.post('/upload', upload.single('file'), (req, res) => {
+	const eid = req.body.eid; // get event ID from request body
+	const fileheader = req.body.fileheader;
     const file = req.file;
     const fileUrl = `http://localhost:9000/creative/${file.filename}`;
 
     // insert file information into database
-    const query = `INSERT INTO core_creative_manager (creative_heading, creative_url) VALUES (?, ?)`;
-    connection.query(query, [file.originalname, fileUrl], (err, results) => {
-        if (err) {
-            console.log(err);
-            res.status(500).json({ message: 'Error uploading file' });
-            return;
-        }
-        res.json({ message: 'File uploaded successfully' });
-    });
+	connection.query('SELECT proposals_event_name FROM core_proposals_manager WHERE cpm_id = ?', [eid], (err, results) => {
+		if (err) {
+		  console.log(err);
+		}
+		const proposalName = results[0].proposals_event_name; // get proposal name from database results
+		const filename = `${proposalName}_${fileheader}${path.extname(file.originalname)}`;
+		const query = `INSERT INTO core_creative_manager (creative_heading, creative_url , cpm_id) VALUES (?, ? , ?)`;
+		connection.query(query, [filename, fileUrl , eid], (err, results) => {
+			if (err) {
+				console.log(err);
+				res.status(500).json({ message: 'Error uploading file' });
+				return;
+			}
+			res.json({ message: 'File uploaded successfully' });
+		});
+	  });
+
 });
 
 module.exports=router;

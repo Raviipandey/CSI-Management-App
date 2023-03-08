@@ -67,4 +67,15 @@
         <item>Aspiration</item>
         <item>Wellness</item>
     </string-array>
+    <string-array name="layout_types">
+        <item>Poster</item>
+        <item>Banner</item>
+        <item>Post</item>
+    </string-array>
+
+    <string-array name="video_types">
+        <item>Reel</item>
+        <item>Youtube</item>
+    </string-array>
+
 </resources>

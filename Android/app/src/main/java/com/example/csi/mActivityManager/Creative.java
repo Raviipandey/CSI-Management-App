@@ -127,6 +127,7 @@ public class Creative extends AppCompatActivity implements PraposalAdapter.OnIte
                         JSONObject minutes = jsonArray.getJSONObject(i);
 
                         eid = minutes.getString("cpm_id");
+                        Log.i("creative id" , eid);
                         String date = minutes.getString("proposals_event_date");
                         String Name = minutes.getString("proposals_event_name");
 //                        String status = minutes.getString("status");
