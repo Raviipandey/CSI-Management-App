@@ -49,7 +49,7 @@
                 android:text="Name  "
                 android:textColor="@color/colorAccent"
                 android:textSize="17sp" />
-            </LinearLayout>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -76,8 +76,8 @@
                 android:text="Theme"
                 android:textSize="17sp"
                 android:textColor="@color/colorAccent"
-                    android:id="@+id/theme_pl"/>
-            </LinearLayout>
+                android:id="@+id/theme_pl"/>
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -106,7 +106,7 @@
                 android:textColor="@color/colorAccent"
                 android:text="Event Date "
                 android:id="@+id/ed_pl"/>
-            </LinearLayout>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -134,7 +134,7 @@
                 android:textColor="@color/colorAccent"
                 android:text="Speaker"
                 android:id="@+id/speaker_pl"/>
-            </LinearLayout>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -162,7 +162,7 @@
                 android:textColor="@color/colorAccent"
                 android:text="Venue"
                 android:id="@+id/venue_pl"/>
-            </LinearLayout>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -257,156 +257,47 @@
                 android:textSize="17sp"
                 android:textColor="@color/colorAccent"
                 android:id="@+id/prize_pl"/>
-            </LinearLayout>
+        </LinearLayout>
         <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20sp"
-                android:text="Description"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="@color/colorAccent"/>
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:textSize="17sp"
-                android:textColor="@color/colorAccent"
-                android:text="Description "
-                android:layout_marginBottom="10dp"
-                android:id="@+id/desc_pl"/>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20sp"
+            android:text="Description"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/colorAccent"/>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="40dp"
+            android:textSize="17sp"
+            android:textColor="@color/colorAccent"
+            android:text="Description "
+            android:layout_marginBottom="10dp"
+            android:id="@+id/desc_pl"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="0dp"
-                android:background="#EDEDED" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginVertical="10dp"
-                android:text="BUDGET DETAILS"
-                android:textColor="@color/colorPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"
+            android:text="BUDGET DETAILS"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="0dp"
-                android:background="#EDEDED" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="20sp"
-                    android:text="Creative Budget"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/cb"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="40dp"
-                    android:text="Creative Budget."
-                    android:textColor="@color/colorAccent"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="0dp"
-                android:background="#EDEDED" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#fff"
-                android:orientation="vertical"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="20sp"
-                    android:text="Publicity Budget"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/pb"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="40dp"
-                    android:text="publicity budget "
-                    android:textColor="@color/colorAccent"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="0dp"
-                android:background="#EDEDED" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:orientation="vertical"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="20sp"
-                    android:text="Guest Budget"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/gb"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="40dp"
-                    android:text="guest budget:"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-
-            <Button
-                android:id="@+id/edit_pr_req"
-                android:layout_width="251dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginVertical="20dp"
-                android:background="@drawable/ripple_effect"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="edit"
-                android:visibility="gone"
-                android:textColor="@color/white" />
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -414,7 +305,6 @@
             android:background="#EDEDED" />
 
         <LinearLayout
-            android:id="@+id/pr_pl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
@@ -424,7 +314,192 @@
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:paddingLeft="20sp"
+                android:text="Creative Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Creative Budget."
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Publicity Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="publicity budget "
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Guest Budget"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/gb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="guest budget:"
+                android:textColor="@color/colorAccent"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+
+
+        <Button
+            android:id="@+id/edit_pr_req"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="20dp"
+            android:background="@drawable/ripple_effect"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="edit"
+            android:visibility="gone"
+            android:textColor="@color/white" />
+        <!--        <View-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="1dp"-->
+        <!--            android:layout_margin="0dp"-->
+        <!--            android:background="#EDEDED" />-->
+
+        <LinearLayout
+            android:id="@+id/pr_pl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="10dp"
+                android:text="EXPENSES DOCUMENT"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!--            <RelativeLayout-->
+            <!--                xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--                android:id="@+id/main_layout"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:padding="16dp">-->
+
+            <Button
+                android:id="@+id/select_file_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="Select File" />
+
+            <Button
+                android:id="@+id/download_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_below="@id/select_file_button"
+                android:visibility="invisible"
+                android:text="Download" />
+
+            <!--                <Button-->
+            <!--                    android:id="@+id/download_button_for_others"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_below="@id/select_file_button"-->
+            <!--                    android:text="Download The PDF" />-->
+
+            <!--            </RelativeLayout>-->
+
+
+
+
+
+
+
+            <!--            <Button-->
+            <!--                android:id="@+id/uploadPDF"-->
+            <!--                style="?android:attr/borderlessButtonStyle"-->
+            <!--                android:layout_width="240dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:layout_marginTop="10dp"-->
+            <!--                android:background="@drawable/ripple_effect"-->
+            <!--                android:clickable="true"-->
+            <!--                android:drawableStart="@drawable/ic_insert_photo_black_24dp"-->
+            <!--                android:drawableLeft="@drawable/ic_insert_photo_black_24dp"-->
+            <!--                android:drawablePadding="15dp"-->
+            <!--                android:focusable="true"-->
+            <!--                android:gravity="center_vertical"-->
+            <!--                android:paddingHorizontal="15dp"-->
+            <!--                android:text="Upload PDF Document"-->
+            <!--                android:textColor="@color/white" />-->
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_horizontal"
                 android:text="PR Requirements"

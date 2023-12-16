@@ -185,18 +185,17 @@ public class ProfileEdit extends AppCompatActivity {
     }
 
     private void loadImageUrl(String url) {
-        Picasso.with(getApplicationContext()).load(url).placeholder(R.mipmap.ic_launcher)
+        Picasso.get().load(url).placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
-                .into(imageButton, new com.squareup.picasso.Callback(){
-
+                .into(imageButton, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-
+                        // Handle success
                     }
 
                     @Override
-                    public void onError() {
-
+                    public void onError(Exception e) {
+                        // Handle error
                     }
                 });
 

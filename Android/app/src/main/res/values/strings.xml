@@ -1,8 +1,8 @@
 <resources>
 <!--    <string name="server_url">http://165.232.181.152:9000</string>-->
 <!--    <string name="gallery_url">http://165.232.181.152:9091</string>-->
-    <string name="server_url">http://192.168.0.105:9000</string>
-    <string name="gallery_url">http://192.168.0.103:9091</string>
+    <string name="server_url">http://192.168.1.106:9000</string>
+    <string name="gallery_url">http://192.168.1.106:9091</string>
     <string name="app_name">CSI</string>
     <string name="title_activity_minutes_list">MinutesList</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -73,9 +73,18 @@
         <item>Post</item>
     </string-array>
 
+    <string-array name="content_types">
+        <item>Poster</item>
+        <item>Banner</item>
+        <item>Post</item>
+    </string-array>
+
     <string-array name="video_types">
         <item>Reel</item>
         <item>Youtube</item>
     </string-array>
-
+    <string-array name="emptyspinner">
+        <item></item>
+    </string-array>
+    <string name="add_button">Add</string>
 </resources>

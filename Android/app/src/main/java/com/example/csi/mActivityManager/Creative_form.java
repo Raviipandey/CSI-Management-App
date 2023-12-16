@@ -2,13 +2,18 @@ package com.example.csi.mActivityManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
@@ -16,13 +21,20 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.provider.DocumentFile;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -33,12 +45,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+import android.support.v4.view.ViewPager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.csi.Gallery.Activities.DisplayImage;
@@ -46,8 +60,13 @@ import com.example.csi.Gallery.ImageFilePath;
 import com.example.csi.Prompts.MainActivity;
 import com.example.csi.Prompts.Manager;
 import com.example.csi.R;
+import com.example.csi.mAdapter.MediaPagerAdapter;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.viewpagerindicator.CirclePageIndicator;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -59,6 +78,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -74,11 +94,22 @@ public class Creative_form extends AppCompatActivity {
     private static final int REQUEST_CODE_FILE_PICKER = 1;
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_VIDEO = 1;
+    private Context context;
 
     private File mSelectedFile;
 //    private String filePath;
     private LinearLayout mPreviewLayout;
     ImageView imagePreview;
+    private Button floatingButton;
+    private View newLayout;
+
+    private ViewPager viewPager;
+    private MediaPagerAdapter mediaPagerAdapter;
+    CirclePageIndicator indicator ;
+    private List<String> mediaUrls = new ArrayList<>();
+
+
+
 
     public String mediaType = "Image", eid;
     public String server_url;
@@ -103,12 +134,18 @@ public class Creative_form extends AppCompatActivity {
     }
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/creative/viewpropdetail";
         setContentView(R.layout.activity_creative_form);
         mPreviewLayout = findViewById(R.id.preview_layout);
+
+
+
+
 
         Log.i("sanket testing", "entered");
         //Toast.makeText(this, "creative form", Toast.LENGTH_SHORT).show();
@@ -159,6 +196,21 @@ public class Creative_form extends AppCompatActivity {
             video_text.setText("Video Url");
         }
 
+        viewPager = findViewById(R.id.viewPager);
+        indicator = findViewById(R.id.indicator);
+
+
+
+        List<String> mediaUrls = new ArrayList<>();
+// Add your media URLs here
+//        mediaUrls.add("https://foundations.projectpythia.org/_images/GitHub-logo.png");
+//        mediaUrls.add("http://192.168.1.106:9000/creative/Spark%20AR%20_Banner.jpg");
+//        mediaUrls.add("https://foundations.projectpythia.org/_images/GitHub-logo.png");
+//        mediaUrls.add("http://192.168.1.106:9000/creative/Spark%20AR%20_Poster.mp4");
+
+//        mediaPagerAdapter = new MediaPagerAdapter(this, mediaUrls);
+//        viewPager.setAdapter(mediaPagerAdapter);
+
 
 
         Button browsefile = findViewById(R.id.browse_file_button);
@@ -189,6 +241,8 @@ public class Creative_form extends AppCompatActivity {
             }
         });
 
+//
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,9 +250,157 @@ public class Creative_form extends AppCompatActivity {
             }
         });
 
+        // Make a POST request to fetch media URLs
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/creative/fetch";
+        JSONObject jsonParams = new JSONObject();
+        try {
+            // Replace "your_eid_value" with the actual value for 'eid'
+            jsonParams.put("eid", eid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonParams,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Parse the JSON response and get image URLs
+                        List<String> mediaUrls = parseResponse(response);
+                        Log.i("Media ke urlsss", String.valueOf(mediaUrls));
+
+                        // Set up ViewPager with the fetched media URLs
+                        setupViewPager(mediaUrls);
+
+                        // Set up GestureDetector inside the response listener
+                        GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
+                            @Override
+                            public void onLongPress(MotionEvent e) {
+                                // Handle long press event
+                                int currentItem = viewPager.getCurrentItem();
+                                if (currentItem >= 0 && currentItem < mediaUrls.size()) {
+                                    String videoUrl = mediaUrls.get(currentItem);
+
+                                    // Start the download process
+                                    downloadVideo(videoUrl);
+                                }
+                            }
+                        });
+
+                        viewPager.setOnTouchListener((v, event) -> {
+                            gestureDetector.onTouchEvent(event);
+                            return false;
+                        });
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                    }
+                }
+        );
+
+// Add the request to the Volley request queue
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
 
     }
 
+    private void downloadVideo(String videoUrl) {
+        // Show a toast indicating that the download has started
+        Toast.makeText(this, "Download started", Toast.LENGTH_SHORT).show();
+
+        // Parse the file name from the URL
+        String fileName = getFileNameFromUrl(videoUrl);
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(videoUrl));
+        request.setTitle("Video Download");
+        request.setDescription("Downloading video");
+
+        // Specify the local destination for the downloaded file with the parsed file name
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+        // Get download service and enqueue the request
+        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        downloadManager.enqueue(request);
+    }
+
+    // Helper method to extract file name from the URL
+    private String getFileNameFromUrl(String url) {
+        String[] segments = url.split("/");
+        return segments[segments.length - 1];
+    }
+
+
+
+    private List<String> parseResponse(JSONObject response) {
+//        List<String> mediaUrls = new ArrayList<>();
+
+        try {
+            JSONArray imageUrls = response.getJSONArray("imageUrls");
+            for (int i = 0; i < imageUrls.length(); i++) {
+                String imageUrl = imageUrls.getString(i);
+                mediaUrls.add(imageUrl);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return mediaUrls;
+    }
+
+
+    private void setupViewPager(List<String> mediaUrls) {
+
+        if (mediaUrls.isEmpty()) {
+            // Set default image from local resources if no URLs are available
+            mediaUrls.add(getApplicationContext().getResources().getString(R.string.server_url) + "/creative/default_image.png");
+        }
+
+        mediaPagerAdapter = new MediaPagerAdapter(this, mediaUrls);
+        viewPager.setAdapter(mediaPagerAdapter);
+        indicator.setViewPager(viewPager);
+    }
+
+
+
+
+
+
+
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(getApplicationContext()));
+        LayoutInflater inflater = getActivity(getApplicationContext()).getLayoutInflater();
+        View view = inflater.inflate(R.layout.popup_layout, null);
+        builder.setView(view)
+                .setTitle("Uploaded Files")
+                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+
+        // Initialize RecyclerView
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(getApplicationContext())));
+
+        // Replace this with your list of file names
+        List<String> fileNames = new ArrayList<>();
+        // Populate fileNames with your data
+
+        // Create an instance of your custom adapter and set it to the RecyclerView
+        FileListAdapter adapter = new FileListAdapter(getActivity(getApplicationContext()), fileNames);
+        recyclerView.setAdapter(adapter);
+
+        return builder.create();
+    }
+
+    private Activity getActivity(Context context) {
+        this.context = context;
+        return (Activity) context;
+    }
 
 
     public void onBrowseFileButtonClick(View view) {
@@ -402,18 +604,17 @@ public class Creative_form extends AppCompatActivity {
         uiHandler.post(new Runnable(){
             @Override
             public void run() {
-                Picasso.with(getApplicationContext()).load(poster_url).placeholder(R.mipmap.ic_launcher)
+                Picasso.get().load(poster_url)
+                        .placeholder(R.mipmap.ic_launcher)
                         .error(R.mipmap.ic_launcher)
-                        .into(imagePreview, new com.squareup.picasso.Callback(){
-
+                        .into(imagePreview, new Callback() {
                             @Override
                             public void onSuccess() {
                                 Log.i("response_poster", "SUCCESS");
-
                             }
 
                             @Override
-                            public void onError() {
+                            public void onError(Exception e) {
                                 Log.i("response_poster", "error");
                             }
                         });
@@ -541,33 +742,104 @@ public class Creative_form extends AppCompatActivity {
                     // Video file selected, show the second Spinner
                     videoTypeSpinner.setVisibility(View.VISIBLE);
                 }
+                else {
+                    // mimeType is either null or doesn't match image or video, hide both Spinners
+                    photoTypeSpinner.setVisibility(View.GONE);
+                    videoTypeSpinner.setVisibility(View.GONE);
+                }
             }
 
             Button uploadButton = findViewById(R.id.upload_button);
-            // Set a click listener for the button
             uploadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // Call the uploadFile() function
                     Log.i("filepath", filePath);
-                    uploadFile(filePath);
+                    // Create a Runnable for additional UI updates
+                    Runnable uiUpdateCallback = new Runnable() {
+                        @Override
+                        public void run() {
+                            // Additional UI updates can be performed here
+                        }
+                    };
+                    // Call the uploadFile() function with the file path and uiUpdateCallback
+                    uploadFile(filePath, uiUpdateCallback);
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
 
+    private void fetchMediaUrls() {
+        // Make a POST request to fetch media URLs
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/creative/fetch";
+        JSONObject jsonParams = new JSONObject();
+        try {
+            // Replace "your_eid_value" with the actual value for 'eid'
+            jsonParams.put("eid", eid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonParams,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Parse the JSON response and get image URLs
+                        List<String> mediaUrls = parseResponse(response);
+                        Log.i("Fetched Media URLs", String.valueOf(mediaUrls));
 
+                        // Update the UI with the fetched media URLs
+                        updateUIWithMediaUrls(mediaUrls);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        Log.e("Fetch Media URLs", "Error: " + error.getMessage());
+                    }
+                }
+        );
 
+        // Add the request to the Volley request queue
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
+    }
+
+    private void updateUIWithMediaUrls(List<String> mediaUrls) {
+        // Set up ViewPager with the fetched media URLs
+        setupViewPager(mediaUrls);
+
+        // Set up GestureDetector inside the response listener
+        GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                // Handle long press event
+                int currentItem = viewPager.getCurrentItem();
+                if (currentItem >= 0 && currentItem < mediaUrls.size()) {
+                    String videoUrl = mediaUrls.get(currentItem);
+
+                    // Start the download process
+                    downloadVideo(videoUrl);
+                }
+            }
+        });
+
+        viewPager.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        });
     }
 
 
-
-    public void uploadFile(String filePath) {
+    public void uploadFile(String filePath , Runnable uiUpdateCallback) {
         Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
-        String fileheader = photoTypeSpinner.getSelectedItem().toString();
+        Spinner videoTypeSpinner = findViewById(R.id.video_type_spinner);
+        final String[] fileheader = { "None" };
         progress.setTitle("Uploading");
         progress.setMessage("Please wait...");
         progress.show();
@@ -587,14 +859,16 @@ public class Creative_form extends AppCompatActivity {
                 RequestBody file_body;
                 if(mediaType.equals("image")) {
                     file_body = RequestBody.create(MediaType.parse("image/*"), file);
+                    fileheader[0] = photoTypeSpinner.getSelectedItem().toString();
                 } else {
                     file_body = RequestBody.create(MediaType.parse("video/*"), file);
+                    fileheader[0] = videoTypeSpinner.getSelectedItem().toString();
                 }
 
                 RequestBody request_body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("eid", eid)
-                        .addFormDataPart("fileheader", fileheader)
+                        .addFormDataPart("fileheader", fileheader[0])
                         .addFormDataPart("file", file.getName(), file_body)
                         .build();
 
@@ -605,17 +879,49 @@ public class Creative_form extends AppCompatActivity {
 
                 try {
                     okhttp3.Response response = client.newCall(request).execute();
-                    if (!response.isSuccessful()) {
+                    if (response.isSuccessful()) {
+                        // Parse the response and get the updated media URLs
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        List<String> updatedMediaUrls = parseResponse(jsonResponse);
+
+                        // Update the UI on the main thread
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Update the media URLs and notify the adapter
+                                mediaUrls.clear();
+                                mediaUrls.addAll(updatedMediaUrls);
+                                mediaPagerAdapter.notifyDataSetChanged();
+
+                                // Call the provided callback for additional UI updates
+                                if (uiUpdateCallback != null) {
+                                    uiUpdateCallback.run();
+                                }
+
+                                // Dismiss the progress dialog
+                                progress.dismiss();
+
+                                // Fetch media URLs just after updating the UI
+                                fetchMediaUrls();
+                            }
+                        });
+                    } else {
+                        // Handle unsuccessful response
                         throw new IOException("Error : " + response);
                     }
-                    // Do something with the response
-                    Log.i("response on upload", "Response" + response);
-
-                    progress.dismiss();
-
-                } catch (IOException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
-                    Log.i("MultiPart", "Something went wrong");
+                    Log.e("MultiPart", "Error during file upload", e);
+
+                    // Handle the error, e.g., display a toast or alert dialog
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Error during file upload", Toast.LENGTH_SHORT).show();
+                            // Dismiss the progress dialog
+                            progress.dismiss();
+                        }
+                    });
                 }
             }
         });
@@ -623,89 +929,6 @@ public class Creative_form extends AppCompatActivity {
     }
 
 
-
-
-
-
-
-//    private void uploadFile(File file) throws IOException {
-//        OkHttpClient client = new OkHttpClient();
-//
-//        String filePath = file.getAbsolutePath();
-//        Log.i("file path", filePath);
-//        String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
-//        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
-//        MediaType mediaType = MediaType.parse(mimeType);
-//
-//        if (mediaType != null) {
-//            Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
-//            String fileheader = photoTypeSpinner.getSelectedItem().toString();
-//
-//            // Construct new file name
-//            String newFileName = "proposals_event_name_" + fileheader + getFileExtension(file.getName());
-//
-//            RequestBody requestBody = new MultipartBody.Builder()
-//                    .setType(MultipartBody.FORM)
-//                    .addFormDataPart("file", newFileName, RequestBody.create(mediaType, file))
-//                    .build();
-//            okhttp3.Request request = new okhttp3.Request.Builder()
-//                    .url(getResources().getString(R.string.server_url) + "/creative/upload")
-//                    .post(requestBody)
-//                    .build();
-//            okhttp3.Response response = client.newCall(request).execute();
-//            if (!response.isSuccessful()) {
-//                throw new IOException("Unexpected code " + response);
-//            } else {
-//                // Rename file
-//                File renamedFile = new File(file.getParent(), newFileName);
-//                if (file.renameTo(renamedFile)) {
-//                    Log.i("file renamed", renamedFile.getAbsolutePath());
-//                } else {
-//                    Log.e("file not renamed", file.getAbsolutePath());
-//                }
-//            }
-//        }
-//    }
-
-//    public void onUploadButtonClick(View view) {
-//        if (mSelectedFile != null) {
-//            try {
-//                // rename the file based on the selected option in the spinner
-//                Spinner videoTypeSpinner = findViewById(R.id.video_type_spinner);
-//                Spinner photoTypeSpinner = findViewById(R.id.layout_type_spinner);
-//                String fileheader = photoTypeSpinner.getSelectedItem().toString();
-//                Log.i("spinner header" , fileheader);
-//                String fileExtension = getFileExtension(mSelectedFile.getName());
-//                String newFileName = name + fileheader + "." + fileExtension;
-//                File newFile = new File(mSelectedFile.getParent(), newFileName);
-//                mSelectedFile.renameTo(newFile);
-//
-//                // upload the renamed file to the database
-//                uploadFile(newFile);
-//
-////                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-////                        MimeTypeMap.getFileExtensionFromUrl(mSelectedFile.getPath()));
-////                if (mimeType.startsWith("image/")) {
-////                    // handle image file
-////                    ImageView preview = new ImageView(this);
-////                    preview.setImageURI(Uri.fromFile(newFile));
-////                    mPreviewLayout.addView(preview);
-////                } else if (mimeType.startsWith("video/")) {
-////                    // handle video file
-////                    VideoView preview = new VideoView(this);
-////                    preview.setVideoURI(Uri.fromFile(newFile));
-////                    preview.start();
-////                    mPreviewLayout.addView(preview);
-////                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(this, "Please select a file to upload", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
 
     private String getFileExtension(String fileName) {

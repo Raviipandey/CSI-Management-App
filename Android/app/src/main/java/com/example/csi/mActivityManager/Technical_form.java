@@ -159,7 +159,7 @@ public class Technical_form extends AppCompatActivity {
 
 
 
-//    @Override
+    //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //
 //    }
@@ -255,7 +255,7 @@ public class Technical_form extends AppCompatActivity {
 
                         // Split the comma-separated string into an array of individual status values
                         String[] statusValues = statusString.split(",");
-                        Log.i("status ki values", statusValues[1] );
+//                        Log.i("status ki values", statusValues[1] );
 
 
 

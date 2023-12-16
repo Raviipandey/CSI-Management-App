@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({
 var cors=require('cors');
 app.use(cors());
 
+app.use('/creative', express.static('./creative'));
 var login=require('./routes/core_login');
 var minutes=require('./routes/core_minutes');
 var profile=require('./routes/core_profile');

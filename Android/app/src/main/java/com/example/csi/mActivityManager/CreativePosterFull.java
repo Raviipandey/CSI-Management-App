@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.csi.R;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
 
 public class CreativePosterFull extends AppCompatActivity {
 
@@ -28,20 +29,19 @@ public class CreativePosterFull extends AppCompatActivity {
     }
 
     private void loadImageUrl(String url) {
-        Picasso.with(this).load(url).placeholder(R.mipmap.ic_launcher)
+        Picasso.get().load(url).placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
-                .into(imageView, new com.squareup.picasso.Callback(){
-
+                .into(imageView, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-
+                        // Handle success
                     }
 
                     @Override
-                    public void onError() {
-
+                    public void onError(Exception e) {
+                        // Handle error
                     }
                 });
-
     }
+
 }
