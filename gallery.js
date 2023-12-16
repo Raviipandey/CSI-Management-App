@@ -10,7 +10,12 @@ app.use(bodyParser.urlencoded({
 app.post('/mkdir',(req,res) =>{
 	var address=req.body.path;
 	var fname=req.body.fname;
-	var directoryPath=path.join(__dirname,'gallery/',address,fname);
+	 // Replace spaces with underscores in the folder name
+	 var sanitizedFname = fname.replace(/\s+/g, '_');
+
+	 var directoryPath = path.join(__dirname, 'server_uploads/gallery/', address, sanitizedFname);
+	
+	
 	fs.mkdir(directoryPath,function(err){
 		if(err){
 			//console.log("Error);
@@ -20,7 +25,7 @@ app.post('/mkdir',(req,res) =>{
 			//console.log("Succesfully Created");
 		}
 	});
-	directoryPath=path.join(__dirname,'gallery/',address);
+	directoryPath=path.join(__dirname,'server_uploads/gallery/',address);
 	fs.readdir(directoryPath,function(err,files){
 		if (err){
 			//console.log("Error");
@@ -39,7 +44,7 @@ var path = require('path');
 var fs = require('fs');
 app.post('/event',(req,res)=>{
 	var address=req.body.path;
-	var directoryPath=path.join(__dirname,'gallery/',address);
+	var directoryPath=path.join(__dirname,'server_uploads/gallery/',address);
 	fs.readdir(directoryPath,function(err,files){
 		if(err){
 			//console.log("Error");
@@ -57,7 +62,7 @@ var multer=require('multer');
 var address;
 var storage=multer.diskStorage({
 	destination: function(req,file,cb){
-		cb(null,'gallery/'+address);
+		cb(null,'server_uploads/gallery/'+address);
 	},
 	filename: function(req,file,cb){
 		cb(null,file.originalname);
@@ -92,7 +97,7 @@ app.post('/upload', (req,res) =>{
 app.post('/view',(req,res)=>{
 	var address = req.body.path;
 	var link = [];
-	var directoryPath = path.join(__dirname,'gallery/',address);
+	var directoryPath = path.join(__dirname,'server_uploads/gallery/',address);
 	fs.readdir(directoryPath, function (err, files){
 		if (err){
 			//console.log("Error");
@@ -100,21 +105,22 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://192.168.1.106:9091/images/'+files[i];
+        			link[i] = 'http://192.168.0.104:9091/images/'+files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);
 		}
 	});
 	app.use(express.static('public'));
-	app.use('/images', express.static(__dirname + '/gallery' +'/' + address));
+	app.use('/images', express.static(__dirname + '/server_uploads/gallery/' +'/' + address));
        //app.use('/images', express.static(__dirname + '/images'));
 });
 
 // Deleting an Image
 app.delete('/delete/:fileName', (req, res) => {
 	const fileName = req.params.fileName;
-	const imagePath = path.join(__dirname, 'gallery', address, fileName);
+	const imagePath = path.join(__dirname, 'server_uploads/gallery/',address, fileName);
+	
 	fs.unlink(imagePath, (err) => {
 	  if (err) {
 		// console.log("Error");
@@ -134,4 +140,5 @@ app.use('/report', express.static(__dirname + '/report'));
 app.listen(9091,(req,res)=>{
     console.log("Listening on 9091");
 });
+
 
