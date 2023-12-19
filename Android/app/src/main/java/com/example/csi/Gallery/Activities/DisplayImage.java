@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +60,7 @@ public class DisplayImage extends AppCompatActivity {
     ArrayList<String> imagesUrl;
     GalleryImageAdapter galleryImageAdapter;
     private RequestQueue mRequestQueue;
+    ImageButton deleteButton;
 
     //updated variables use to upload images only
     ProgressDialog progress;
@@ -74,6 +76,7 @@ public class DisplayImage extends AppCompatActivity {
         initURL3();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,11 @@ public class DisplayImage extends AppCompatActivity {
         Fab = (FloatingActionButton) findViewById(R.id.fab);
         mRequestQueue = Volley.newRequestQueue(this);
         imagesUrl = new ArrayList<>();
+
+        deleteButton = findViewById(R.id.delete);
+        deleteButton.setVisibility(View.INVISIBLE);
+
+
 
         Fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +114,15 @@ public class DisplayImage extends AppCompatActivity {
         final IRecyclerViewClickListener listener = new IRecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
+
+            }
+            @Override
+            public void onLongClick(View v, int adapterPosition) {
+
+
+            }
+            @Override
+            public void onItemClick(int position, String imageUrl) {
                 Intent i = new Intent(getApplicationContext(), FullScreenActivity.class);
                 i.putExtra("IMAGES",imagesUrl);
                 i.putExtra("POSITION",position);
@@ -113,14 +130,27 @@ public class DisplayImage extends AppCompatActivity {
             }
         };
 
-        galleryImageAdapter = new GalleryImageAdapter(this, imagesUrl, listener);
+        galleryImageAdapter = new GalleryImageAdapter(this, imagesUrl, listener, PARENT_PATH , deleteButton);
         recyclerView.setAdapter(galleryImageAdapter);
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Call the deleteSelectedImages method in your adapter
+                galleryImageAdapter.deleteSelectedImages();
+                deleteButton.setVisibility(View.INVISIBLE);
+            }
+        });
         initURL3();
 
         Log.i("imagesUrl", String.valueOf(imagesUrl));
 
+
+
     }
+
+
+
 
     public void initURL3() {
 

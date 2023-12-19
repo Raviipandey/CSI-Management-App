@@ -96,6 +96,7 @@ app.post('/upload', (req,res) =>{
 //Viewing Images In A Directory
 app.post('/view',(req,res)=>{
 	var address = req.body.path;
+	console.log("This is the address", address);
 	var link = [];
 	var directoryPath = path.join(__dirname,'server_uploads/gallery/',address);
 	fs.readdir(directoryPath, function (err, files){
@@ -105,7 +106,7 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://192.168.0.104:9091/images/'+files[i];
+        			link[i] = 'http://192.168.1.101:9091/images/'+files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);
@@ -116,23 +117,35 @@ app.post('/view',(req,res)=>{
        //app.use('/images', express.static(__dirname + '/images'));
 });
 
-// Deleting an Image
-app.delete('/delete/:fileName', (req, res) => {
-	const fileName = req.params.fileName;
-	const imagePath = path.join(__dirname, 'server_uploads/gallery/',address, fileName);
-	
-	fs.unlink(imagePath, (err) => {
-	  if (err) {
-		// console.log("Error");
-		res.sendStatus(400);
-	  } else {
-		// console.log("Succesfully Deleted");
-		res.sendStatus(200);
-	  }
-	});
-  });
 
-  
+
+app.delete('/delete/:year/:folder/:fileName', (req, res) => {
+    const { year, folder, fileName } = req.params;
+
+    const filePath = path.join(__dirname, 'server_uploads/gallery', year, folder, fileName);
+
+    // Check if the file exists
+    if (fs.existsSync(filePath)) {
+        // Delete the file
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error('Error deleting image:', err);
+                res.sendStatus(400);
+            } else {
+                console.log('Successfully deleted');
+                res.sendStatus(200);
+            }
+        });
+    } else {
+        console.error('File not found');
+        res.sendStatus(404);
+    }
+});
+
+
+
+
+
 app.use('/images', express.static(__dirname + '/images'));
 app.use('/images', express.static(__dirname + '/creative'));
 app.use('/report', express.static(__dirname + '/report'));
@@ -140,5 +153,3 @@ app.use('/report', express.static(__dirname + '/report'));
 app.listen(9091,(req,res)=>{
     console.log("Listening on 9091");
 });
-
-

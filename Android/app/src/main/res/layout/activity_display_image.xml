@@ -9,9 +9,7 @@
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/recyclerview">
-
-    </android.support.v7.widget.RecyclerView>
+        android:id="@+id/recyclerview" />
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -24,8 +22,30 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:backgroundTint="@color/colorPrimary"
-            android:src="@drawable/ic_add_photo_alternate_black_18dp"
-            />
+            android:src="@drawable/ic_add_photo_alternate_black_18dp" />
+
+        <ImageButton
+            android:id="@+id/delete"
+            style="@android:style/Widget.Holo.Light.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="90dp"
+            android:background="@drawable/circular_button_background"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="Delete Button"
+            android:cropToPadding="false"
+            android:padding="16dp"
+            android:src="@drawable/ic_delete" />
+
+        <Button
+            android:id="@+id/downloadButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download"
+            android:visibility="gone" />
 
     </android.support.design.widget.CoordinatorLayout>
 
