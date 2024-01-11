@@ -106,7 +106,7 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://192.168.1.101:9091/images/'+files[i];
+        			link[i] = 'http://128.199.23.207:9091/images/'+files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);

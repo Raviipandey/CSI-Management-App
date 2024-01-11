@@ -4,6 +4,15 @@ var dotenv = require('dotenv');
 dotenv.config();
 var generator = require('generate-password');
 var nodemailer = require('nodemailer');
+var multer=require('multer');
+var path = require('path');
+var fs = require('fs');
+var app=express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -16,6 +25,7 @@ var transporter = nodemailer.createTransport({
 // MySQL Connection
 var mysql = require('mysql');
 const { json } = require('body-parser');
+const { log } = require('console');
 var connection = mysql.createConnection({
   host: '128.199.23.207',
 	user: "csi",
@@ -29,6 +39,27 @@ connection.connect(function(err) {
       console.log('Not Connected To Mysql!Profile');
     }
 });
+
+// Set up file storage for profile pictures
+const profilePicStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'profile_pic');
+  },
+  filename: function (req, file, cb) {
+    const userId = req.body.userId; // Assuming you pass the user ID in the request body
+    const fileName = `profile_${userId}_${Date.now()}${path.extname(file.originalname)}`;
+    cb(null, fileName);
+  }
+});
+
+
+const profilePicUpload = multer({ 
+  storage: profilePicStorage,
+  limits: {
+      fileSize: 5 * 1024 * 1024 // 5 MB limit
+  }
+});
+
 
 router.get('/',(req,res)=>{
 	var id = req.query.id;
@@ -141,6 +172,32 @@ router.post('/edit',(req,res)=>{
     console.log(result)
 	}
 	});
+});
+
+router.post('/profileupload', profilePicUpload.single('profilePic'), (req, res) => {
+  console.log(req.body);
+  try {
+    const baseServerUrl = 'http://128.199.23.207:9000'; // Your server's base URL
+    const filePath = req.file.filename; // Assuming you're storing just the filename
+    const profilePicUrl = `${baseServerUrl}/profile_pic/${filePath}`; // Constructing the full URL
+    console.log(profilePicUrl);
+    const userId = req.body.userId; // User ID from the request body
+
+    // SQL query to update core_profilepic_url in the core_details table
+    const updateQuery = 'UPDATE core_details SET core_profilepic_url = ? WHERE core_id = ?';
+
+    connection.query(updateQuery, [profilePicUrl, userId], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Database update failed' });
+      }
+
+      res.status(200).json({ success: true, message: 'Profile picture uploaded successfully', fileUrl: profilePicUrl });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
 });
 
 

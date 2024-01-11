@@ -2,9 +2,16 @@ package com.example.csi.Prompts;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +23,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -30,7 +39,10 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,8 +51,93 @@ public class ProfileEdit extends AppCompatActivity {
     String server_url;     //Main Server URL
     //String server_url="http://192.168.43.84:8080/profile/edit";
     String position_s, UProfile;
+    private static final int PICK_IMAGE_REQUEST = 1;
 
     ImageView imageButton;
+
+    public void onEditProfilePhotoClick(View view) {
+        // Open the gallery for image selection
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+
+    private String getFileNameFromUri(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+    private void uploadImageToServer(String imageBase64, String fileName) {
+        String url = "http://192.168.1.101:9000/profile/profileupload";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("profilePic", imageBase64); // This key should match the key expected on the server
+            jsonObject.put("filename", fileName);      // If your server expects a 'filename', include it
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final String requestBody = jsonObject.toString();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("VolleyResponse", "Response from the server: " + response);
+                Toast.makeText(ProfileEdit.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Toast.makeText(ProfileEdit.this, "Failed to Upload Image", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return requestBody.getBytes(StandardCharsets.UTF_8);
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri selectedImageUri = data.getData();
+            loadImageUrl(selectedImageUri.toString());
+
+            String imageBase64 = convertAndResizeImageToBase64(selectedImageUri);
+            String fileName = getFileNameFromUri(selectedImageUri);
+            uploadImageToServer(imageBase64, fileName); // Pass filename here
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +281,36 @@ public class ProfileEdit extends AppCompatActivity {
 
     }
 
+
+    private String convertAndResizeImageToBase64(Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;  // Use RGB_565 configuration
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+
+            // Adjust target width and height
+            int targetWidth = 400;
+            int targetHeight = (int) (bitmap.getHeight() * (targetWidth / (double) bitmap.getWidth()));
+
+            // Resize the bitmap
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            // Adjust compression quality
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+
+            byte[] byteArray = outputStream.toByteArray();
+            return Base64.encodeToString(byteArray, Base64.DEFAULT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
     private void loadImageUrl(String url) {
         Picasso.get().load(url).placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
@@ -198,7 +325,6 @@ public class ProfileEdit extends AppCompatActivity {
                         // Handle error
                     }
                 });
-
     }
 
     void post_edited_info(String id_s, String name_s, String email_s, String  phn_s, String yr_s , String branch_s, String rol_s, final String batch_s)

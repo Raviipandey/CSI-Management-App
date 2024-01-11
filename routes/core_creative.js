@@ -23,7 +23,9 @@ connection.connect(function(err){
 	}
 });
 
-const server_url = "http://192.168.1.106:9000"
+const server_url = "http://128.199.23.207:9000"
+
+
 
 //Listing All events
 router.get('/listcreative',(req,res)=>{
@@ -148,7 +150,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
 router.post('/upload', upload.single('file'), (req, res) => {
 	const eid = req.body.eid;
 	const fileheader = req.body.fileheader;
@@ -180,9 +181,6 @@ router.post('/upload', upload.single('file'), (req, res) => {
 	  });
 	});
   });
-
-
-
 
 // Define a route to fetch uploaded files using a POST request
 router.post('/fetch', (req, res) => {

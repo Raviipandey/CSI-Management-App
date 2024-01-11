@@ -9,7 +9,10 @@ app.use(bodyParser.urlencoded({
 var cors=require('cors');
 app.use(cors());
 
+
+
 app.use('/creative', express.static('./creative'));
+app.use('/profile_pic', express.static('./profile_pic'));
 var login=require('./routes/core_login');
 var minutes=require('./routes/core_minutes');
 var profile=require('./routes/core_profile');
@@ -20,6 +23,7 @@ var creative=require('./routes/core_creative');
 var publicity=require('./routes/core_publicity');
 var technical=require("./routes/core_technical");
 var report=require("./routes/report.js");
+
 
 app.use('/login',login);
 app.use('/minutes',minutes);

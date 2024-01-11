@@ -116,7 +116,7 @@ public class Profile extends Fragment {
                 edit_profile.putExtra("core_branch",branch.getText().toString());
                 edit_profile.putExtra("core_rollno",roln.getText().toString());
 //                edit_profile.putExtra("batch",batch.getText().toString());
-                edit_profile.putExtra("profilePic", UProfile);
+                edit_profile.putExtra("core_profilepic_url", UProfile);
                 startActivity(edit_profile);
                 //finish();
             }
