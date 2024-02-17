@@ -33,18 +33,33 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.example.csi.R;
+import com.joooonho.SelectableRoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttp;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
 public class ProfileEdit extends AppCompatActivity {
 
@@ -54,6 +69,8 @@ public class ProfileEdit extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
 
     ImageView imageButton;
+
+
 
     public void onEditProfilePhotoClick(View view) {
         // Open the gallery for image selection
@@ -82,47 +99,63 @@ public class ProfileEdit extends AppCompatActivity {
         }
         return result;
     }
-    private void uploadImageToServer(String imageBase64, String fileName) {
-        String url = "http://192.168.1.101:9000/profile/profileupload";
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("profilePic", imageBase64); // This key should match the key expected on the server
-            jsonObject.put("filename", fileName);      // If your server expects a 'filename', include it
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void uploadImageToServer(String filePath, String fileName) {
 
-        final String requestBody = jsonObject.toString();
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/profileupload";
+        OkHttpClient client = new OkHttpClient();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        File file = new File(filePath);
+        MediaType mediaType = MediaType.parse("image/jpeg"); // Adjust this according to your image type
+
+        // Create RequestBody instance from file
+        RequestBody fileBody = RequestBody.create(mediaType, file);
+
+        // MultipartBody Builder
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("profilePic", fileName, fileBody); // Ensure this field name matches with the server's expected field name
+
+        // Adding additional data if needed
+        // For example, if you need to send the user ID
+         builder.addFormDataPart("userId", getIntent().getStringExtra("core_id"));
+
+        RequestBody requestBody = builder.build();
+
+        // Build your request
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+
+        // Making the request
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(String response) {
-                Log.i("VolleyResponse", "Response from the server: " + response);
-                Toast.makeText(ProfileEdit.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                Toast.makeText(ProfileEdit.this, "Failed to Upload Image", Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return requestBody.getBytes(StandardCharsets.UTF_8);
+            public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
+                runOnUiThread(() -> {
+                    try {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String responseData = response.body().string();
+                            // Handle the server response
+                            Toast.makeText(ProfileEdit.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ProfileEdit.this, "Server responded with error: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(ProfileEdit.this, "Error handling server response", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(ProfileEdit.this, "Failed to Upload Image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
+        });
     }
+
+
 
 
     @Override
@@ -131,12 +164,23 @@ public class ProfileEdit extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri selectedImageUri = data.getData();
-            loadImageUrl(selectedImageUri.toString());
+//            loadImageUrl(selectedImageUri.toString());
 
-            String imageBase64 = convertAndResizeImageToBase64(selectedImageUri);
+            String filePath = getRealPathFromURI(selectedImageUri); // Obtain the real file path
             String fileName = getFileNameFromUri(selectedImageUri);
-            uploadImageToServer(imageBase64, fileName); // Pass filename here
+            uploadImageToServer(filePath, fileName); // Upload using the file path
         }
+    }
+
+    // Method to get the real path from URI
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
     }
 
     @Override
@@ -149,7 +193,9 @@ public class ProfileEdit extends AppCompatActivity {
         getSupportActionBar().setTitle("Edit Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        imageButton = findViewById(R.id.profile_photo_E);
+
+
+
 
         //declaring variables
         Button save_button = findViewById(R.id.save_button);
@@ -161,9 +207,11 @@ public class ProfileEdit extends AppCompatActivity {
         final RadioGroup branch = findViewById(R.id.branch_E);
         final EditText rol = findViewById(R.id.rollNo_E);
         final RadioGroup batch = findViewById(R.id.batch_E);
+        SelectableRoundedImageView imageView = findViewById(R.id.profile_photo_E);
 
         //getting data from profile
-        UProfile = getIntent().getStringExtra("profilePic");
+
+        UProfile = getIntent().getStringExtra("core_profilepic_url");
 
         id.setText(getIntent().getStringExtra("core_id"));
         name.setText(getIntent().getStringExtra("core_en_fname"));
@@ -172,6 +220,10 @@ public class ProfileEdit extends AppCompatActivity {
         rol.setText(getIntent().getStringExtra("core_rollno"));
         position_s = getIntent().getStringExtra("core_role_id");
         String Year = getIntent().getStringExtra("core_class");
+        String profileImageUrl = getIntent().getStringExtra("core_profilepic_url");
+        Picasso.get().load(profileImageUrl)
+                .placeholder(R.drawable.ic_person_black_24dp)
+                .into(imageView);
         switch (Year) {
             case "FE":
                 RadioButton FE = findViewById(R.id.radio_FE);
@@ -190,6 +242,9 @@ public class ProfileEdit extends AppCompatActivity {
                 BE.setChecked(true);
                 break;
         }
+
+
+
 
 //        String Branch = getIntent().getStringExtra("branch");
 //        switch (Branch) {
@@ -233,7 +288,7 @@ public class ProfileEdit extends AppCompatActivity {
 //        Log.i("check data incoming", getIntent().getStringExtra("year") + " " + getIntent().getStringExtra("branch") + " " + getIntent().getStringExtra("batch"));
         Log.i("volleyABC", "position value" + position_s + getIntent().getStringExtra("core_role_id"));
 
-        loadImageUrl(UProfile);
+
 
         save_button.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -245,6 +300,7 @@ public class ProfileEdit extends AppCompatActivity {
                 String id_s = id.getText().toString();
                 String name_s = name.getText().toString();
                 String email_s = email.getText().toString();
+                String prof_url = profileImageUrl;
                 if (!isEmailValid(email_s)) {
                     // email.setError("Invalid Email Address");
                     Log.i("emailerror", "wrong email" + email_s);
@@ -269,12 +325,14 @@ public class ProfileEdit extends AppCompatActivity {
                 if (batch_b != null) batch_s = batch_b.getText().toString();
                 else batch_s = getIntent().getStringExtra("batch");
 
-                post_edited_info(id_s, name_s, email_s, phn_s, yr_s, branch_s, rol_s, batch_s);//posting data on server
+                post_edited_info(id_s, name_s, email_s, phn_s, yr_s, branch_s, rol_s, batch_s , prof_url);//posting data on server
                 Log.i("ID idhar ayega", id_s);
                 //profile_after_edit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 //startActivity(profile_after_edit);
                 //ProfileEdit.this.getSupportFragmentManager().beginTransaction().replace(R.id.containerID, Profile.newInstance()).commit();
                 //finish();
+
+
 
             }
         });
@@ -282,52 +340,23 @@ public class ProfileEdit extends AppCompatActivity {
     }
 
 
-    private String convertAndResizeImageToBase64(Uri imageUri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+//    private void loadImageUrl(String url) {
+//        Picasso.get().load(url).placeholder(R.mipmap.ic_launcher)
+//                .error(R.mipmap.ic_launcher)
+//                .into(imageButton, new com.squareup.picasso.Callback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        // Handle success
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        // Handle error
+//                    }
+//                });
+//    }
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.RGB_565;  // Use RGB_565 configuration
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
-
-            // Adjust target width and height
-            int targetWidth = 400;
-            int targetHeight = (int) (bitmap.getHeight() * (targetWidth / (double) bitmap.getWidth()));
-
-            // Resize the bitmap
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-            // Adjust compression quality
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
-
-            byte[] byteArray = outputStream.toByteArray();
-            return Base64.encodeToString(byteArray, Base64.DEFAULT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-
-    private void loadImageUrl(String url) {
-        Picasso.get().load(url).placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher)
-                .into(imageButton, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        // Handle success
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        // Handle error
-                    }
-                });
-    }
-
-    void post_edited_info(String id_s, String name_s, String email_s, String  phn_s, String yr_s , String branch_s, String rol_s, final String batch_s)
+    void post_edited_info(String id_s, String name_s, String email_s, String  phn_s, String yr_s , String branch_s, String rol_s, final String batch_s , String profileurl)
     {
         Log.i("volleyABC", "Reached in get info");
 
@@ -341,6 +370,7 @@ public class ProfileEdit extends AppCompatActivity {
             jsonObject.put("year",yr_s);
 //            jsonObject.put("branch",branch_s);
             jsonObject.put("rollno",rol_s);
+            jsonObject.put("core_profile_url" , profileurl);
 //            jsonObject.put("batch",batch_s);
             Log.i("volleyABC", "Created jason");
         }

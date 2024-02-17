@@ -77,6 +77,8 @@
         <activity
             android:name=".Prompts.AddMinute"
             android:theme="@style/AppTheme2" />
+
+
         <activity
             android:name=".Prompts.MainActivity"
             android:screenOrientation="portrait">

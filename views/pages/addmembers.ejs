@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Sign Up Form by Colorlib</title>
+
+    <!-- Font Icon -->
+    <!-- <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css"> -->
+
+    <!-- Main css -->
+
+    <!--     Fonts and icons     -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <!-- Nucleo Icons -->
+    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script
+      src="https://kit.fontawesome.com/42d5adcbca.js"
+      crossorigin="anonymous"
+    ></script>
+    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- CSS Files -->
+    <link
+    id="pagestyle"
+    href="../assets/css/argon-dashboard.css?v=2.0.4"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/views/assets/css/register.css" />
+  </head>
+  <body class="g-sidenav-show bg-gray-100">
+    <div
+      class="min-height-300 bg-primary position-absolute w-100"
+    ></div>
+    <%- include('../templates/asidebar'); %>
+
+    <main class="main-content position-relative border-radius-lg">
+      <!-- Navbar -->
+      <%- include('../templates/navbar'); %>
+      <!-- End Navbar -->
+      <div class="container-fluid py-4">
+        <div>
+          <!-- Sign up form -->
+          <section class="add-core-member" style="padding-top: 100px;">
+            <div class="container bg-white">
+              <div class="signup-content">
+                <div class="signup-form">
+                  <h2 class="form-title">Add Core Member</h2>
+                  <form method="POST" class="register-form" id="add-core-member-form">
+                    <div class="form-group">
+                      <label for="role"><i class="ni ni-badge"></i></label>
+                      <select name="role" id="role">
+                        <option value="3">Chairperson</option>
+                        <option value="4">Vice Chairperson</option>
+                        <option value="10">Secretary</option>
+                        <option value="5">Event Head</option>
+                        <option value="6">Technical Head</option>
+                        <option value="7">Web Development Head</option>
+                        <option value="11">Documentation Head</option>
+                        <option value="8">Public Relations Head</option>
+                        <option value="9">Creative Head</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="first-name"><i class="ni ni-single-02"></i></label>
+                      <input type="text" name="first_name" id="first-name" placeholder="First Name" />
+                    </div>
+                    <div class="form-group">
+                      <label for="last-name"><i class="ni ni-single-02"></i></label>
+                      <input type="text" name="last_name" id="last-name" placeholder="Last Name" />
+                    </div>
+                    <div class="form-group">
+                      <label for="password"><i class="ni ni-lock-circle-open"></i></label>
+                      <input type="password" name="password" id="password" placeholder="Password" />
+                    </div>
+                    <div class="form-group">
+                      <label for="roll-no"><i class="ni ni-credit-card"></i></label>
+                      <input type="text" name="roll_no" id="roll-no" placeholder="Roll No" />
+                    </div>
+                    <div class="form-group">
+                      <label for="mob-no"><i class="ni ni-phone"></i></label>
+                      <input type="text" name="mob_no" id="mob-no" placeholder="Mobile No" />
+                    </div>
+                    <div class="form-group">
+                      <label for="email"><i class="ni ni-email-83"></i></label>
+                      <input type="email" name="email" id="email" placeholder="Email" />
+                    </div>
+                    <div class="form-group">
+                      <label for="branch"><i class="ni ni-istanbul"></i></label>
+                      <input type="text" name="branch" id="branch" placeholder="Branch" />
+                    </div>
+                    <div class="form-group">
+                      <label for="class"><i class="ni ni-hat-3"></i></label>
+                      <input type="text" name="class" id="class" placeholder="Class" />
+                    </div>
+                    <div class="form-group form-button">
+                      <input type="submit" name="add_member" id="add-member" class="form-submit" value="Add Member" onclick="submitForm()" />
+                    </div>
+                  </form>
+                </div>
+                <!-- Include your signup-image section -->
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!--footer starts-->
+        <!-- <%- include('../templates/footer'); %> -->
+        <!--footer ends-->
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+      // Function to submit the form using Ajax
+      function submitForm() {
+        // Get form data
+        const formData = {
+          role: $('#role').val(),
+          first_name: $('#first-name').val(),
+          last_name: $('#last-name').val(),
+          roll_no: $('#roll-no').val(),
+          mob_no: $('#mob-no').val(),
+          email: $('#email').val(),
+          password: $('#password').val(),
+          branch: $('#branch').val(),
+          class_name: $('#class').val(),
+        };
+        // Make an Ajax request to your server endpoint
+        $.ajax({
+          type: 'POST',
+          url: '/addmembers',
+          contentType: 'application/json', // Set the content type to JSON
+          data: JSON.stringify(formData), // Convert the object to a JSON string
+          success: function (response) {
+            // Handle success response
+            console.log('Form submitted successfully:', response);
+          },
+          error: function (error) {
+            // Handle error response
+            console.error('Error submitting form:', error);
+          },
+        });
+      }
+    </script>
+    <!-- <script src="/"></script> -->
+    <!-- <script src="js/main.js"></script> -->
+  </body>
+  <!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>

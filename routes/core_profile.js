@@ -10,6 +10,7 @@ var fs = require('fs');
 var app=express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
+const {connection , server_url} = require('../serverconfig');
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
@@ -22,23 +23,23 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-// MySQL Connection
-var mysql = require('mysql');
-const { json } = require('body-parser');
-const { log } = require('console');
-var connection = mysql.createConnection({
-  host: '128.199.23.207',
-	user: "csi",
-	password: "csi",
-	database: 'csiApp2022'
-});
-connection.connect(function(err) {
-    if (!err) {
-      console.log('Connected to MySql!Profileeee');
-    } else {
-      console.log('Not Connected To Mysql!Profile');
-    }
-});
+// // MySQL Connection
+// var mysql = require('mysql');
+// const { json } = require('body-parser');
+// const { log } = require('console');
+// var connection = mysql.createConnection({
+//   host: '128.199.23.207',
+// 	user: "csi",
+// 	password: "csi",
+// 	database: 'csiApp2022'
+// });
+// connection.connect(function(err) {
+//     if (!err) {
+//       console.log('Connected to MySql!Profileeee');
+//     } else {
+//       console.log('Not Connected To Mysql!Profile');
+//     }
+// });
 
 // Set up file storage for profile pictures
 const profilePicStorage = multer.diskStorage({
@@ -65,7 +66,7 @@ router.get('/',(req,res)=>{
 	var id = req.query.id;
   // console.log(id);
 	//fetching deatails from profile table
-	connection.query('SELECT core_id,core_en_fname,core_role_id,core_email,core_mobileno,core_branch,core_rollno,core_class FROM core_details where core_id=?',[id],function(error,results,fields){
+	connection.query('SELECT core_id,core_en_fname,core_role_id,core_email,core_mobileno,core_branch,core_rollno,core_class , core_profilepic_url FROM core_details where core_id=?',[id],function(error,results,fields){
     connection.query('Select role_name from core_role_master CR where EXISTS ( select core_role_id from core_details CD where CR.role_id=CD.core_role_id and CD.core_id=?)',[id],function(error2,result2){
       
       // console.log(results)
@@ -88,6 +89,7 @@ router.get('/',(req,res)=>{
           "core_branch":results[0].core_branch,
           "core_rollno":results[0].core_rollno,
           "core_class":results[0].core_class,
+          "core_profilepic_url":results[0].core_profilepic_url,
           "membership_left":result3[0].Membership_left
            });
         // res.send(result2[0])
@@ -177,9 +179,9 @@ router.post('/edit',(req,res)=>{
 router.post('/profileupload', profilePicUpload.single('profilePic'), (req, res) => {
   console.log(req.body);
   try {
-    const baseServerUrl = 'http://128.199.23.207:9000'; // Your server's base URL
+    
     const filePath = req.file.filename; // Assuming you're storing just the filename
-    const profilePicUrl = `${baseServerUrl}/profile_pic/${filePath}`; // Constructing the full URL
+    const profilePicUrl = `${server_url}/profile_pic/${filePath}`; // Constructing the full URL
     console.log(profilePicUrl);
     const userId = req.body.userId; // User ID from the request body
 

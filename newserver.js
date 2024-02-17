@@ -44,16 +44,23 @@ app.use(express.static(__dirname + "/views"));
 
 //mobile app routes
 
-var login=require('./routes/login');
-var minutes=require('./routes/minutes');
-var profile=require('./routes/profile');
-var attendance=require('./routes/attendance');
-var feedback=require("./routes/feedback");
-var proposal=require('./routes/proposal');
-var creative=require('./routes/creative');
-var publicity=require('./routes/publicity');
-var technical=require("./routes/technical");
+var cors=require('cors');
+app.use(cors());
+
+
+app.use('/creative', express.static('./creative'));
+app.use('/profile_pic', express.static('./profile_pic'));
+var login=require('./routes/core_login.js');
+var minutes=require('./routes/core_minutes.js');
+var profile=require('./routes/core_profile.js');
+var attendance=require('./routes/core_attendance.js');
+var feedback=require("./routes/feedback.js");
+var proposal=require('./routes/core_proposal.js');
+var creative=require('./routes/core_creative.js');
+var publicity=require('./routes/core_publicity.js');
+var technical=require("./routes/core_technical.js");
 var report=require("./routes/report.js");
+
 
 app.use('/login',login);
 app.use('/minutes',minutes);
@@ -65,7 +72,6 @@ app.use('/creative',creative);
 app.use('/publicity',publicity);
 app.use('/technical',technical);
 app.use('/report',report);
-
 //web app view
 
 app.set('views', path.join(__dirname, 'views'));
@@ -80,6 +86,7 @@ var feedback = require('./routes/web-app/feedback');
 var minute = require('./routes/web-app/minutes');
 var technical = require('./routes/web-app/technical');
 var publicity = require('./routes/web-app/publicity');
+var addmembers = require('./routes/web-app/addmembers')
 const { request } = require('http');
 
 app.use('/authUser', authUser.post);
@@ -102,10 +109,11 @@ app.use('/techData', technical.get);
 app.use('/techall', technical.techall);
 app.use('/publicityData', publicity.get);
 app.use('/publicityall', publicity.publicityall);
+app.use('/addmemberspage', addmembers.get)
+app.use('/addmembers', addmembers.addmembers)
 
 
 app.get("/",(req,res)=>{
-// return res.send("Welcome to CSI-DBIT");
     let session = req.session;
         if (session.userid) {
         res.redirect("/dashboard");
@@ -115,6 +123,7 @@ app.get("/",(req,res)=>{
             });
         }
 });
+
 
 app.get("/logout", (req, res, next)=>{
     req.session.destroy();

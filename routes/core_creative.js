@@ -5,25 +5,7 @@ dotenv.config();
 const fs = require('fs');
 const path = require('path')
 const app = express();
-
-//Mysql Connection
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host: '128.199.23.207',
-	user: "csi",
-	password: "csi",
-	database: 'csiApp2022'
-});
-connection.connect(function(err){
-	if(err){
-		console.log('Not Connected to MySql!Creative.js');
-	}
-	else{
-		console.log("Connected To Mysql!Creative.js");
-	}
-});
-
-const server_url = "http://128.199.23.207:9000"
+const {connection , server_url} = require('../serverconfig');
 
 
 

@@ -24,6 +24,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.csi.Prompts.ProfileEdit;
 import com.example.csi.R;
+import com.joooonho.SelectableRoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -40,6 +41,7 @@ public class Profile extends Fragment {
     String position_s=" ", UID, UProfile;
     View rootView;
     ImageView imageButton;
+    private String profileImageUrl;
 
     public static Profile newInstance() {
         return new Profile();
@@ -75,7 +77,7 @@ public class Profile extends Fragment {
         getActivity().setTitle("My Profile");
         Bundle bundle = getArguments();
 
-        UProfile = this.getArguments().getString("profilePic");
+        UProfile = this.getArguments().getString("core_profilepic_url");
         swipe();
         imageButton = rootView.findViewById(R.id.profile_photo);
         loadImageUrl(UProfile);
@@ -90,6 +92,8 @@ public class Profile extends Fragment {
 
         get_data();//fetch data from server
 
+
+
         edit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,6 +107,7 @@ public class Profile extends Fragment {
                 TextView roln = rootView.findViewById(R.id.rollNo);
                 TextView batch = rootView.findViewById(R.id.batch);
                 TextView  branch= rootView.findViewById(R.id.branch);
+                SelectableRoundedImageView imageView = rootView.findViewById(R.id.profile_photo);
 
                 Intent edit_profile =new Intent(getActivity(), ProfileEdit.class);
 
@@ -115,8 +120,8 @@ public class Profile extends Fragment {
                 edit_profile.putExtra("core_class",yr.getText().toString());
                 edit_profile.putExtra("core_branch",branch.getText().toString());
                 edit_profile.putExtra("core_rollno",roln.getText().toString());
+                edit_profile.putExtra("core_profilepic_url", profileImageUrl);
 //                edit_profile.putExtra("batch",batch.getText().toString());
-                edit_profile.putExtra("core_profilepic_url", UProfile);
                 startActivity(edit_profile);
                 //finish();
             }
@@ -161,7 +166,7 @@ public class Profile extends Fragment {
             @Override
             public void onResponse(String response) {
 
-                Log.i("volleyABC response", response);
+                Log.i("volleyABC", response);
                 //Toast.makeText(MainActivity.this,response, Toast.LENGTH_SHORT).show();
                 set_data(response);//set data in textiles
             }
@@ -210,6 +215,8 @@ public class Profile extends Fragment {
         TextView batch = rootView.findViewById(R.id.batch);
         TextView  branch = rootView.findViewById(R.id.branch);
         TextView membershipLeft = rootView.findViewById(R.id.membershipLeft);
+        SelectableRoundedImageView imageView = rootView.findViewById(R.id.profile_photo);
+
         JSONObject fetchedData ;
         try {
             fetchedData= new JSONObject(data);
@@ -225,6 +232,12 @@ public class Profile extends Fragment {
             roln.setText(fetchedData.getString("core_rollno"));
 //            batch.setText(fetchedData.getString("batch"));
             membershipLeft.setText(fetchedData.getString("membership_left"));
+
+            profileImageUrl = fetchedData.getString("core_profilepic_url");
+            Picasso.get().load(fetchedData.getString("core_profilepic_url"))
+                    .placeholder(R.drawable.ic_person_black_24dp)
+                    .into(imageView);
+
             Log.i("volleyABC", "set_data: created json object all");
 
         } catch (JSONException e) {

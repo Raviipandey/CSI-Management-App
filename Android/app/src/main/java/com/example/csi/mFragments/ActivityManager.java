@@ -127,7 +127,7 @@ public class ActivityManager extends Fragment  {
 
        }
     }
-// animation ends here
+// animation ends
 
 
     private void imageSlider() {

@@ -7,37 +7,34 @@ app.use(bodyParser.urlencoded({
 }));
 
 //Making Of Directory
-app.post('/mkdir',(req,res) =>{
-	var address=req.body.path;
-	var fname=req.body.fname;
-	 // Replace spaces with underscores in the folder name
-	 var sanitizedFname = fname.replace(/\s+/g, '_');
+app.post('/mkdir', (req, res) => {
+    console.log("Inside /mkdir");
+    var address = req.body.path;
+    var fname = req.body.fname;
 
-	 var directoryPath = path.join(__dirname, 'server_uploads/gallery/', address, sanitizedFname);
-	
-	
-	fs.mkdir(directoryPath,function(err){
-		if(err){
-			//console.log("Error);
-			res.sendStatus(400);
-		}
-		else{
-			//console.log("Succesfully Created");
-		}
-	});
-	directoryPath=path.join(__dirname,'server_uploads/gallery/',address);
-	fs.readdir(directoryPath,function(err,files){
-		if (err){
-			//console.log("Error");
-			res.sendStatus(400);
-	    	}
-		else{
-			//console.log("Succesfully Listed");
-			res.status(200).send(files);
-		}
-	});
+    // Keep the folder name as is, including spaces
+    var directoryPath = path.join(__dirname, 'server_uploads/gallery/', address, fname);
 
+    fs.mkdir(directoryPath, function(err) {
+        if (err) {
+            console.log("Error creating directory: ", err);
+            res.sendStatus(400);
+            return; // Make sure to return here so the rest of the code doesn't execute
+        }
+    });
+
+    // Re-read the directory list
+    directoryPath = path.join(__dirname, 'server_uploads/gallery/', address);
+    fs.readdir(directoryPath, function(err, files) {
+        if (err) {
+            console.log("Error reading directory: ", err);
+            res.sendStatus(400);
+        } else {
+            res.status(200).send(files);
+        }
+    });
 });
+
 
 //Viewing Folder In A Directory
 var path = require('path');
@@ -106,7 +103,7 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://128.199.23.207:9091/images/'+files[i];
+        			link[i] = 'http://192.168.1.102:9091/images/'+files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);

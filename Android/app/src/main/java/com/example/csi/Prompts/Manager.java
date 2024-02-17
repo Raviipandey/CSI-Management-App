@@ -48,6 +48,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
     View mView;
     ImageView imageView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,8 +71,9 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
         urole = intent.getStringExtra(MainActivity.EXTRA_UROLE);
         urole=preferenceConfig.readRoleStatus();
         uProfile = intent.getStringExtra(MainActivity.EXTRA_URL);
+
         uProfile=preferenceConfig.readUrlStatus();
-        Log.i("tracking uid","manager when received "+uid+uname+urole+uProfile);
+        Log.i("trackinggggg","manager when received "+uid+uname+urole+uProfile);
         //get data sent by Mainactivity.java ends
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.server_url_button);
