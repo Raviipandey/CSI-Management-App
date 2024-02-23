@@ -440,61 +440,53 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!--            <RelativeLayout-->
-            <!--                xmlns:android="http://schemas.android.com/apk/res/android"-->
-            <!--                android:id="@+id/main_layout"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:padding="16dp">-->
+            <TextView
+                android:id="@+id/tvFileStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Note: Expense file not uploaded yet"
+                android:visibility="visible"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="20dp"
+                android:paddingBottom="10dp"
+                android:layout_gravity="left"/>
 
             <Button
                 android:id="@+id/select_file_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="10dp"
                 android:text="Select File" />
 
-            <Button
-                android:id="@+id/download_button"
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:layout_below="@id/select_file_button"
-                android:visibility="invisible"
-                android:text="Download" />
+                android:layout_below="@id/select_file_button">
 
-            <!--                <Button-->
-            <!--                    android:id="@+id/download_button_for_others"-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_below="@id/select_file_button"-->
-            <!--                    android:text="Download The PDF" />-->
+                <Button
+                    android:id="@+id/delete_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginLeft="28dp"
+                    android:text="Delete File"
+                    android:visibility="gone" />
 
-            <!--            </RelativeLayout>-->
+                <Button
+                    android:id="@+id/download_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginLeft="28dp"
+                    android:layout_toEndOf="@id/delete_button"
+                    android:layout_toRightOf="@id/delete_button"
+                    android:text="Download"
+                    android:visibility="invisible" />
 
-
-
-
-
-
-
-            <!--            <Button-->
-            <!--                android:id="@+id/uploadPDF"-->
-            <!--                style="?android:attr/borderlessButtonStyle"-->
-            <!--                android:layout_width="240dp"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_gravity="center"-->
-            <!--                android:layout_marginTop="10dp"-->
-            <!--                android:background="@drawable/ripple_effect"-->
-            <!--                android:clickable="true"-->
-            <!--                android:drawableStart="@drawable/ic_insert_photo_black_24dp"-->
-            <!--                android:drawableLeft="@drawable/ic_insert_photo_black_24dp"-->
-            <!--                android:drawablePadding="15dp"-->
-            <!--                android:focusable="true"-->
-            <!--                android:gravity="center_vertical"-->
-            <!--                android:paddingHorizontal="15dp"-->
-            <!--                android:text="Upload PDF Document"-->
-            <!--                android:textColor="@color/white" />-->
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="fill_parent"

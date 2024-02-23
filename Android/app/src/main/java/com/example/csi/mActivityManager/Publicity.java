@@ -70,6 +70,7 @@ import java.util.zip.GZIPOutputStream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -83,7 +84,7 @@ public class Publicity extends AppCompatActivity {
     LinearLayout pr_lay;
     Button edit_pr, submit_pr;
     String eid;
-    TextView eventName, eventTheme, event_date, eventDescription, speaker, venue, fee_csi, fee_non_csi, prize, cr_budget, pub_budget, guest_budget;
+    TextView eventName, eventTheme, event_date, eventDescription, speaker, venue, fee_csi, fee_non_csi, prize, cr_budget, pub_budget, guest_budget, tvFileStatus;
     EditText target_aud, comments, money_c, money_s;
     CheckBox reg_desk, inclass_pub;
     LinearLayout comments_layout;
@@ -94,7 +95,7 @@ public class Publicity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
 
-    private Button selectFileButton;
+    private Button selectFileButton, deleteButton;
     private String currentFileName = null;
 
     private Button downloadButtonForOthers;
@@ -116,6 +117,7 @@ public class Publicity extends AppCompatActivity {
 
 
         eventName = (TextView) findViewById(R.id.name_pl);
+        tvFileStatus = findViewById(R.id.tvFileStatus);
         eventTheme = (TextView) findViewById(R.id.theme_pl);
         event_date = (TextView) findViewById(R.id.ed_pl);
         speaker = (TextView) findViewById(R.id.speaker_pl);
@@ -133,6 +135,7 @@ public class Publicity extends AppCompatActivity {
         cr_budget = findViewById(R.id.cb);
         pub_budget = findViewById(R.id.pb);
         guest_budget = findViewById(R.id.gb);
+
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -158,6 +161,9 @@ public class Publicity extends AppCompatActivity {
             findViewById(R.id.pr_comments).setEnabled(false);
             findViewById(R.id.pr_m_coll).setEnabled(false);
             findViewById(R.id.pr_m_spent).setEnabled(false);
+            findViewById(R.id.delete_button).setEnabled(false);
+
+
         }
 
         edit_pr.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +173,7 @@ public class Publicity extends AppCompatActivity {
                 edit_pr.setVisibility(View.GONE);
                 pub_add_checkbox.setVisibility(View.VISIBLE);
                 pr_lay.setVisibility(View.VISIBLE);
+
 
 
             }
@@ -191,6 +198,7 @@ public class Publicity extends AppCompatActivity {
         selectFileButton = findViewById(R.id.select_file_button);
         if (!urole1.equals("PR Head")) {
             selectFileButton.setVisibility(View.GONE);
+
         }
         selectFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,6 +206,18 @@ public class Publicity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("application/pdf");
                 startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
+
+        deleteButton = findViewById(R.id.delete_button);
+        if (!urole1.equals("PR Head")) {
+            deleteButton.setVisibility(View.GONE);
+
+        }
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteUploadedFile();
             }
         });
 
@@ -209,9 +229,11 @@ public class Publicity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         boolean isFileUploaded = sharedPreferences.getBoolean(eid, false);
         if (isFileUploaded) {
+            tvFileStatus.setVisibility(View.GONE); // Hide the status message
             selectFileButton.setEnabled(false); // Disable the select file button
             Button downloadButton = findViewById(R.id.download_button);
             downloadButton.setVisibility(View.VISIBLE); // Show the download button
+            deleteButton.setVisibility(View.VISIBLE);
             downloadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -270,48 +292,79 @@ public class Publicity extends AppCompatActivity {
     }
 
 
-    private void showRenameDialog(final Uri fileUri) {
-        // Get the original file name
-        final String originalFileName = getFileName(fileUri);
-
-        // Create a new dialog box
+    private void showUploadConfirmationDialog(final Uri fileUri) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Rename file");
-
-        // Create an EditText view to allow the user to enter a new file name
-        final EditText input = new EditText(this);
-        input.setText(originalFileName);
-        builder.setView(input);
-
-        // Disable the choose button if a file has already been uploaded
+        builder.setTitle("Confirm Upload");
+        builder.setMessage("Do you want to upload the selected file?");
 
         builder.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Get the new file name from the EditText view
-                String newFileName = input.getText().toString().trim();
-                if (newFileName.isEmpty()) {
-                    // If the user did not enter a new file name, use the original file name
-                    newFileName = originalFileName;
-                }
-
-                // Upload the file with the new file name
-                uploadFile(fileUri, newFileName);
+                // Proceed with file upload
+                uploadFile(fileUri);
             }
         });
-
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // If the user clicked Cancel, do nothing
                 dialog.cancel();
             }
         });
 
-        // Show the dialog box
         builder.show();
     }
+
+    private void deleteUploadedFile() {
+        // Build the delete request
+        OkHttpClient client = new OkHttpClient();
+        // Use FormBody to send eid as part of the request body
+        RequestBody formBody = new FormBody.Builder()
+                .add("eid", eid)
+                .build();
+
+        okhttp3.Request deleteRequest = new okhttp3.Request.Builder()
+                .url(getApplicationContext().getResources().getString(R.string.server_url) + "/publicity/delete")
+                .post(formBody)
+                .build();
+
+        // Execute the delete request asynchronously
+        client.newCall(deleteRequest).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Publicity.this, "Error deleting file", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Publicity.this, "File deleted successfully", Toast.LENGTH_SHORT).show();
+                        selectFileButton.setEnabled(true); // Enable the select file button
+                        findViewById(R.id.download_button).setVisibility(View.GONE); // Hide the download button
+                        findViewById(R.id.delete_button).setVisibility(View.GONE); // Hide the delete button
+
+                        // Update SharedPreferences to reflect that the file has been deleted
+                        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                        editor.putBoolean(eid, false);
+                        editor.apply();
+                    }
+                });
+            }
+        });
+    }
+
+
 
 
     @Override
@@ -320,11 +373,12 @@ public class Publicity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            showRenameDialog(uri);
+            showUploadConfirmationDialog(uri);
         }
     }
 
-    private void uploadFile(Uri fileUri, String fileName) {
+    private void uploadFile(Uri fileUri) {
+        String eventNameText = eventName.getText().toString();
         try {
             InputStream inputStream = getContentResolver().openInputStream(fileUri);
 
@@ -342,19 +396,15 @@ public class Publicity extends AppCompatActivity {
             builder.setType(MultipartBody.FORM);
 
             // Add file to the builder
-            byte[] bytes = new byte[0];
-            try {
-                bytes = new byte[inputStream.available()];
-                inputStream.read(bytes);
-                RequestBody requestBody = RequestBody.create(MediaType.parse("application/pdf"), bytes);
-                builder.addFormDataPart("pdfFile", fileName, requestBody);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // Add params to the builder
-            builder.addFormDataPart("filename", fileName);
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            RequestBody requestBody = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), bytes);
+            builder.addFormDataPart("pdfFile", "file.pdf", requestBody);
             builder.addFormDataPart("eid", eid);
+            Log.i("eid for server upload",  eid);
+
+            builder.addFormDataPart("eventname", eventNameText); // Make sure this matches the server's expected field name
+            Log.i("event name",  eventNameText);
 
             // Build the request
             okhttp3.Request request = new okhttp3.Request.Builder()
@@ -410,10 +460,17 @@ public class Publicity extends AppCompatActivity {
                                                 throw new IOException("Unexpected code " + response);
                                             }
 
+                                            // Try to extract the file name from the Content-Disposition header
+                                            String contentDisposition = response.header("Content-Disposition");
+                                            String downloadedFileName = "downloaded_file.pdf"; // Default file name if header parsing fails
+                                            if (contentDisposition != null && contentDisposition.contains("filename=")) {
+                                                downloadedFileName = contentDisposition.split("filename=")[1].replaceAll("\"", "");
+                                            }
+
                                             // Create a file with the downloaded content
                                             byte[] bytes = response.body().bytes();
                                             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                                            File file = new File(downloadsDir, fileName);
+                                            File file = new File(downloadsDir, downloadedFileName);
                                             FileOutputStream outputStream = new FileOutputStream(file);
                                             outputStream.write(bytes);
                                             outputStream.close();
@@ -434,6 +491,9 @@ public class Publicity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(Publicity.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
+                            selectFileButton.setEnabled(false);
+                            findViewById(R.id.download_button).setVisibility(View.VISIBLE);
+                            findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
                         }
                     });
                 }

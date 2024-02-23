@@ -32,83 +32,95 @@ connection.connect(function (err) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "server_uploads/publicity_pdf/"); // Set the destination folder for uploaded files
+        cb(null, "server_uploads/publicity_pdf/");
     },
     filename: function (req, file, cb) {
-      cb(null, file.originalname); // Set the filename to the original filename of the uploaded file
+        // Use the original file name or a timestamp-based temporary name
+        const tempFilename = Date.now() + path.extname(file.originalname); // Temporary name with original extension
+        cb(null, tempFilename);
     },
-  });
-  
-  const upload = multer({ 
-    limits: { fileSize: 10000000 },
-    storage: storage });
-  
-  // Create a route to handle file uploads
-  router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
-    const file = req.file;
-    const eid = req.body.eid;
-    console.log(eid);
-  
-    // Check if a file was uploaded
-    if (!file) {
-      const error = new Error("Please upload a file");
-      error.httpStatusCode = 400;
-      return next(error);
-    }
-  
-    // Insert the file URL into the MySQL database
-    const url = "http://localhost:3000/server_uploads/publicity_pdf/" + file.filename; // Set the file URL to the server URL and the filename
-    const size = file.size;
-    const query = "INSERT INTO files (content, name, pdf_cpm_id, size) VALUES (?, ?, ?, ?)"; // Replace "files" with the name of your MySQL table
-  
-    connection.query(query, [ url, file.filename, eid, size ], function (error, results, fields) {
-      if (error) throw error;
-      res.send("File uploaded successfully");
-    });
-  });
-  
-// Create a route to handle file downloads
-router.get("/download", function (req, res) {
-    const eid = req.query.eid;
-  
-    // Query the MySQL database to get the file URL and filename based on the "eid" parameter
-    const query = "SELECT content, name FROM files WHERE pdf_cpm_id = ?";
-    connection.query(query, [eid], function (error, results, fields) {
-      if (error) {
-        console.error(error);
-        return res.status(500).send("Error retrieving file from database");
-      }
-  
-      if (!results || !results.length) {
-        return res.status(404).send("File not found");
-      }
-  
-      const url = results[0].content;
-      const filename = results[0].name;
-
-// Extract the file path from the URL
-const filePath = url.split('/').pop();
-
-// Create an absolute path based on your server's file system
-const absolutePath = path.join(__dirname, '..', 'server_uploads', 'publicity_pdf', filePath);
-
-// Set the headers for the download response
-res.setHeader("Content-disposition", "attachment; filename=" + filename);
-res.setHeader("Content-type", "application/pdf");
-
-// Send the file to the client
-res.sendFile(absolutePath, function (error) {
-  if (error) {
-    console.error(error);
-    res.status(error.status).end();
-  } else {
-    console.log("Sent file:", absolutePath);
-  }
 });
 
+
+const upload = multer({ 
+    limits: { fileSize: 10000000 },
+    storage: storage 
+});
+
+router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
+    const file = req.file;
+    if (!file) {
+        return res.status(400).send("Please upload a file");
+    }
+    
+    // Now req.body is populated, including eid and eventname
+    const { eid, eventname } = req.body;
+    const originalFilePath = file.path;
+    const newFilename = `${eid}_${eventname}_publicity.pdf`;
+    const newFilePath = path.join("server_uploads/publicity_pdf/", newFilename);
+
+    // Rename the file on the server file system
+    fs.rename(originalFilePath, newFilePath, (err) => {
+        if (err) {
+            console.error('File renaming error:', err);
+            return res.status(500).send("Error processing file");
+        }
+
+        // Proceed to insert file metadata into the database with the new filename
+        const size = file.size;
+        const query = "INSERT INTO publicity_files (eid, eventname, filename, filepath, size) VALUES (?, ?, ?, ?, ?)";
+
+        connection.query(query, [eid, eventname, newFilename, newFilePath, size], function (error, results, fields) {
+            if (error) {
+                console.error('Database insertion error:', error);
+                return res.status(500).send("Error saving file info to database");
+            }
+            res.send("File uploaded and renamed successfully");
+        });
     });
-  });
-  
+});
+
+router.get("/download", function (req, res) {
+    const eid = req.query.eid;
+
+    // Retrieve the file metadata from the database
+    const query = "SELECT filepath, filename FROM publicity_files WHERE eid = ?";
+    connection.query(query, [eid], function (error, results, fields) {
+        if (error) return res.status(500).send("Error retrieving file from database");
+        if (!results.length) return res.status(404).send("File not found");
+
+        const { filepath, filename } = results[0];
+        const absolutePath = path.join(__dirname, '..', filepath);
+
+        // Serve the file to the client
+        res.download(absolutePath, filename, function (error) {
+            if (error) res.status(error.status).end();
+            else console.log("Sent file:", filename);
+        });
+    });
+});
+
+router.post("/delete", function (req, res) {
+    const eid = req.body.eid;
+
+    const querySelect = "SELECT filepath FROM publicity_files WHERE eid = ?";
+    connection.query(querySelect, [eid], function (error, results, fields) {
+        if (error) return res.status(500).send("Error retrieving file for deletion: " + error.message);
+        if (!results.length) return res.status(404).send("File not found for deletion");
+
+        const absolutePath = path.join(__dirname, '..', results[0].filepath);
+
+        fs.unlink(absolutePath, function (err) {
+            if (err) return res.status(500).send("Error deleting the file: " + err.message);
+
+            const queryDelete = "DELETE FROM publicity_files WHERE eid = ?";
+            connection.query(queryDelete, [eid], function (error, results, fields) {
+                if (error) return res.status(500).send("Error deleting file info from database: " + error.message);
+                res.send("File deleted successfully");
+            });
+        });
+    });
+});
 
 //Viewing Events
 router.post('/viewEvent', (req, res) => {
