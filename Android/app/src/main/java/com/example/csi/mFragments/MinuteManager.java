@@ -1,6 +1,7 @@
 package com.example.csi.mFragments;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.csi.Prompts.AddMinute;
 import com.example.csi.Prompts.DetailActivity;
 import com.example.csi.R;
+import com.example.csi.SharedPreferenceConfig;
 import com.example.csi.mAdapter.ExampleAdapter;
 import com.example.csi.mAdapter.ExampleItem;
 
@@ -46,6 +48,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClickedListener {
+    private String urole1,eid , BoxStatus;
 
     //creating constant variables to use as keywords while sending data to DetailActivity.java
     public static final String EXTRA_AGENDA = "agenda";
@@ -56,6 +59,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
     public static final String EXTRA_ABSENTEE = "absentee";
     public static final String EXTRA_TASK = "task";
     public static final String EXTRA_PERSON = "person";
+    private SharedPreferenceConfig preferenceConfig;
 
     private RecyclerView rv;
     private ExampleAdapter mExampleAdapter;
@@ -76,10 +80,15 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         rootView = inflater.inflate(R.layout.minute_manager,null);
         getActivity().setTitle("Minute Manager");
         Bundle bundle = getArguments();
         UID = this.getArguments().getString("id");
+        // Adjusted to use getActivity() for context.
+        preferenceConfig = new SharedPreferenceConfig(getActivity());
+
+        urole1 = preferenceConfig.readRoleStatus();
         //SearchBar
         SearchInput = rootView.findViewById(R.id.search_bar);
         //We are getting User ID from navigation manager to this fragment
@@ -94,6 +103,12 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
 
         mExampleList = new ArrayList<>();
         mAddMinute = rootView.findViewById(R.id.add_button);
+
+        if(!urole1.equals("Secretary")){
+            mAddMinute.setVisibility(View.GONE);
+
+        }
+
         mAddMinute.setOnClickListener(new View.OnClickListener() {
             Context context = rootView.getContext();
             @Override
@@ -127,6 +142,8 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
             }
         });
         return rootView;
+
+
     }
 
     public void parseJSON() {
