@@ -4,6 +4,14 @@ var mysql = require('mysql');
 const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const request = require('request');
+
+// Increase payload limit to 50MB
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 // MySQL Connection
@@ -21,6 +29,103 @@ connection.connect(function(err) {
         console.log('Not Connected to MySql!Technical.js');
     }
 });
+
+
+// Create a storage object with Multer to handle file uploads
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "server_uploads/technical_pdf/");
+    },
+    filename: function (req, file, cb) {
+        // Use the original file name or a timestamp-based temporary name
+        const tempFilename = Date.now() + path.extname(file.originalname); // Temporary name with original extension
+        cb(null, tempFilename);
+    },
+});
+
+
+const upload = multer({ 
+    limits: { fileSize: 10000000 },
+    storage: storage 
+});
+
+router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
+    const file = req.file;
+    if (!file) {
+        return res.status(400).send("Please upload a file");
+    }
+    
+    // Now req.body is populated, including eid and eventname
+    const { eid, eventname } = req.body;
+    console.log("name", eventname);
+    const originalFilePath = file.path;
+    const newFilename = `${eid}_${eventname}_technical.pdf`;
+    const newFilePath = path.join("server_uploads/technical_pdf/", newFilename);
+
+    // Rename the file on the server file system
+    fs.rename(originalFilePath, newFilePath, (err) => {
+        if (err) {
+            console.error('File renaming error:', err);
+            return res.status(500).send("Error processing file");
+        }
+
+        // Proceed to insert file metadata into the database with the new filename
+        const size = file.size;
+        const query = "INSERT INTO technical_files (eid, eventname, filename, filepath, size) VALUES (?, ?, ?, ?, ?)";
+
+        connection.query(query, [eid, eventname, newFilename, newFilePath, size], function (error, results, fields) {
+            if (error) {
+                console.error('Database insertion error:', error);
+                return res.status(500).send("Error saving file info to database");
+            }
+            res.send("File uploaded and renamed successfully");
+        });
+    });
+});
+
+router.get("/download", function (req, res) {
+    const eid = req.query.eid;
+
+    // Retrieve the file metadata from the database
+    const query = "SELECT filepath, filename FROM technical_files WHERE eid = ?";
+    connection.query(query, [eid], function (error, results, fields) {
+        if (error) return res.status(500).send("Error retrieving file from database");
+        if (!results.length) return res.status(404).send("File not found");
+
+        const { filepath, filename } = results[0];
+        const absolutePath = path.join(__dirname, '..', filepath);
+
+        // Serve the file to the client
+        res.download(absolutePath, filename, function (error) {
+            if (error) res.status(error.status).end();
+            else console.log("Sent file:", filename);
+        });
+    });
+});
+
+router.post("/delete", function (req, res) {
+    const eid = req.body.eid;
+
+    const querySelect = "SELECT filepath FROM technical_files WHERE eid = ?";
+    connection.query(querySelect, [eid], function (error, results, fields) {
+        if (error) return res.status(500).send("Error retrieving file for deletion: " + error.message);
+        if (!results.length) return res.status(404).send("File not found for deletion");
+
+        const absolutePath = path.join(__dirname, '..', results[0].filepath);
+
+        fs.unlink(absolutePath, function (err) {
+            if (err) return res.status(500).send("Error deleting the file: " + err.message);
+
+            const queryDelete = "DELETE FROM technical_files WHERE eid = ?";
+            connection.query(queryDelete, [eid], function (error, results, fields) {
+                if (error) return res.status(500).send("Error deleting file info from database: " + error.message);
+                res.send("File deleted successfully");
+            });
+        });
+    });
+});
+
 
 //Viewing Events
 router.post('/viewEvents', (req, res) =>{

@@ -230,41 +230,41 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/colorPrimary"
                         android:text="0000"/>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="0dp"
-            android:background="#EDEDED" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white"
-            android:padding="5dp">
-            <TextView
-                android:layout_width="fill_parent"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="20sp"
-                android:text="Worth Prize"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="@color/colorAccent"/>
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:text="Worth Prize"
-                android:textSize="17sp"
-                android:textColor="@color/colorAccent"
-                android:id="@+id/prize_tf"/>
-        </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="0dp"
-            android:background="#EDEDED" />
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="5dp">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20sp"
+                    android:text="Worth Prize"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/colorAccent"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="40dp"
+                    android:text="Worth Prize"
+                    android:textSize="17sp"
+                    android:textColor="@color/colorAccent"
+                    android:id="@+id/prize_tf"/>
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
 
             <TextView
                 android:layout_width="fill_parent"
@@ -400,7 +400,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_margin="0dp"
-                android:background="@color/colorAccent" />
+                android:background="#EDEDED" />
         </LinearLayout>
 
         <LinearLayout
@@ -465,24 +465,22 @@
                 android:text="Softwares Installed"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
-
-
         </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="0dp"
-            android:background="#EDEDED" />
 
         <LinearLayout
             android:id="@+id/checkbox_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:paddingBottom="10dp"
+            android:textColor="@color/colorPrimary"
             android:orientation="vertical">
         </LinearLayout>
 
         <LinearLayout
+            android:padding="5dp"
             android:id="@+id/tasks_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -498,40 +496,17 @@
         <Button
             android:id="@+id/add_checkbox_button"
             android:visibility="gone"
-            android:text="Add New Task"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="251dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginVertical="20dp"
-            android:background="@drawable/ripple_effect"
-            android:textColor="@color/white"
-            android:clickable="true"
-            android:focusable="true"/>
-        <LinearLayout
+            android:text="Add Tasks"
+
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_gravity="left"
+            android:layout_marginVertical="20dp"
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="Technical Requirements"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:textStyle="bold"
-                android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/black"
+            android:clickable="true"
+            android:focusable="true"/>
 
-            <TextView
-                android:id="@+id/tech_req"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:text="Technical Requirements"
-                android:textColor="@color/colorAccent"
-                android:textSize="17sp" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -542,6 +517,7 @@
             android:id="@+id/tf_comment_layout"
             android:visibility="gone"
             >
+
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -575,12 +551,13 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginEnd="20dp"
                 />
+
             <Button
                 android:id="@+id/Send_Tech_form"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="251dp"
                 android:layout_height="wrap_content"
-                android:text="Update"
+                android:text="Click To Update The Tasks "
                 android:visibility="visible"
                 android:layout_gravity="center"
                 android:layout_marginVertical="20dp"
@@ -589,6 +566,81 @@
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tech_pl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="0dp"
+                    android:background="#EDEDED" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="10dp"
+                    android:text="TECH DOC. UPLOAD"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/techFileStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Note: Expense file not uploaded yet (Max upload size: 10 mb)"
+                    android:visibility="visible"
+                    android:textColor="@color/colorPrimary"
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_gravity="left"/>
+
+                <Button
+                    android:id="@+id/tech_select_file_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Select File" />
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tech_select_file_button">
+
+                    <Button
+                        android:id="@+id/tech_delete_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginStart="28dp"
+                        android:layout_marginLeft="28dp"
+                        android:text="Delete File"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/tech_download_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="28dp"
+                        android:layout_marginLeft="28dp"
+                        android:layout_toEndOf="@id/tech_delete_button"
+                        android:layout_toRightOf="@id/tech_delete_button"
+                        android:text="Download"
+                        android:visibility="invisible" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+
+
+
         <Button
             android:id="@+id/updateTech"
             style="?android:attr/borderlessButtonStyle"

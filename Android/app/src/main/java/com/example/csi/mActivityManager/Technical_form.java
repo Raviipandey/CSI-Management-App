@@ -1,8 +1,15 @@
 package com.example.csi.mActivityManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,14 +46,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+
 public class Technical_form extends AppCompatActivity {
     private String urole1,eid , BoxStatus;
+    LinearLayout tech_lay;
     private SharedPreferenceConfig preferenceConfig;
-    private TextView name , theme , e_date,speaker,csi_f,ncsi_f,worth_prize , description, cr_budget, pub_budget, guest_budget , tech_req;
+    private TextView name , theme , e_date,speaker,csi_f,ncsi_f,worth_prize , description, cr_budget, pub_budget, guest_budget , tech_req, techFileStatus;
     CheckBox question , internet , software;
     EditText comments;
     LinearLayout comments_layout;
@@ -54,6 +73,8 @@ public class Technical_form extends AppCompatActivity {
     private ArrayList<String> checkboxNames = new ArrayList<>();
     private List<CheckBox> checkBoxList = new ArrayList<>();
     private List<CheckBox> checkedboxes = new ArrayList<>();
+    private Button techselectFileButton, techdeleteButton;
+    private static final int REQUEST_CODE = 1;
 
 
     @Override
@@ -64,9 +85,12 @@ public class Technical_form extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         urole1=preferenceConfig.readRoleStatus();
+        tech_lay = findViewById(R.id.tech_pl);
 //        linearLayout = (LinearLayout) findViewById(R.id.linear_layout);
 
-        name =findViewById(R.id.name_tf);
+//        name =findViewById(R.id.name_tf);
+        name = (TextView) findViewById(R.id.name_tf);
+        techFileStatus = findViewById(R.id.techFileStatus);
         theme  =findViewById(R.id.theme_tf);
         e_date =findViewById(R.id.ed_tf);
         speaker =findViewById(R.id.speaker_tf);
@@ -77,7 +101,6 @@ public class Technical_form extends AppCompatActivity {
         cr_budget=findViewById(R.id.cb);
         pub_budget=findViewById(R.id.pb);
         guest_budget=findViewById(R.id.gb);
-        tech_req = findViewById(R.id.tech_req);
         checkboxContainer = findViewById(R.id.checkbox_container);
         Bundle extras = getIntent().getExtras();
         if(extras == null) {
@@ -96,19 +119,30 @@ public class Technical_form extends AppCompatActivity {
 
         Button edit = findViewById(R.id.updateTech);
         Button add_checkbox_button = findViewById(R.id.add_checkbox_button);
+
+
         if(urole1.equals("Tech Head" )){
             edit.setVisibility(View.VISIBLE);
+            tech_lay.setVisibility(View.GONE);
+        }else{
+            tech_lay.setVisibility(View.VISIBLE);
+            findViewById(R.id.tech_delete_button).setEnabled(false);
+
+
         }
+
 
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tech_lay.setVisibility(View.VISIBLE);
                 add_checkbox_button.setVisibility(View.VISIBLE);
                 comments_layout.setVisibility(View.VISIBLE);
                 question.setEnabled(true);
                 internet.setEnabled(true);
                 software.setEnabled(true);
                 edit.setVisibility(View.GONE);
+
 
 
 
@@ -125,6 +159,7 @@ public class Technical_form extends AppCompatActivity {
                 question.setEnabled(false);
                 internet.setEnabled(false);
                 software.setEnabled(false);
+                tech_lay.setVisibility(View.VISIBLE);
 
                 volley_send();
             }
@@ -146,7 +181,315 @@ public class Technical_form extends AppCompatActivity {
             }
         });
 
+        techselectFileButton = findViewById(R.id.tech_select_file_button);
+        if (!urole1.equals("Tech Head")) {
+            techselectFileButton.setVisibility(View.GONE);
+
+        }
+        techselectFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("application/pdf");
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
+
+        techdeleteButton = findViewById(R.id.tech_delete_button);
+        if (!urole1.equals("Tech Head")) {
+            techdeleteButton.setVisibility(View.GONE);
+
+        }
+        techdeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteUploadedFile();
+            }
+        });
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+
+        // Check if a file has already been uploaded for this eid
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        boolean isFileUploaded = sharedPreferences.getBoolean(eid, false);
+        if (isFileUploaded) {
+            techFileStatus.setVisibility(View.GONE); // Hide the status message
+            techselectFileButton.setEnabled(false); // Disable the select file button
+            Button techdownloadButton = findViewById(R.id.tech_download_button);
+            techdownloadButton.setVisibility(View.VISIBLE); // Show the download button
+            techdeleteButton.setVisibility(View.VISIBLE);
+            techdownloadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Build the download request
+                    OkHttpClient client = new OkHttpClient();
+                    okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
+                            .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid)
+                            .build();
+
+                    // Execute the download request asynchronously
+                    client.newCall(downloadRequest).enqueue(new okhttp3.Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                            if (!response.isSuccessful()) {
+                                throw new IOException("Unexpected code " + response);
+                            }
+
+                            // Create a file with the downloaded content
+                            byte[] bytes = response.body().bytes();
+                            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                            String fileName = response.header("Content-Disposition").replaceAll("attachment; filename=", "");
+                            File file = new File(downloadsDir, fileName);
+                            FileOutputStream outputStream = new FileOutputStream(file);
+                            outputStream.write(bytes);
+                            outputStream.close();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, try to download file again
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Permission denied to write to external storage", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    private void showUploadConfirmationDialog(final Uri fileUri) {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Confirm Upload");
+        builder.setMessage("Do you want to upload the selected file?");
+
+        builder.setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Proceed with file upload
+                uploadFile(fileUri);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void deleteUploadedFile() {
+        // Build the delete request
+        OkHttpClient client = new OkHttpClient();
+        // Use FormBody to send eid as part of the request body
+        RequestBody formBody = new FormBody.Builder()
+                .add("eid", eid)
+                .build();
+
+        okhttp3.Request deleteRequest = new okhttp3.Request.Builder()
+                .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/delete")
+                .post(formBody)
+                .build();
+
+        // Execute the delete request asynchronously
+        client.newCall(deleteRequest).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Technical_form.this, "Error deleting file", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Technical_form.this, "File deleted successfully", Toast.LENGTH_SHORT).show();
+                        techselectFileButton.setEnabled(true); // Enable the select file button
+                        findViewById(R.id.tech_download_button).setVisibility(View.GONE); // Hide the download button
+                        findViewById(R.id.tech_delete_button).setVisibility(View.GONE); // Hide the delete button
+
+                        // Update SharedPreferences to reflect that the file has been deleted
+                        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                        editor.putBoolean(eid, false);
+                        editor.apply();
+                    }
+                });
+            }
+        });
+    }
+
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            showUploadConfirmationDialog(uri);
+        }
+    }
+
+    private void uploadFile(Uri fileUri) {
+        String eventNameText = name.getText().toString();
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(fileUri);
+
+            // Check if a file has already been uploaded for this eid
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            boolean isFileUploaded = sharedPreferences.getBoolean(eid, false);
+            if (isFileUploaded) {
+                Toast.makeText(this, "You have already uploaded a file for this eid", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Create OkHttp3 client and builder
+            OkHttpClient client = new OkHttpClient();
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.setType(MultipartBody.FORM);
+
+            // Add file to the builder
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            RequestBody requestBody = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), bytes);
+            builder.addFormDataPart("pdfFile", "file.pdf", requestBody);
+            builder.addFormDataPart("eid", eid);
+            Log.i("eid for server upload",  eid);
+
+            builder.addFormDataPart("eventname", eventNameText); // Make sure this matches the server's expected field name
+            Log.i("event name",  eventNameText);
+
+            // Build the request
+            okhttp3.Request request = new okhttp3.Request.Builder()
+                    .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/upload")
+                    .post(builder.build())
+                    .build();
+
+            // Execute the request asynchronously
+            client.newCall(request).enqueue(new okhttp3.Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(Technical_form.this, "Error uploading file", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
+
+                    // Save the eid in SharedPreferences to indicate that a file has been uploaded for this eid
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(eid, true);
+                    editor.apply();
+
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            techselectFileButton.setEnabled(false); // Disable the select file button
+                            Button techdownloadButton = findViewById(R.id.tech_download_button);
+                            techdownloadButton.setVisibility(View.VISIBLE); // Show the download button
+                            techdownloadButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // Build the download request
+                                    okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
+                                            .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid)
+                                            .build();
+
+                                    // Execute the download request asynchronously
+                                    client.newCall(downloadRequest).enqueue(new okhttp3.Callback() {
+                                        @Override
+                                        public void onFailure(Call call, IOException e) {
+                                            e.printStackTrace();
+                                            Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                                            if (!response.isSuccessful()) {
+                                                throw new IOException("Unexpected code " + response);
+                                            }
+
+                                            // Try to extract the file name from the Content-Disposition header
+                                            String contentDisposition = response.header("Content-Disposition");
+                                            String downloadedFileName = "downloaded_file.pdf"; // Default file name if header parsing fails
+                                            if (contentDisposition != null && contentDisposition.contains("filename=")) {
+                                                downloadedFileName = contentDisposition.split("filename=")[1].replaceAll("\"", "");
+                                            }
+
+                                            // Create a file with the downloaded content
+                                            byte[] bytes = response.body().bytes();
+                                            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                            File file = new File(downloadsDir, downloadedFileName);
+                                            FileOutputStream outputStream = new FileOutputStream(file);
+                                            outputStream.write(bytes);
+                                            outputStream.close();
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Technical_form.this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
+                            techselectFileButton.setEnabled(false);
+                            findViewById(R.id.tech_download_button).setVisibility(View.VISIBLE);
+                            findViewById(R.id.tech_delete_button).setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         // TODO Auto-generated method sub
@@ -165,7 +508,7 @@ public class Technical_form extends AppCompatActivity {
 //    }
     private void showNamePrompt() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Name");
+        builder.setTitle("Enter Task Name To Be Added:");
 
         final View inputView = getLayoutInflater().inflate(R.layout.name_prompt, null);
         builder.setView(inputView);
@@ -245,7 +588,7 @@ public class Technical_form extends AppCompatActivity {
                         cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
                         pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
                         guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
-                        tech_req.setText(jsonObject1.getString("tech_comment"));
+
 //                        addCheckbox(jsonObject1.getString("tasks"));
 
 
