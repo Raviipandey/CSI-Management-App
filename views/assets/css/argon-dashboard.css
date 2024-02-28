@@ -4538,11 +4538,11 @@ fieldset:disabled .btn {
   color: var(--bs-nav-link-hover-color);
 }
 
-.nav-link.disabled {
+/* .nav-link.disabled {
   color: var(--bs-nav-link-disabled-color);
   pointer-events: none;
   cursor: default;
-}
+} */
 
 .nav-tabs {
   --bs-nav-tabs-border-width: 1px;
@@ -20895,13 +20895,19 @@ fieldset:disabled .btn {
   height: 100%;
   position: absolute;
   border-radius: 1rem;
+  
 }
 
 .card.card-background .card-body {
   color: #fff;
   position: relative;
   z-index: 2;
+  overflow-x: scroll;
+  overflow: scroll;
+
 }
+
+
 
 .card.card-background .card-body .content-center,
 .card.card-background .card-body .content-left {
