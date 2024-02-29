@@ -32,5 +32,29 @@ module.exports = {
                 }
             }
         );
+    },
+    countMembers: (request, response) => {
+        console.log("Received request for /countMembers");
+
+        connection.query("SELECT COUNT(*) AS count FROM core_details", function (error, results, fields) {
+            if (error) {
+                console.error("Error fetching count of core", error);
+                response.status(500).json({message: "Error fetching count of core", error: error});
+                return;
+            }
+            console.log("Query executed successfully.");
+            
+            if (results.length > 0) {
+                console.log("Count of core:", results[0].count);
+                response.json({
+                    count: results[0].count
+                });
+            } else {
+                console.log("No results found. Returning count as 0.");
+                response.json({
+                    count: 0
+                });
+            }
+        });
     }
 };

@@ -1,59 +1,70 @@
+<!--
+=========================================================
+* Argon Dashboard 2 - v2.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Sign Up Form by Colorlib</title>
 
-    <!-- Font Icon -->
-    <!-- <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css"> -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/icons/favicon-16x16.png">
+  <title>
+    CSI Management App
+  </title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+</head>
 
-    <!-- Main css -->
 
-    <!--     Fonts and icons     -->
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
-      rel="stylesheet"
-    />
-    <!-- Nucleo Icons -->
-    <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
-    <script
-      src="https://kit.fontawesome.com/42d5adcbca.js"
-      crossorigin="anonymous"
-    ></script>
-    <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- CSS Files -->
-    <link
-    id="pagestyle"
-    href="../assets/css/argon-dashboard.css?v=2.0.4"
-    rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/views/assets/css/register.css" />
-  </head>
-  <body class="g-sidenav-show bg-gray-100">
-    <div
-      class="min-height-300 bg-primary position-absolute w-100"
-    ></div>
-    <%- include('../templates/asidebar'); %>
 
-    <main class="main-content position-relative border-radius-lg">
-      <!-- Navbar -->
-  
-      <!-- End Navbar -->
-      <div class="container-fluid py-4">
-        <div>
-          <!-- Sign up form -->
-          <section class="add-core-member" style="padding-top: 100px;">
+<body class="g-sidenav-show bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <%- include('../templates/asidebar'); %>
+  <div class="main-content position-relative max-height-vh-100 h-100">
+
+
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="d-flex align-items-center">
+                <p class="mb-0">ADD CORE MEMBERS</p>
+                
+              </div>
+            </div>
+            <div class="card-body">
+               <!-- Sign up form -->
+          <section class="add-core-member">
             <div class="container bg-white">
               <div class="signup-content">
                 <div class="signup-form">
-                  <h2 class="form-title">Add Core Member</h2>
+
                   <form method="POST" class="register-form" id="add-core-member-form">
                     <div class="form-group">
-                      <label for="role"><i class="ni ni-badge"></i></label>
+                      <label for="role"><i class="ni ni-badge"></i> Add Role</label>
+                      <br>
                       <select name="role" id="role">
                         <option value="3">Chairperson</option>
                         <option value="4">Vice Chairperson</option>
@@ -67,39 +78,39 @@
                       </select>
                     </div>
                     <div class="form-group">
-                      <label for="first-name"><i class="ni ni-single-02"></i></label>
-                      <input type="text" name="first_name" id="first-name" placeholder="First Name" />
+                      <label for="first-name"><i class="ni ni-single-02"></i> First Name</label>
+                      <input type="text" name="first_name" id="first-name" placeholder="First Name" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="last-name"><i class="ni ni-single-02"></i></label>
-                      <input type="text" name="last_name" id="last-name" placeholder="Last Name" />
+                      <label for="last-name"><i class="ni ni-single-02"></i> Last Name</label>
+                      <input type="text" name="last_name" id="last-name" placeholder="Last Name" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="password"><i class="ni ni-lock-circle-open"></i></label>
-                      <input type="password" name="password" id="password" placeholder="Password" />
+                      <label for="password"><i class="ni ni-lock-circle-open"></i> Password</label>
+                      <input type="password" name="password" id="password" placeholder="Password" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="roll-no"><i class="ni ni-credit-card"></i></label>
-                      <input type="text" name="roll_no" id="roll-no" placeholder="Roll No" />
+                      <label for="roll-no"><i class="ni ni-credit-card"></i> Roll No.</label>
+                      <input type="text" name="roll_no" id="roll-no" placeholder="Roll No" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="mob-no"><i class="ni ni-phone"></i></label>
-                      <input type="text" name="mob_no" id="mob-no" placeholder="Mobile No" />
+                      <label for="mob-no"><i class="ni ni-phone"></i> Mobile No.</label>
+                      <input type="text" name="mob_no" id="mob-no" placeholder="Mobile No" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="email"><i class="ni ni-email-83"></i></label>
-                      <input type="email" name="email" id="email" placeholder="Email" />
+                      <label for="email"><i class="ni ni-email-83"></i> Email ID</label>
+                      <input type="email" name="email" id="email" placeholder="Email" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
-                      <label for="branch"><i class="ni ni-istanbul"></i></label>
-                      <input type="text" name="branch" id="branch" placeholder="Branch" />
+                      <label for="branch"><i class="ni ni-istanbul"></i> Branch</label>
+                      <input type="text" name="branch" id="branch" placeholder="Branch" class="form-control form-control-lg"/>
                     </div>
                     <div class="form-group">
-                      <label for="class"><i class="ni ni-hat-3"></i></label>
-                      <input type="text" name="class" id="class" placeholder="Class" />
+                      <label for="class"><i class="ni ni-hat-3"></i> Class</label>
+                      <input type="text" name="class" id="class" placeholder="Class" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group form-button">
-                      <input type="submit" name="add_member" id="add-member" class="form-submit" value="Add Member" onclick="submitForm()" />
+                      <input type="submit" name="add_member" id="add-member" class="form-submit btn btn-dark btn-sm w-100 mb-3" value="Add Member" onclick="submitForm()" />
                     </div>
                   </form>
                 </div>
@@ -107,48 +118,113 @@
               </div>
             </div>
           </section>
+        
+         
+            </div>
+          </div>
         </div>
-
-        <!--footer starts-->
-        <!-- <%- include('../templates/footer'); %> -->
-        <!--footer ends-->
+        <div class="col-md-4">
+          <div class="card card-profile">
+            <img src="../assets/img/dbit-clg.jpg" alt="Image placeholder" class="card-img-top">
+     
+     
+            <div class="card-body pt-0">
+        
+              <div class="text-center mt-4">
+                <h5>
+                  No. of Core Members added
+                </h5>
+            
+                <h5 class="font-weight-bolder" id="member-count">
+                  Loading...
+                </h5>
+                
+       
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script>
-      // Function to submit the form using Ajax
-      function submitForm() {
-        // Get form data
-        const formData = {
-          role: $('#role').val(),
-          first_name: $('#first-name').val(),
-          last_name: $('#last-name').val(),
-          roll_no: $('#roll-no').val(),
-          mob_no: $('#mob-no').val(),
-          email: $('#email').val(),
-          password: $('#password').val(),
-          branch: $('#branch').val(),
-          class_name: $('#class').val(),
-        };
-        // Make an Ajax request to your server endpoint
-        $.ajax({
-          type: 'POST',
-          url: '/addmembers',
-          contentType: 'application/json', // Set the content type to JSON
-          data: JSON.stringify(formData), // Convert the object to a JSON string
-          success: function (response) {
-            // Handle success response
-            console.log('Form submitted successfully:', response);
-          },
-          error: function (error) {
-            // Handle error response
-            console.error('Error submitting form:', error);
-          },
-        });
+      <%- include('../templates/footer'); %>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    // Function to submit the form using Ajax
+    function submitForm() {
+      // Get form data
+      const formData = {
+        role: $('#role').val(),
+        first_name: $('#first-name').val(),
+        last_name: $('#last-name').val(),
+        roll_no: $('#roll-no').val(),
+        mob_no: $('#mob-no').val(),
+        email: $('#email').val(),
+        password: $('#password').val(),
+        branch: $('#branch').val(),
+        class_name: $('#class').val(),
+      };
+      // Make an Ajax request to your server endpoint
+      $.ajax({
+        type: 'POST',
+        url: '/addmembers',
+        contentType: 'application/json', // Set the content type to JSON
+        data: JSON.stringify(formData), // Convert the object to a JSON string
+        success: function (response) {
+          // Handle success response
+          console.log('Form submitted successfully:', response);
+        },
+        error: function (error) {
+          // Handle error response
+          console.error('Error submitting form:', error);
+        },
+      });
+    }
+  </script>
+
+  <script>
+
+$(document).ready(function () {
+  updateMemberCount();
+
+  function updateMemberCount() {
+    $.ajax({
+      url: "/countMembers",
+      method: "GET",
+      dataType: "JSON",
+      success: function (response) {
+        $('#member-count').text(response.count);
+      },
+      error: function (error) {
+        console.error("Error fetching core count:", error);
+        $('#member-count').text("Error");
       }
-    </script>
-    <!-- <script src="/"></script> -->
-    <!-- <script src="js/main.js"></script> -->
-  </body>
-  <!-- This templates was made by Colorlib (https://colorlib.com) -->
+    });
+  }
+});
+
+
+
+  </script>
+
+  <!--   Core JS Files   -->
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+</body>
+
 </html>

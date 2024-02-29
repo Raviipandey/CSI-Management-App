@@ -272,8 +272,8 @@
                       <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                         <i class="ni ni-camera-compact text-dark opacity-10"></i>
                       </div>
-                      <h5 class="text-white mb-1">Get started with Argon</h5>
-                      <p>There’s nothing I really wanted to do in life that I wasn’t able to get good at.</p>
+                      <h5 class="text-white mb-1">Mumbai Hackathon</h5>
+                      <p>The Flagship event, to create incredible open source projects at Mumbai's largest Open Source Hackathon</p>
                     </div>
                   </div>
                   <div class="carousel-item h-100" style="background-image: url('./assets/img/Goc.jpg');
@@ -282,19 +282,18 @@
                       <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                         <i class="ni ni-bulb-61 text-dark opacity-10"></i>
                       </div>
-                      <h5 class="text-white mb-1">Faster way to create web pages</h5>
-                      <p>That’s my skill. I’m not really specifically talented at anything except for the ability to
-                        learn.</p>
+                      <h5 class="text-white mb-1">Game of Codes</h5>
+                      <p>DBIT-CSI Student Branch's intercollegiate Online software Coding Competition under the banner of “CSI TechNext India”</p>
                     </div>
                   </div>
-                  <div class="carousel-item h-100" style="background-image: url('./assets/img/100Days.png');
-      background-size: cover;">
+                  <div class="carousel-item h-100" style="background-image: url('./assets/img/10845678_619744571490283_718086463101887186_o.jpg');
+      background-size: cover;background-position: center;">
                     <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                       <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                         <i class="ni ni-trophy text-dark opacity-10"></i>
                       </div>
-                      <h5 class="text-white mb-1">Share with us your design tips!</h5>
-                      <p>Don’t be afraid to be wrong because you can’t learn anything from a compliment.</p>
+                      <h5 class="text-white mb-1">Encore</h5>
+                      <p>CSI DBIT successfully organized the "First ever Online National Level Paper Presentation Contest" in Mumbai University for B.E. students of Electronics & Telecommunications, Computer and Information Technology (I.T.) engineering branches.</p>
                     </div>
                   </div>
                 </div>
@@ -322,7 +321,7 @@
               </div>
               <div class="table-responsive">
                 <div>
-                  <canvas id="myChart" style="margin: auto;"></canvas>
+                  <canvas id="myChart" style="margin: auto;display: block;"></canvas>
                 </div>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -382,22 +381,22 @@
             
             <div class="card">
               <div class="card-header pb-0 p-3">
-                <h6 class="mb-0">Categories</h6>
+                <h6 class="mb-0">Event Track Details</h6>
               </div>
-              <div class="card-body" style="    max-height: 400px;">
+              <div class="card-body" style="    max-height: 410px;">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                   <p class="mb-0"></p>
                 </div>
                 <!--The recent confirmed event card starts-->
                 <div class="card-body" style="    position: relative; bottom: 20px; max-height: 400px;">
                   <div class="table-responsive">
-                    <table class="table table-striped table-bordered" id="confirmed_data" style="border: thick;">
+                    <table class="table table-striped table-bordered" id="confirmed_data" style="border-collapse: collapse;">
                       <thead>
                         <tr>
                           <th class="text-center" style="vertical-align: middle; text-align: center;color: black;">Event
                             Name</th>
                           <th class="text-center" style="vertical-align: middle; text-align: center;color: black;">
-                            Category</th>
+                            Track</th>
                         </tr>
                       </thead>
                       <tbody class="text-center"></tbody>
@@ -426,21 +425,19 @@
                           for (var count = 0; count < data.data.length; count++) {
 
                             if (data.data[count].proposals_three_track == 1) {
-                              proposals_three_track = 1;
-                              color = '#00ccff';
+                              proposals_three_track = 'academic';
+                              color = '#36a2ebcc';
                             }
                             else if (data.data[count].proposals_three_track == 3) {
-                              proposals_three_track = 3;
-                              color = '#66ff99';
+                              proposals_three_track = 'wellness';
+                              color = '#ff6384cc';
                             }
                             else if (data.data[count].proposals_three_track == 2) {
-                              proposals_three_track = 2;
-                              color = '#ff66ff';
+                              proposals_three_track = 'aspiration';
+                              color = '#ffcd56cc';
                             }
 
-                            // if (category == 'Aspiration'){
-                            //   color = 'cyan'
-                            // }
+                 
 
                             html += `
                                       <tr>

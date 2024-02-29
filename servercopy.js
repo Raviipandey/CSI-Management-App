@@ -110,6 +110,7 @@ app.use('/countApprovedProposals', proposal.countApprovedProposals)
 app.use('/countRejectedProposals', proposal.countRejectedProposals)
 app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals)
 app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals)
+app.use('/countMembers', addmembers.countMembers)
 
 
 app.get("/",(req,res)=>{
@@ -117,7 +118,7 @@ app.get("/",(req,res)=>{
         if (session.userid) {
         res.redirect("/dashboard");
         } else {
-            res.render(__dirname + "/views/login.ejs", {
+            res.render(__dirname + "/views/pages/sign-in.ejs", {
                 Emsg : req.flash("Emsg")
             });
         }
