@@ -30,5 +30,18 @@ module.exports = {
             response.end();
         })
     
+    },
+    techsingle : (request, response) => {
+        connection.query("SELECT * FROM technical_files ORDER BY eid DESC",function(error,results,fields){
+            if (results.length > 0) {
+                    // console.log(results);
+                        response.json({
+                data:results
+            });
+            } else {
+                response.redirect("/error");
+            }
+            response.end();
+        })
     }
 };
