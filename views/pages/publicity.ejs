@@ -34,6 +34,10 @@
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -50,11 +54,11 @@
           <div class="col-12">
             <div class="card mb-4">
               <div class="card-header pb-0">
-                <h6>Authors table</h6>
+                <h6>Publicity Requirement table</h6>
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table table-striped table-bordered" id="tech_data">
+                  <table class="table table-striped table-bordered" id="publicity_data">
                     <thead>
                       <tr style="vertical-align: middle; text-align: center;color: black;">
                         <th>Money Collected (₹)</th>
@@ -113,6 +117,15 @@
                         }
 
                         $('tbody').html(html);
+                        $('#publicity_data').DataTable({
+                    "paging": true,
+                    "searching": true,
+                    "info": true,
+                    "ordering": true,
+                    "responsive": true,
+                    "autoWidth": true,
+                    destroy: true // This ensures DataTables reinitializes
+                });
                       },
                       error: function (XMLHttpRequest, textStatus, errorThrown) {
                         console.log("inside AJAX function: Err");
@@ -132,6 +145,11 @@
           <!--footer ends-->
       </div>
   </main>
+
+   <!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
  
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>

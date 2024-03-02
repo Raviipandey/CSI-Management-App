@@ -92,7 +92,7 @@ public class proposal_desc extends AppCompatActivity {
                                   @Override
                                   public void onClick(View v) {
                                       if(urole1.equals("HOD")) {
-                                          customDialog("The Proposal will be Submitted","3");
+                                          customDialog("The Proposal is Approved","3");
 
 //                                          //if sbc then 2 if hod 3
                                       }
@@ -105,11 +105,11 @@ public class proposal_desc extends AppCompatActivity {
 
 
         rej.setOnClickListener(v -> {
-                    if(urole1.equals("HOD")) customDialog("The Proposal will be Removed","-3");
+                    if(urole1.equals("HOD")) customDialog("The Proposal is Rejected by HOD","-3");
 //                        //if sbc then 1 if hod 2
-                    else if(urole1.equals("SBC")) customDialog("The Proposal will be Removed","-2");
+                    else if(urole1.equals("SBC")) customDialog("The Proposal is Rejected by SBC, but can be edited","-2");
 //                        //if sbc then 1 if hod 2
-                    else if(urole1.equals("Chairperson")) customDialog("The Proposal will be Removed","-1");
+                    else if(urole1.equals("Chairperson")) customDialog("The Proposal is Rejected by Chairperson, but can be edited","-1");
 //            finish();
         }
         );

@@ -14,16 +14,13 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/icons/favicon-16x16.png">
-  <title>
-    CSI Management App
-  </title>
+  <title>CSI Management App</title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <!-- Nucleo Icons -->
@@ -34,27 +31,30 @@
   <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="../assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
-</head>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 
-<body class="g-sidenav-show   bg-gray-100">
+</head>
+<body class="g-sidenav-show bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
     <!--aside bar starts-->
+    <!-- Aside bar content here -->
     <%- include('../templates/asidebar'); %>
     <!--aside bar ends-->
   <main class="main-content position-relative border-radius-lg ">
-
-
-      <!-- End Navbar -->
+      <!-- Content here -->
       <div class="container-fluid py-4">
         <div class="row">
           <div class="col-12">
             <div class="card mb-4">
               <div class="card-header pb-0">
-                <h6>Authors table</h6>
+                <h6>Event Proposals Table</h6>
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table table-striped table-bordered" id="proposal_data">
+                  <table class="table table-striped table-bordered" id="proposal_data" >
                     <thead>
                       <tr style="vertical-align: middle; text-align: center; color: black;">
                         <th>Event Name</th>
@@ -69,6 +69,7 @@
                   </table>
                 </div>
               </div>
+              <!-- Modal and other content here -->
               <div class="modal" tabindex="-1" id="action_modal">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -137,14 +138,18 @@
             </div>
           </div>
         </div>
-
          <!--footer starts-->
+         <!-- Footer content here -->
          <%- include('../templates/footer'); %>
          <!--footer ends-->
       </div>
   </main>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script> <!-- Not needed for CSV, included for completeness -->
 
-  <!-- ======== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script>
     // Script for complete table fetch from mysql starts
@@ -174,19 +179,19 @@
 
                 if (data.data[count].proposals_status == 0) {
                   status_message = "Approval Pending";
-                  color_type = 'yellow';
+                  color_type = 'lightblue';
                 }
                 else if (data.data[count].proposals_status == 1) {
                   status_message = "Approved by Chairperson";
-                  color_type = "cyan";
+                  color_type = "#CBC3E3";
                 }
                 else if (data.data[count].proposals_status == 2) {
                   status_message = "Approved by SBC";
-                  color_type = 'chartreuse';
+                  color_type = 'yellow';
                 }
                 else if (data.data[count].proposals_status == 3) {
                   status_message = "Approved by HOD";
-                  color_type = 'chartreuse';
+                  color_type = '#32cd32';
                 }
                 else if (data.data[count].proposals_status == -1) {
                   status_message = "Rejected by Chairperson";
@@ -234,6 +239,19 @@
 
 
             $('tbody').html(html);
+
+            // Initialize DataTable here, after data is loaded and table is updated
+            $('#proposal_data').DataTable({
+                    "paging": true,
+                    "searching": true,
+                    "info": true,
+                    "ordering": true,
+                    "responsive": true,
+                    "autoWidth": true,
+                    destroy: true, // This ensures DataTables reinitializes
+                    dom: 'Bfrtip',
+                buttons: ['csv']
+                });
 
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -353,31 +371,19 @@
 
   </script>
 
+      <!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
 
 
-
-
-  <!-- ============= -->
 
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
-</body>
 
+</body>
 </html>

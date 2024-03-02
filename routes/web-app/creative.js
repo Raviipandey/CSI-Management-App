@@ -7,7 +7,7 @@ const { response } = require("express");
 module.exports = {
     get: (request, response) => {
         var session = request.session;
-        var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "feedback.ejs");
+        var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "creative.ejs");
         if (session.userid != null) {
             response.render(FeedbackPath, {role : session.userrole});
           } else {

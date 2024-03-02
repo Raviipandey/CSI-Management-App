@@ -16,23 +16,37 @@ module.exports = {
 
     addmembers: (request, response) => {
         console.log("Ye rahi request", request.body);
-        const { role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name } = request.body;
-        
-        // Use a callback to handle the result or error
+        const { role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name, mem_strt, mem_end } = request.body;
+
+        // Step 1: Insert data into core_details to get core_id
         connection.query(
             'INSERT INTO csiApp2022.core_details (core_role_id, core_en_fname, core_en_lname, core_rollno, core_mobileno, core_email, core_pwd, core_branch, core_class) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name],
             (error, result) => {
                 if (error) {
-                    console.error('Error inserting data into the database:', error.message);
+                    console.error('Error inserting data into the core_details table:', error.message);
                     response.status(500).send('Internal Server Error');
                 } else {
-                    console.log('Data inserted successfully!');
-                    response.status(200).send('Data inserted successfully!');
+                    // Step 2: Use the obtained core_id to insert data into core_membership
+                    const core_id = result.insertId; // Assuming the auto-incremented primary key is core_id
+                    connection.query(
+                        'INSERT INTO csiApp2022.core_membership (core_id, membership_start_date, membership_end_date) VALUES (?, ?, ?)',
+                        [core_id, mem_strt, mem_end],
+                        (membershipError, membershipResult) => {
+                            if (membershipError) {
+                                console.error('Error inserting data into the core_membership table:', membershipError.message);
+                                response.status(500).send('Internal Server Error');
+                            } else {
+                                // Set success flash message
+                                request.flash('success', 'Member added successfully!');
+                                response.redirect('/addmembers'); // Redirect to the addmembers page
+                            }
+                        }
+                    );
                 }
             }
-        );
-    },
+        );
+    },
     countMembers: (request, response) => {
         console.log("Received request for /countMembers");
 

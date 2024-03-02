@@ -95,11 +95,11 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         mView = navigationView.getHeaderView(0); //created an object for HeaderView in navigationView
 
-        UID = (TextView)mView.findViewById(R.id.uid_final);
+//        UID = (TextView)mView.findViewById(R.id.uid_final);
         UNAME = (TextView)mView.findViewById(R.id.uname_final);
         UROLE = (TextView)mView.findViewById(R.id.uroll_final);
 
-        UID.setText(uid); //Setting data of user into the header of navigation view
+//        UID.setText(uid); //Setting data of user into the header of navigation view
         UNAME.setText(uname);
         UROLE.setText(urole);
 

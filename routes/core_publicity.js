@@ -6,6 +6,7 @@ const app = express();
 const fs = require('fs');
 const request = require('request');
 var bodyParser=require('body-parser');
+const { server_url} = require('../serverconfig');
 
 // Increase payload limit to 50MB
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -71,7 +72,7 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
 
     // Construct the full URL to access the file via the server
     // Ensure this matches how your server is configured to serve static files
-    const fullFileUrl = `http://${serverHost}:${serverPort}/server_uploads/publicity_pdf/${newFilename}`;
+    const fullFileUrl = `${server_url}/server_uploads/publicity_pdf/${newFilename}`;
 
 
         // Proceed to insert file metadata into the database with the new filename

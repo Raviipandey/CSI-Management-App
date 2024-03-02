@@ -65,6 +65,7 @@ app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images
 
 
 
+
 app.use('/login',login);
 app.use('/minutes',minutes);
 app.use('/profile',profile);
@@ -88,7 +89,7 @@ app.set('view engine', 'ejs');
 var authUser = require('./routes/web-app/authUser');
 var dashboard = require('./routes/web-app/dashboard');
 var proposal = require('./routes/web-app/proposal');
-var feedback = require('./routes/web-app/feedback');
+var creative = require('./routes/web-app/creative.js');
 var minute = require('./routes/web-app/minutes');
 var technical = require('./routes/web-app/technical');
 var publicity = require('./routes/web-app/publicity');
@@ -104,10 +105,10 @@ app.use('/fetchall', proposal.fetchall);
 app.use('/fetchsingle', proposal.fetchsingle);
 app.use('/hodstatusapprove', proposal.hodstatusconf);
 app.use('/hodstatusreject', proposal.hodstatusrej);
-app.use('/feedbackData', feedback.get);
-app.use('/feedbackall', feedback.feedbackall);
-app.use('/feedbacksingle', feedback.feedbacksingle);
-app.use('/feedbackupdate', feedback.feedbackupdate);
+app.use('/feedbackData', creative.get);
+app.use('/feedbackall', creative.feedbackall);
+app.use('/feedbacksingle', creative.feedbacksingle);
+app.use('/feedbackupdate', creative.feedbackupdate);
 app.use('/minuteData', minute.get);
 app.use('/minuteall', minute.minuteall);
 app.use('/minutesingle', minute.minutesingle);
