@@ -24,6 +24,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.csi.Gallery.Activities.DisplayEventName;
 import com.example.csi.Prompts.DetailActivity;
 import com.example.csi.Prompts.MainActivity;
@@ -39,6 +43,10 @@ import com.example.csi.mActivityManager.Technical;
 import com.example.csi.mActivityManager.praposal_recycler;
 import com.example.csi.mActivityManager.publcity_recycler;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,6 +57,7 @@ public class ActivityManager extends Fragment  {
     String roll_text;
 
     View rootView;
+    public String server_url;
     GridLayout mainGrid;
     //below 4 objects are used for image slider
     ViewPager viewPager;
@@ -82,7 +91,8 @@ public class ActivityManager extends Fragment  {
 
         sliderDotsPanel = (LinearLayout) rootView.findViewById(R.id.SliderDots);
 
-        imageSlider();
+        //Fetch image URLs and setup the ViewPager
+        fetchImageUrls();
 
         //set Event
         setSingleEvent(mainGrid);
@@ -90,50 +100,76 @@ public class ActivityManager extends Fragment  {
 
         return rootView;
 
+
     }
+
+    private void fetchImageUrls() {
+        String url = getActivity().getApplicationContext().getResources().getString(R.string.server_url) + "/images/list-images"; // Adjust to your server's actual URL
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+                response -> {
+                    List<String> imageUrls = new ArrayList<>();
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            String imageUrl = response.getString(i);
+                            Log.d("Image URL", imageUrl); // Log each URL
+                            imageUrls.add(imageUrl);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    imageSlider(imageUrls); // Proceed to set up the image slider with the URLs
+                },
+                error -> error.printStackTrace());
+
+        RequestQueue requestQueue = Volley.newRequestQueue(requireContext()); // Ensure context is available
+        requestQueue.add(jsonArrayRequest);
+    }
+
+
 
 
 
     // image slider animation
     public static class DepthPageTransformer implements ViewPager.PageTransformer {
-       @Override
-       public void transformPage(View page, float position) {
+        @Override
+        public void transformPage(View page, float position) {
 
-           if (position < -1){    // [-Infinity,-1)
-               // This page is way off-screen to the left.
-               page.setAlpha(0);
+            if (position < -1){    // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                page.setAlpha(0);
 
-           }
-           else if (position <= 0){    // [-1,0]
-               page.setAlpha(1);
-               page.setTranslationX(0);
-               page.setScaleX(1);
-               page.setScaleY(1);
+            }
+            else if (position <= 0){    // [-1,0]
+                page.setAlpha(1);
+                page.setTranslationX(0);
+                page.setScaleX(1);
+                page.setScaleY(1);
 
-           }
-           else if (position <= 1){    // (0,1]
-               page.setTranslationX(-position*page.getWidth());
-               page.setAlpha(1-Math.abs(position));
-               page.setScaleX(1-Math.abs(position));
-               page.setScaleY(1-Math.abs(position));
+            }
+            else if (position <= 1){    // (0,1]
+                page.setTranslationX(-position*page.getWidth());
+                page.setAlpha(1-Math.abs(position));
+                page.setScaleX(1-Math.abs(position));
+                page.setScaleY(1-Math.abs(position));
 
-           }
-           else {    // (1,+Infinity]
-               // This page is way off-screen to the right.
-               page.setAlpha(0);
+            }
+            else {    // (1,+Infinity]
+                // This page is way off-screen to the right.
+                page.setAlpha(0);
 
-           }
+            }
 
 
-       }
+        }
     }
 // animation ends
 
 
-    private void imageSlider() {
+    private void imageSlider(List<String> imageUrls) {
 
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity(), imageUrls);
 
         viewPager.setAdapter(viewPagerAdapter);
 
@@ -143,7 +179,7 @@ public class ActivityManager extends Fragment  {
         for (int i =0; i < dotsCount; i++){
 
             dots[i] = new ImageView(getActivity());
-                dots[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.nonactive_dot));
+            dots[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.nonactive_dot));
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -186,7 +222,7 @@ public class ActivityManager extends Fragment  {
         @Override
         public void run() {
 
-           Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 
@@ -225,7 +261,7 @@ public class ActivityManager extends Fragment  {
                     switch (finalI){
                         case 0:
                             startActivity(new Intent(getActivity(), praposal_recycler.class));
-                                break;
+                            break;
                         case 1:
                             Intent creative = new Intent(getActivity(), Creative.class);
 //                            Toast.makeText(getActivity(), roll_text, Toast.LENGTH_SHORT).show();
