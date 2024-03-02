@@ -80,7 +80,7 @@ router.get('/',(req,res)=>{
       connection.query('SELECT TIMESTAMPDIFF(year, membership_start_date, membership_end_date) AS Membership_left from core_membership where core_id=?',[id],function(error,result3,fields){
         // res.send(results[0]);
         res.status(200).send({
-          "name":result2[0].role_name,
+          "role_name":result2[0].role_name,
           "core_id":results[0].core_id,
           "core_en_fname":results[0].core_en_fname,
           "core_role_id":results[0].core_role_id,
