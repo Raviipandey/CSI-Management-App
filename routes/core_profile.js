@@ -161,9 +161,13 @@ router.post('/edit',(req,res)=>{
 	var year = req.query.year;
 	var rollno = req.query.rollno;
 
+  var core_email= req.query.core_email;  //email_s
+  var core_mobileno= req.query.core_mobileno;
+  var branch=req.query.branch;
+
 
 	//fetching creator from users table
-	connection.query('UPDATE core_details SET core_en_fname =?, core_class =?, core_rollno =? WHERE core_id=?',[name,year,rollno,id],function(error,result,fields){
+	connection.query('UPDATE core_details SET core_en_fname =?, core_email=? , core_mobileno=?,core_class =?, core_branch =?,core_rollno =? WHERE core_id=?',[name,core_email,core_mobileno,year,branch,rollno,id],function(error,result,fields){
   // console.log()
 	if (error)
 	res.sendStatus(400);
@@ -175,6 +179,7 @@ router.post('/edit',(req,res)=>{
 	}
 	});
 });
+
 
 router.post('/profileupload', profilePicUpload.single('profilePic'), (req, res) => {
   console.log(req.body);

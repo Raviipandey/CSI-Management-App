@@ -273,13 +273,16 @@
                     android:text="Batch"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="@color/colorAccent"/>
+                    android:textColor="@color/colorAccent"
+                    android:visibility="gone"/>
                 <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="15dp"
-                    android:id="@+id/batch_E">
+                    android:id="@+id/batch_E"
+                    android:visibility="gone">
+
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
