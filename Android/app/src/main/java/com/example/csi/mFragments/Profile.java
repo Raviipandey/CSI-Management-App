@@ -77,6 +77,7 @@ public class Profile extends Fragment {
         getActivity().setTitle("My Profile");
         Bundle bundle = getArguments();
 
+
         UProfile = this.getArguments().getString("core_profilepic_url");
         swipe();
         imageButton = rootView.findViewById(R.id.profile_photo);
@@ -86,6 +87,7 @@ public class Profile extends Fragment {
 
         //decalring varriables
         TextView id = rootView.findViewById(R.id.id);
+        TextView role = rootView.findViewById(R.id.role);
         //id will get from called intent
         // id.setText(getIntent().getStringExtra("id from respective intent"));
         id.setText(UID);
@@ -206,6 +208,7 @@ public class Profile extends Fragment {
 
     void set_data(String data) {
         Log.i("volleyABC", "set_data called"+data);
+        TextView role = rootView.findViewById(R.id.role);
         TextView id = rootView.findViewById(R.id.id);
         TextView name = rootView.findViewById(R.id.profile_name);
         TextView email = rootView.findViewById(R.id.email);
@@ -220,7 +223,7 @@ public class Profile extends Fragment {
         JSONObject fetchedData ;
         try {
             fetchedData= new JSONObject(data);
-
+            role.setText(fetchedData.getString("role_name"));
             id.setText(fetchedData.getString("core_id"));
             name.setText(fetchedData.getString("core_en_fname"));
             position_s= fetchedData.getString("core_role_id");
@@ -231,7 +234,9 @@ public class Profile extends Fragment {
             branch.setText(fetchedData.getString("core_branch"));
             roln.setText(fetchedData.getString("core_rollno"));
 //            batch.setText(fetchedData.getString("batch"));
-            membershipLeft.setText(fetchedData.getString("membership_left"));
+            String membershipLeftValue = fetchedData.getString("membership_left");
+            String textToShow = membershipLeftValue + " years";
+            membershipLeft.setText(textToShow);
 
             profileImageUrl = fetchedData.getString("core_profilepic_url");
             Picasso.get().load(fetchedData.getString("core_profilepic_url"))
