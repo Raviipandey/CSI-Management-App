@@ -1,5 +1,6 @@
 var express=require('express');
 var app=express();
+const fs = require('fs');
 const createError = require('http-errors');
 var bodyParser=require('body-parser');
 app.use(bodyParser.json());
@@ -44,7 +45,10 @@ app.use(express.static(__dirname + "/views"));
 
 
 app.use('/creative', express.static('./creative'));
+
+
 app.use('/profile_pic', express.static('./profile_pic'));
+
 var login=require('./routes/core_login.js');
 var minutes=require('./routes/core_minutes.js');
 var profile=require('./routes/core_profile.js');
@@ -55,6 +59,10 @@ var creative=require('./routes/core_creative.js');
 var publicity=require('./routes/core_publicity.js');
 var technical=require("./routes/core_technical.js");
 var report=require("./routes/report.js");
+const featured_img = require("./routes/featured_img.js")
+
+app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images_dynamic')));
+
 
 
 app.use('/login',login);
@@ -67,6 +75,8 @@ app.use('/creative',creative);
 app.use('/publicity',publicity);
 app.use('/technical',technical);
 app.use('/report',report);
+app.use('/images', featured_img);
+
 
 //web app view
 
@@ -114,6 +124,7 @@ app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals)
 app.use('/countMembers', addmembers.countMembers)
 
 
+
 app.get("/",(req,res)=>{
     let session = req.session;
         if (session.userid) {
@@ -124,6 +135,9 @@ app.get("/",(req,res)=>{
             });
         }
 });
+
+
+
 
 
 app.get("/logout", (req, res, next)=>{
