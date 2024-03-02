@@ -65,12 +65,20 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
             console.error('File renaming error:', err);
             return res.status(500).send("Error processing file");
         }
+        // Define the server's host and port
+    const serverHost = 'localhost'; // Use '127.0.0.1' if 'localhost' does not work in your environment
+    const serverPort = 9000; // Adjust based on your actual server port
+
+    // Construct the full URL to access the file via the server
+    // Ensure this matches how your server is configured to serve static files
+    const fullFileUrl = `http://${serverHost}:${serverPort}/server_uploads/publicity_pdf/${newFilename}`;
+
 
         // Proceed to insert file metadata into the database with the new filename
         const size = file.size;
         const query = "INSERT INTO publicity_files (eid, eventname, filename, filepath, size) VALUES (?, ?, ?, ?, ?)";
 
-        connection.query(query, [eid, eventname, newFilename, newFilePath, size], function (error, results, fields) {
+        connection.query(query, [eid, eventname, newFilename, fullFileUrl, size], function (error, results, fields) {
             if (error) {
                 console.error('Database insertion error:', error);
                 return res.status(500).send("Error saving file info to database");

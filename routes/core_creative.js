@@ -136,9 +136,12 @@ router.post('/upload', upload.single('file'), (req, res) => {
 	const eid = req.body.eid;
 	const fileheader = req.body.fileheader;
 	const file = req.file;
+
 	
 	// Ensure the filename is URL-friendly
 	const sanitizedFileHeader = fileheader.replace(/\s/g, ''); // Remove spaces
+	const server_port = 9000; // Adjust the port number if your server runs on a different port
+	const server_url = `http://localhost:${server_port}`;
 	const fileUrl = `${server_url}/creative/${file.filename}`;
   
 	// Insert file information into the database

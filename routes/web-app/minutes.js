@@ -17,20 +17,22 @@ module.exports = {
     },
 
     minuteall : (request, response) => {
-
-        connection.query("SELECT * FROM core_minute_manager ORDER BY cpm_id DESC",function(error,results,fields){
-            if (results.length > 0) {
-                    // console.log(results);
-                        response.json({
-                data:results
-            });
+        connection.query("SELECT * FROM core_minute_manager ORDER BY cmm_id DESC", function(error, results, fields) {
+            if (error) {
+                console.error('Query error:', error);
+                return response.redirect("/error"); // Handle the error appropriately
+            }
+    
+            if (results && results.length > 0) {
+                response.json({
+                    data: results
+                });
             } else {
                 response.redirect("/error");
             }
-            response.end();
-        })
-    
+        });
     },
+    
 
     minutesingle : (request, response) => {
 
@@ -38,7 +40,7 @@ module.exports = {
     
         console.log(id);
     
-        var query = `SELECT * FROM core_minute_manager WHERE cpm_id = "${id}"`;
+        var query = `SELECT * FROM core_minute_manager WHERE cmm_id = "${id}"`;
         
         connection.query(query, function(error, data){
     
