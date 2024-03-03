@@ -145,7 +145,7 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
     // Method to delete an image on the server using Volley
     private void deleteImageOnServer(String folder, String imageUrl) {
         // Construct your delete URL based on the server logic
-        String deleteUrl = context.getApplicationContext().getResources().getString(R.string.gallery_url) + "/delete/" +  folder + getImageFileNameFromUrl(imageUrl);
+        String deleteUrl = context.getApplicationContext().getResources().getString(R.string.server_url) + "/gallery/delete/" +  folder + getImageFileNameFromUrl(imageUrl);
 
         StringRequest stringRequest = new StringRequest(Request.Method.DELETE, deleteUrl, new Response.Listener<String>() {
             @Override

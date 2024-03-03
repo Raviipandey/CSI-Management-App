@@ -63,7 +63,7 @@ public class DisplayEventName extends AppCompatActivity implements EventNameAdap
 
     private void parseJSON() {
         //String url = "http://192.168.43.84:8080/event";
-        String url =  getApplicationContext().getResources().getString(R.string.gallery_url) + "/event";    //Main Server URL
+        String url =  getApplicationContext().getResources().getString(R.string.server_url) + "/gallery/event";    //Main Server URL
         //String url = "http://192.168.42.156:8080/event";
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
@@ -179,7 +179,7 @@ public class DisplayEventName extends AppCompatActivity implements EventNameAdap
     private void createDirectory(final String Directory) {
 
         //String url = "http://192.168.43.84:8080/mkdir";
-        String url = getApplicationContext().getResources().getString(R.string.gallery_url) + "/mkdir";    //Main Server URL
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/gallery/mkdir";    //Main Server URL
         //String url = "http://192.168.42.156:8080/mkdir";
 
         //creating jsonobject starts
