@@ -28,6 +28,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.csi.Gallery.Interfaces.IRecyclerViewClickListener;
 import com.example.csi.R;
+import com.example.csi.SharedPreferenceConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +42,20 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
     private SparseBooleanArray selectedItems = new SparseBooleanArray();
     private String parentPath;
     private ImageButton deleteButton;
+    private SharedPreferenceConfig preferenceConfig;
 
 
 
-    public GalleryImageAdapter(Context context, ArrayList<String> urlList, IRecyclerViewClickListener clickListener, String parentPath, ImageButton deleteButton) {
+
+
+    String urole;
+    public GalleryImageAdapter(Context context, ArrayList<String> urlList, IRecyclerViewClickListener clickListener, String parentPath, ImageButton deleteButton, String urole) {
         this.context = context;
         this.urlList = urlList;
         this.clickListener = clickListener;
         this.parentPath = parentPath;
         this.deleteButton = deleteButton;
-
+        this.urole = urole;
     }
 
     @NonNull
@@ -59,6 +64,7 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.gallery_item, viewGroup, false);
         return new ImageViewHolder(v, clickListener);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder imageViewHolder, int position) {
@@ -201,6 +207,9 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
             checkBox = itemView.findViewById(R.id.checkbox);
 
 
+
+
+
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -232,7 +241,13 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
                 selectedItems.put(position, true);
                 notifyDataSetChanged();  // Notify adapter to refresh the UI
                 setDeleteButtonVisibility();
-                deleteButton.setVisibility(View.VISIBLE);
+                if(urole.equals("PR Head")){
+                    deleteButton.setVisibility(View.VISIBLE);
+                }
+                else{
+                    deleteButton.setVisibility(View.INVISIBLE);
+                }
+
 
             }
             return true;

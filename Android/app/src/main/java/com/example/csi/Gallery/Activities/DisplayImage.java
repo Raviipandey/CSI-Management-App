@@ -1,6 +1,7 @@
 package com.example.csi.Gallery.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.csi.Gallery.DisplayImageAdapter.GalleryImageAdapter;
+import com.example.csi.SharedPreferenceConfig;
 import com.example.csi.Gallery.ImageFilePath;
 import com.example.csi.Gallery.Interfaces.IRecyclerViewClickListener;
 import com.example.csi.R;
@@ -53,7 +55,8 @@ import okhttp3.RequestBody;
 public class DisplayImage extends AppCompatActivity {
 
     String PARENT_PATH = "";
-
+    private SharedPreferenceConfig preferenceConfig;
+    String urole;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     FloatingActionButton Fab;
@@ -61,6 +64,7 @@ public class DisplayImage extends AppCompatActivity {
     GalleryImageAdapter galleryImageAdapter;
     private RequestQueue mRequestQueue;
     ImageButton deleteButton;
+
 
     //updated variables use to upload images only
     ProgressDialog progress;
@@ -77,9 +81,13 @@ public class DisplayImage extends AppCompatActivity {
     }
 
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        urole = preferenceConfig.readRoleStatus();
         setContentView(R.layout.activity_display_image);
         getSupportActionBar().setTitle("Gallery");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -89,11 +97,19 @@ public class DisplayImage extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         Fab = (FloatingActionButton) findViewById(R.id.fab);
+
         mRequestQueue = Volley.newRequestQueue(this);
         imagesUrl = new ArrayList<>();
 
         deleteButton = findViewById(R.id.delete);
         deleteButton.setVisibility(View.INVISIBLE);
+
+        if(urole.equals("PR Head")){
+            Fab.setVisibility(View.VISIBLE);
+        }
+        else{
+            Fab.setVisibility(View.GONE);
+        }
 
 
 
@@ -130,7 +146,7 @@ public class DisplayImage extends AppCompatActivity {
             }
         };
 
-        galleryImageAdapter = new GalleryImageAdapter(this, imagesUrl, listener, PARENT_PATH , deleteButton);
+        galleryImageAdapter = new GalleryImageAdapter(this, imagesUrl, listener, PARENT_PATH , deleteButton ,  urole);
         recyclerView.setAdapter(galleryImageAdapter);
 
         deleteButton.setOnClickListener(new View.OnClickListener() {

@@ -71,8 +71,6 @@ const uploadsPath = path.join(__dirname, 'server_uploads');
 app.use('/galleryimages', express.static(path.join(uploadsPath, 'gallery')));
 
 
-
-
 app.use('/login',login);
 app.use('/minutes',minutes);
 app.use('/profile',profile);
