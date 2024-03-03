@@ -44,7 +44,7 @@ public class feedback extends Fragment {
     private String usrid, usrname = "";
     EditText feedback_text;
     TextView name_text_v;
-    Button save_feedback;
+    //Button save_feedback;
     String feedback = null;
     JSONObject jsonObject =new JSONObject();
     private RequestQueue mRequestQueue;
@@ -60,7 +60,7 @@ public class feedback extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.activity_feedback, container, false);
         server_url = rootView.getResources().getString(R.string.server_url) + "/feedback";
-        getActivity().setTitle("Feedback");
+        getActivity().setTitle("FAQs");
 
 
 //        Bundle bundle = getArguments();
@@ -69,28 +69,28 @@ public class feedback extends Fragment {
         Log.i("volleyABC", "to feedback section" + usrid + usrname);
 //        Toast.makeText(getActivity(), "Feedback section" + usrid + usrname, Toast.LENGTH_SHORT).show();
 
-        feedback_text = rootView.findViewById(R.id.text_feedback);
+      //  feedback_text = rootView.findViewById(R.id.text_feedback);
         name_text_v = rootView.findViewById(R.id.name_feedback);
-        save_feedback = rootView.findViewById(R.id.feedback_save);
+      //  save_feedback = rootView.findViewById(R.id.feedback_save);
         mRequestList = new ArrayList<>();
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
-        save_feedback.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                feedback = feedback_text.getText().toString();
-
-                //below two lines closes keyborad input on click of save button
-                InputMethodManager inputManager = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getActivity().getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-//                Toast.makeText(getActivity(), "Feedback section save clicked" + feedback, Toast.LENGTH_SHORT).show();
-                setJason();
-                send_data();
-                feedback_text.setText("");
-
-            }
-        });
+//        save_feedback.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                feedback = feedback_text.getText().toString();
+//
+//                //below two lines closes keyborad input on click of save button
+//                InputMethodManager inputManager = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+//                inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getActivity().getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+//
+////                Toast.makeText(getActivity(), "Feedback section save clicked" + feedback, Toast.LENGTH_SHORT).show();
+//                setJason();
+//                send_data();
+//                feedback_text.setText("");
+//
+//            }
+//        });
 
         name_text_v.setText(usrname);
 
@@ -126,50 +126,50 @@ public class feedback extends Fragment {
 
     }
 
-    public  void send_data(){
-        final String requestBody = jsonObject.toString();
-        Log.i("volleyABC123",requestBody);
-
-        //getting response from server starts
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, server_url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("volleyABC", "got response    " + response);
-                Toast.makeText(getActivity(), "Thank you for feedback", Toast.LENGTH_SHORT).show();
-
-                //this will close feedback and return to main page
-                Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
-                }
-            }
-        }){
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return requestBody.getBytes("utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-        };
-
-        mRequestQueue.add(stringRequest);
-    }
+//    public  void send_data(){
+//        final String requestBody = jsonObject.toString();
+//        Log.i("volleyABC123",requestBody);
+//
+//        //getting response from server starts
+//
+//        StringRequest stringRequest = new StringRequest(Request.Method.POST, server_url, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.i("volleyABC", "got response    " + response);
+//                Toast.makeText(getActivity(), "Thank you for feedback", Toast.LENGTH_SHORT).show();
+//
+//                //this will close feedback and return to main page
+//                Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                try {
+//                    String statusCode = String.valueOf(error.networkResponse.statusCode);
+//                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
+//                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
+//                    error.printStackTrace();
+//                } catch(Exception e) {
+//                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        }){
+//            @Override
+//            public byte[] getBody() throws AuthFailureError {
+//                try {
+//                    return requestBody.getBytes("utf-8");
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//            }
+//
+//            @Override
+//            public String getBodyContentType() {
+//                return "application/json; charset=utf-8";
+//            }
+//        };
+//
+//        mRequestQueue.add(stringRequest);
+//    }
 }

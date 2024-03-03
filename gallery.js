@@ -5,9 +5,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+var router = express.Router();
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 //Making Of Directory
-app.post('/mkdir', (req, res) => {
+router.post('/mkdir', (req, res) => {
     console.log("Inside /mkdir");
     var address = req.body.path;
     var fname = req.body.fname;
@@ -35,11 +40,11 @@ app.post('/mkdir', (req, res) => {
     });
 });
 
-
 //Viewing Folder In A Directory
 var path = require('path');
 var fs = require('fs');
-app.post('/event',(req,res)=>{
+router.post('/event',(req,res)=>{
+	console.log("This is the path" , req.body.path);
 	var address=req.body.path;
 	var directoryPath=path.join(__dirname,'server_uploads/gallery/',address);
 	fs.readdir(directoryPath,function(err,files){
@@ -56,6 +61,7 @@ app.post('/event',(req,res)=>{
 
 //Uploading Images and Videos
 var multer=require('multer');
+const { server_url } = require('./serverconfig');
 var address;
 var storage=multer.diskStorage({
 	destination: function(req,file,cb){
@@ -70,14 +76,14 @@ var upload=multer({
 }).array('file',10);
 
 //Updating Path
-app.post('/path',(req,res)=>{
+router.post('/path',(req,res)=>{
 	address=req.body.path;
 	//console.log("Path Succesfully Updated");
 	res.sendStatus(200);
 });
 
 //Uploading Files
-app.post('/upload', (req,res) =>{
+router.post('/upload', (req,res) =>{
    	upload(req,res,function(err){
 		if(err){
 			//console.log("Error");
@@ -91,11 +97,12 @@ app.post('/upload', (req,res) =>{
 });
 
 //Viewing Images In A Directory
-app.post('/view',(req,res)=>{
+router.post('/view',(req,res)=>{
 	var address = req.body.path;
 	console.log("This is the address", address);
 	var link = [];
 	var directoryPath = path.join(__dirname,'server_uploads/gallery/',address);
+	console.log(directoryPath);
 	fs.readdir(directoryPath, function (err, files){
 		if (err){
 			//console.log("Error");
@@ -103,20 +110,18 @@ app.post('/view',(req,res)=>{
 	    	}
 		else{
 			for (var i in files){
-        			link[i] = 'http://192.168.0.104:9091/images/'+files[i];
+        			link[i] = server_url+'/galleryimages/' + address + files[i];
 			}
 		// console.log("Succesfully URL Sent");
 		 res.status(200).send(link);
 		}
 	});
-	app.use(express.static('public'));
-	app.use('/images', express.static(__dirname + '/server_uploads/gallery/' +'/' + address));
+	router.use(express.static('public'));
+	// app.use('/galleryimages', express.static(path.join(__dirname, 'server_uploads', 'gallery')));
        //app.use('/images', express.static(__dirname + '/images'));
 });
 
-
-
-app.delete('/delete/:year/:folder/:fileName', (req, res) => {
+router.delete('/delete/:year/:folder/:fileName', (req, res) => {
     const { year, folder, fileName } = req.params;
 
     const filePath = path.join(__dirname, 'server_uploads/gallery', year, folder, fileName);
@@ -139,14 +144,11 @@ app.delete('/delete/:year/:folder/:fileName', (req, res) => {
     }
 });
 
-
-
-
-
-app.use('/images', express.static(__dirname + '/images'));
+app.use('/galleryimages', express.static(__dirname + '/galleryimages'));
 app.use('/images', express.static(__dirname + '/creative'));
 app.use('/report', express.static(__dirname + '/report'));
 //port listening
-app.listen(9091,(req,res)=>{
-    console.log("Listening on 9091");
-});
+// app.listen(9091,(req,res)=>{
+//     console.log("Listening on 9091");
+// });
+module.exports = router;

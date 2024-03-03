@@ -8,6 +8,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+const {address} = require('./gallery.js')
 var cors=require('cors');
 app.use(cors());
 const path = require('path');
@@ -25,7 +26,7 @@ app.use(flash());
 app.use(
     session({
         resave: true,
-        saveUnitialized: true,
+        saveUninitialized: true,  
         secret: "secret",
         cookie: { maxAge: oneDay }
     })
@@ -52,6 +53,7 @@ app.use('/creative', express.static('./creative'));
 
 app.use('/profile_pic', express.static('./profile_pic'));
 
+
 var login=require('./routes/core_login.js');
 var minutes=require('./routes/core_minutes.js');
 var profile=require('./routes/core_profile.js');
@@ -63,10 +65,13 @@ var publicity=require('./routes/core_publicity.js');
 var technical=require("./routes/core_technical.js");
 var report=require("./routes/report.js");
 const featured_img = require("./routes/featured_img.js")
+const galleryRouter = require('./gallery.js');
+
 
 app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images_dynamic')));
 
-
+const uploadsPath = path.join(__dirname, 'server_uploads');
+app.use('/galleryimages', express.static(path.join(uploadsPath, 'gallery')));
 
 
 app.use('/login',login);
@@ -80,6 +85,7 @@ app.use('/publicity',publicity);
 app.use('/technical',technical);
 app.use('/report',report);
 app.use('/images', featured_img);
+app.use('/gallery', galleryRouter);
 
 
 //web app view
