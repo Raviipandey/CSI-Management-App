@@ -97,12 +97,7 @@
                 <!-- Add your carousel component here -->
                 <div id="imageCarousel" class="carousel slide" data-ride="carousel">
                   <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <img src="../assets/img/100Days.png" class="d-block w-100" alt="Image 1">
-                    </div>
-                    <div class="carousel-item">
-                      <img src="image2.jpg" class="d-block w-100" alt="Image 2">
-                    </div>
+                    
                     <!-- Add more carousel items as needed -->
                   </div>
                   <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
@@ -302,6 +297,58 @@
       });
       //Script for update ends                               
     });                           
+  </script>
+  <script>
+    $(document).on('click', '.edit', function () {
+    var id = $(this).data('id');
+
+    $.ajax({
+        url: "/fetchcreative",
+        method: "GET",
+        data: { id: id },
+        dataType: "JSON",
+        success: function (creativeData) {
+          console.log(creativeData);
+            // Update modal title
+            $('#dynamic_modal_title').text('Event Proposal - ' + creativeData[0].proposals_event_name);
+
+            // Update feedback input field
+            $('#first_name').val(creativeData[0].proposals_comment);
+
+            // Update carousel content
+            updateCarousel(creativeData);
+
+            // Update hidden input field for id
+            $('#id').val(creativeData[0].cpm_id);
+
+            // Show the modal
+            $('#action_modal').modal('show');
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("Error fetching creative data: " + textStatus);
+            alert("Error fetching creative data: " + errorThrown);
+        }
+        });
+    });
+
+// Function to update the carousel content
+function updateCarousel(creativeData) {
+    var carouselInner = $('#imageCarousel .carousel-inner');
+    carouselInner.empty(); // Clear existing carousel items
+
+    // Add new carousel items based on creativeData
+    for (var i = 0; i < creativeData.length; i++) {
+        var activeClass = i === 0 ? 'active' : ''; // Set 'active' class for the first item
+
+        var carouselItem = `
+            <div class="carousel-item ${activeClass}">
+                <img src="${creativeData[i].creative_url}" class="d-block w-100" alt="Image ${i + 1}">
+            </div>
+        `;
+
+        carouselInner.append(carouselItem);
+    }
+}
   </script>
 
     <!-- jQuery -->

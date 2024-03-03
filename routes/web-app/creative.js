@@ -35,6 +35,7 @@ module.exports = {
     feedbacksingle : (request, response) => {
 
         var id = request.query.id;
+        console.log("This is the id", id);
         
     //    console.log("test: "+id);
        var query = `SELECT * FROM core_proposals_manager WHERE cpm_id = "${id}"`;
@@ -67,7 +68,18 @@ module.exports = {
     
         });
     
-    }
+    },
+
+    fetchcreative : (request , response) =>{
+        // console.log("Request recieved" , request);
+        var id = request.query.id;
+        var query = `SELECT * FROM (SELECT core_creative_manager.cpm_id,proposals_event_name,proposals_event_category,proposals_event_date,speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget , creative_url FROM core_proposals_manager,core_creative_manager WHERE core_proposals_manager.cpm_id=core_creative_manager.cpm_id) AS creative WHERE cpm_id="${id}"`;
+        connection.query(query , function(err , data){
+            console.log(data);
+            response.json(data)
+        })
+    },
+
 
 
 };

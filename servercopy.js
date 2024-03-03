@@ -115,6 +115,8 @@ app.use('/feedbackData', creative.get);
 app.use('/feedbackall', creative.feedbackall);
 app.use('/feedbacksingle', creative.feedbacksingle);
 app.use('/feedbackupdate', creative.feedbackupdate);
+app.use('/fetchcreative', creative.fetchcreative);
+
 app.use('/minuteData', minute.get);
 app.use('/minuteall', minute.minuteall);
 app.use('/minutesingle', minute.minutesingle);

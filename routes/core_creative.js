@@ -26,22 +26,21 @@ router.get('/listcreative',(req,res)=>{
 });
 
 //Viewing pre-filled event detail
-router.post('/viewpropdetail', (req, res) => {
-    var cpm_id = req.body.cpm_id;
-    console.log(cpm_id);
-    var qry = 'SELECT * FROM (SELECT core_creative_manager.cpm_id,proposals_event_name,proposals_event_category,proposals_event_date,speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget , creative_url FROM core_proposals_manager,core_creative_manager WHERE core_proposals_manager.cpm_id=core_creative_manager.cpm_id) AS creative WHERE cpm_id=?'
-    connection.query(qry, [cpm_id], function (err, result) {
-        if (err) {
-            console.log("Failed to view creative event detail");
-            res.sendStatus(400);
-        } else {
-            console.log("Successfully viewed creative event detail");
-            console.log(result);
-
-            // Render the 'creative.ejs' template with the fetched data
-            res.render('pages/creative', { result: result });
-        }
-    });
+router.post('/viewpropdetail',(req,res)=>{
+	var cpm_id=req.body.cpm_id;
+	console.log(cpm_id);
+	var qry = 'SELECT * FROM(SELECT core_creative_manager.cpm_id,proposals_event_name,proposals_event_category,proposals_event_date,speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget , creative_url FROM core_proposals_manager,core_creative_manager WHERE core_proposals_manager.cpm_id=core_creative_manager.cpm_id) AS creative WHERE cpm_id=?'
+	connection.query(qry,[cpm_id],function(err,result){
+		if(err){
+			console.log("Failed to view  creative event detail");
+			res.sendStatus(400);
+		}
+		else{
+			console.log("Succesfully viewed creative event detail");
+			console.log(result);
+			res.status(200).send(result[0]);
+		}
+	});
 });
 
 //Submit Creative
