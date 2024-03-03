@@ -8,6 +8,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const request = require('request');
+const { server_url} = require('../serverconfig');
 
 // Increase payload limit to 50MB
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -70,19 +71,16 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
             return res.status(500).send("Error processing file");
         }
 
-          // Define the server's host and port
-    const serverHost = 'localhost'; // Use '127.0.0.1' if 'localhost' does not work in your environment
-    const serverPort = 9000; // Adjust based on your actual server port
 
     // Construct the full URL to access the file via the server
     // Ensure this matches how your server is configured to serve static files
-    const fullFileUrl = `http://${serverHost}:${serverPort}/server_uploads/technical_pdf/${newFilename}`;
+    const fullFileUrl = `${server_url}/server_uploads/technical_pdf/${newFilename}`;
 
         // Proceed to insert file metadata into the database with the new filename
         const size = file.size;
-        const query = "INSERT INTO technical_files (eid, eventname, filename, filepath, size) VALUES (?, ?, ?, ?, ?)";
+        const query = "INSERT INTO technical_files (eid, eventname, filename, filepath, size, url) VALUES (?, ?, ?, ?, ?, ?)";
 
-        connection.query(query, [eid, eventname, newFilename, fullFileUrl, size], function (error, results, fields) {
+        connection.query(query, [eid, eventname, newFilename, newFilePath, size, fullFileUrl], function (error, results, fields) {
             if (error) {
                 console.error('Database insertion error:', error);
                 return res.status(500).send("Error saving file info to database");
@@ -96,7 +94,7 @@ router.get("/download", function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
-    const query = "SELECT filepath, filename FROM technical_files WHERE eid = ?";
+    const query = "SELECT filepath, filename, url FROM technical_files WHERE eid = ?";
     connection.query(query, [eid], function (error, results, fields) {
         if (error) return res.status(500).send("Error retrieving file from database");
         if (!results.length) return res.status(404).send("File not found");
@@ -115,7 +113,7 @@ router.get("/download", function (req, res) {
 router.post("/delete", function (req, res) {
     const eid = req.body.eid;
 
-    const querySelect = "SELECT filepath FROM technical_files WHERE eid = ?";
+    const querySelect = "SELECT filepath, url FROM technical_files WHERE eid = ?";
     connection.query(querySelect, [eid], function (error, results, fields) {
         if (error) return res.status(500).send("Error retrieving file for deletion: " + error.message);
         if (!results.length) return res.status(404).send("File not found for deletion");

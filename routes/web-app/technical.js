@@ -17,31 +17,17 @@ module.exports = {
     },
 
     techall : (request, response) => {
-
-        connection.query("SELECT * FROM core_technical_manager ORDER BY cpm_id DESC",function(error,results,fields){
-            if (results.length > 0) {
-                    // console.log(results);
-                        response.json({
-                data:results
-            });
-            } else {
-                response.redirect("/error");
-            }
-            response.end();
-        })
+        const sql = `SELECT e.proposals_event_name, e.proposals_event_category, e.proposals_event_date, e.proposals_reg_fee_csi, e.proposals_reg_fee_noncsi, t.qs_set, t.software_install, tt.tasks, tt.status, tf.url AS file_url, tf.filename AS file_name FROM core_proposals_manager e INNER JOIN core_technical_manager t ON e.cpm_id = t.cpm_id LEFT JOIN (SELECT cpm_id, GROUP_CONCAT(task) AS tasks, GROUP_CONCAT(status) AS status FROM technical_tasks GROUP BY cpm_id) tt ON t.cpm_id = tt.cpm_id LEFT JOIN technical_files tf ON t.cpm_id = tf.eid;`;
     
-    },
-    techsingle : (request, response) => {
-        connection.query("SELECT * FROM technical_files ORDER BY eid DESC",function(error,results,fields){
-            if (results.length > 0) {
-                    // console.log(results);
-                        response.json({
-                data:results
-            });
+        connection.query(sql, function(error, results, fields) {
+            if (error) {
+                console.error('Query error:', error);
+                response.sendStatus(500); // Internal Server Error
             } else {
-                response.redirect("/error");
+                response.json({
+                    data: results
+                });
             }
-            response.end();
-        })
+        });
     }
 };

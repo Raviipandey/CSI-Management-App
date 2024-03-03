@@ -18,6 +18,7 @@ const session = require('express-session');
 const oneDay = 1000 * 60 * 5;
 const router = express.Router();
 var flash = require("connect-flash");
+const multer = require('multer');
 
 app.use(flash());
 
@@ -44,6 +45,8 @@ app.use("/jquery",express.static("jquery"));
 
 app.use(express.static(__dirname + "/views"));
 
+// Correctly configure the path to your static files
+app.use('/server_uploads', express.static(path.join(__dirname, 'server_uploads')));
 
 app.use('/creative', express.static('./creative'));
 
@@ -92,6 +95,17 @@ app.set('view engine', 'ejs');
 
 //web app routes
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'tmp_uploads/'); // Destination folder for temporary uploads
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname); // Keep the original filename
+    }
+  });
+
+const upload = multer({ storage: storage });
+
 var authUser = require('./routes/web-app/authUser');
 var dashboard = require('./routes/web-app/dashboard');
 var proposal = require('./routes/web-app/proposal');
@@ -99,7 +113,8 @@ var creative = require('./routes/web-app/creative.js');
 var minute = require('./routes/web-app/minutes');
 var technical = require('./routes/web-app/technical');
 var publicity = require('./routes/web-app/publicity');
-var addmembers = require('./routes/web-app/addmembers')
+var addmembers = require('./routes/web-app/addmembers');
+var featurepage = require('./routes/web-app/featurepage');
 const { request } = require('http');
 
 app.use('/authUser', authUser.post);
@@ -124,13 +139,15 @@ app.use('/techData', technical.get);
 app.use('/techall', technical.techall);
 app.use('/publicityData', publicity.get);
 app.use('/publicityall', publicity.publicityall);
-app.use('/addmemberspage', addmembers.get)
-app.use('/addmembers', addmembers.addmembers)
-app.use('/countApprovedProposals', proposal.countApprovedProposals)
-app.use('/countRejectedProposals', proposal.countRejectedProposals)
-app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals)
-app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals)
-app.use('/countMembers', addmembers.countMembers)
+app.use('/addmemberspage', addmembers.get);
+// app.use('/featurepage', featurepage.get);
+app.use('/featurepage', featurepage);
+app.use('/addmembers', addmembers.addmembers);
+app.use('/countApprovedProposals', proposal.countApprovedProposals);
+app.use('/countRejectedProposals', proposal.countRejectedProposals);
+app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals);
+app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals);
+app.use('/countMembers', addmembers.countMembers);
 
 
 
