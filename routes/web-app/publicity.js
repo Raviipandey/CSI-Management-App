@@ -17,18 +17,17 @@ module.exports = {
     },
 
     publicityall : (request, response) => {
-
-            connection.query("SELECT * FROM core_pr_manager ORDER BY cpm_id DESC",function(error,results,fields){
-                if (results.length > 0) {
-                        // console.log(results);
-                            response.json({
-                    data:results
-                });
-                } else {
-                    response.redirect("/error");
-                }
-                response.end();
-            })
+        const sql = `SELECT e.proposals_event_name, e.proposals_event_category, e.proposals_event_date,e.proposals_publicity_budget, p.pr_desk_publicity, p.pr_class_publicity, p.pr_member_count, p.pr_rcd_amount, p.pr_spent, (SELECT GROUP_CONCAT(pt.pub_tasks) FROM publicity_tasks pt WHERE pt.cpm_id = p.cpm_id) AS tasks,(SELECT GROUP_CONCAT(pt.status) FROM publicity_tasks pt WHERE pt.cpm_id = p.cpm_id) AS status,f.url AS documentUrl FROM core_proposals_manager e INNER JOIN core_pr_manager p ON e.cpm_id = p.cpm_id LEFT JOIN publicity_files f ON p.cpm_id = f.eid;`;
     
+        connection.query(sql, function(error, results, fields) {
+            if (error) {
+                console.error('Query error:', error);
+                response.sendStatus(500); // Internal Server Error
+            } else {
+                response.json({
+                    data: results
+                });
+            }
+        });
     }
 };

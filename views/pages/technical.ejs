@@ -63,11 +63,12 @@
                   <table class="table table-striped table-bordered" id="tech_data">
                     <thead>
                       <tr style="vertical-align: middle; text-align: center;color: black;">
-                        <th>qs_set</th>
-                        <th>Internet Availability</th>
-                        <th>Software Installation</th>
-                        <th>Status</th>
-                        <th>Other Comments</th>
+                        <th>Event Name</th>
+                        <th>Event Date</th>
+                        <th>CSI Registration Fee</th>
+                        <th>Non-CSI Registration Fee</th>
+                        <th>Tasks</th>
+                        <th>Action</th>
 
                       </tr>
                     </thead>
@@ -77,6 +78,58 @@
               </div>
               <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
               <script>
+  
+                $(document).ready(function () {
+                  function load_data() {
+                    $.ajax({
+                      url: "/techall", // Make sure this endpoint exists and is configured in your server
+                  method: "GET",
+                  dataType: "JSON",
+                  success: function (data) {
+                    var html = '';
+                    data.data.forEach(function(row) {
+                      const eventDate = new Date(row.proposals_event_date);
+              
+                // Format the date as dd-mm-yyyy
+                const formattedDate = eventDate.getDate().toString().padStart(2, '0') + '-' + 
+                                      (eventDate.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+                                      eventDate.getFullYear();
+                      html += `<tr>
+                                <td>${row.proposals_event_name}</td>
+                                <td>${formattedDate}</td>
+                                <td>${row.proposals_reg_fee_csi}</td>
+                                <td>${row.proposals_reg_fee_noncsi}</td>
+                                <td>${row.tasks}</td>
+                              
+                                <td>
+                                  <a href="${row.documentUrl}" target="_blank" class="btn btn-primary btn-sm">View</a>
+                                  
+                                </td>
+                              </tr>`;
+                    });
+                    $('#tech_data tbody').html(html);
+                   
+              
+                        $('#tech_data').DataTable({
+                          "paging": true,
+                          "searching": true,
+                          "info": true,
+                          "ordering": true,
+                          "responsive": true,
+                          "autoWidth": true,
+                          destroy: true // Ensures DataTables reinitializes
+                        });
+                      },
+                      error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log("Error during AJAX request:", textStatus, errorThrown);
+                      }
+                    });
+                  }
+              
+                  load_data(); // Call the function to load your data
+                });
+              </script>
+              <!-- <script>
                 // Script for complete table fetch from mysql starts
                 $(document).ready(function () {
 
@@ -170,7 +223,7 @@
                   }
                   // Script for complete table fetch from mysql ends
                 }); 
-              </script>
+              </script> -->
             </div>
           </div>
         </div>

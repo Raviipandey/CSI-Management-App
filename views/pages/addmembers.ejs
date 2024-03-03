@@ -55,7 +55,8 @@
               </div>
             </div>
             <div class="card-body">
-              <div id="flash-message" style="display: none;" class="alert" role="alert"></div>
+              <!-- Add a flash message container -->
+<div id="flash-message" style="display: none;" class="alert" role="alert"></div>
 
                <!-- Sign up form -->
           <section class="add-core-member">
@@ -112,6 +113,10 @@
                       <input type="text" name="class" id="class" placeholder="Class" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
+                      <label for="acad"><i class="ni ni-hat-3"></i> Academic year (note: mention in yy-yy format)</label>
+                      <input type="text" name="acad" id="acad" placeholder="Acad" class="form-control form-control-lg" />
+                    </div>
+                    <div class="form-group">
                       <label for="class"><i class="ni ni-calendar-grid-58"></i> Membership Start Date</label>
                       <input type="date" name="mem_strt" id="membership-start" placeholder="Mem_strt" class="form-control form-control-lg" />
                     </div>
@@ -120,7 +125,7 @@
                       <input type="date" name="mem_end" id="membership-end" placeholder="Mem_end" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group form-button">
-                      <input type="submit" name="add_member" id="add-member" class="form-submit btn btn-dark btn-sm w-100 mb-3" value="Add Member" onclick="submitForm()" />
+                      <input type="submit" name="add_member" id="add-member" class="form-submit btn btn-dark btn-sm w-100 mb-3" value="Add Member" />
                     </div>
                   </form>
                 </div>
@@ -160,43 +165,53 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script>
-    // Function to submit the form using Ajax
-    function submitForm() {
-        // Prevent form from submitting normally to prevent page reload
-  event.preventDefault();
-      // Get form data
-      const formData = {
-        role: $('#role').val(),
-        first_name: $('#first-name').val(),
-        last_name: $('#last-name').val(),
-        roll_no: $('#roll-no').val(),
-        mob_no: $('#mob-no').val(),
-        email: $('#email').val(),
-        password: $('#password').val(),
-        branch: $('#branch').val(),
-        class_name: $('#class').val(),
-        mem_strt:$('#membership-start').val(),
-        mem_end:$('#membership-end').val(),
-        
-      };
-      // Make an Ajax request to your server endpoint
-      $.ajax({
-        type: 'POST',
-        url: '/addmembers',
-        contentType: 'application/json', // Set the content type to JSON
-        data: JSON.stringify(formData), // Convert the object to a JSON string
-        success: function (response) {
-          // Handle success response
-          $('#flash-message').removeClass('alert-danger').addClass('alert-success').text('Member added successfully!').show();
-          console.log('Form submitted successfully:', response);
-        },
-        error: function (error) {
-          // Handle error response
-          $('#flash-message').removeClass('alert-success').addClass('alert-danger').text('Failed to add member. Please try again.').show();
-          console.error('Error submitting form:', error);
-        },
-      });
+    $(document).ready(function() {
+  // Bind an event listener to the form submission
+  $('#add-core-member-form').on('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Collect form data
+    const formData = {
+      role: $('#role').val(),
+      first_name: $('#first-name').val(),
+      last_name: $('#last-name').val(),
+      roll_no: $('#roll-no').val(),
+      mob_no: $('#mob-no').val(),
+      email: $('#email').val(),
+      password: $('#password').val(),
+      branch: $('#branch').val(),
+      class_name: $('#class').val(),
+      acad: $('#acad').val(),
+      mem_strt: $('#membership-start').val(),
+      mem_end: $('#membership-end').val(),
+    };
+
+    // Perform AJAX request
+    $.ajax({
+    type: 'POST',
+    url: '/addmembers',
+    contentType: 'application/json',
+    data: JSON.stringify(formData),
+    success: function(response) {
+        // Display success message (Optional)
+        alert('Member added successfully!');
+
+        // Refresh the current page
+        window.location.reload();
+
+        // Or, redirect to another page, e.g., the members list page
+        // window.location.href = '/memberslist';
+    },
+    error: function(error) {
+        // Display error message
+        alert('Failed to add member. Please try again.');
+        console.error('Error submitting form:', error);
     }
+});
+
+  });
+});
+
   </script>
 
   <script>
