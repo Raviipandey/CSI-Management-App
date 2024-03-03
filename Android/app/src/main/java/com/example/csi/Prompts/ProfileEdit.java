@@ -118,7 +118,7 @@ public class ProfileEdit extends AppCompatActivity {
 
         // Adding additional data if needed
         // For example, if you need to send the user ID
-         builder.addFormDataPart("userId", getIntent().getStringExtra("core_id"));
+        builder.addFormDataPart("userId", getIntent().getStringExtra("role_name"));
 
         RequestBody requestBody = builder.build();
 
@@ -206,7 +206,7 @@ public class ProfileEdit extends AppCompatActivity {
         final RadioGroup yr = findViewById(R.id.year_E);
         final RadioGroup branch = findViewById(R.id.branch_E);
         final EditText rol = findViewById(R.id.rollNo_E);
-        final RadioGroup batch = findViewById(R.id.batch_E);
+        //final RadioGroup batch = findViewById(R.id.batch_E);
         SelectableRoundedImageView imageView = findViewById(R.id.profile_photo_E);
 
         //getting data from profile
@@ -312,20 +312,20 @@ public class ProfileEdit extends AppCompatActivity {
                 String rol_s = rol.getText().toString();
                 String yr_s;
                 String branch_s;
-                String batch_s;
+                //    String batch_s;
 
                 RadioButton yr_b = findViewById(yr.getCheckedRadioButtonId());
                 RadioButton br_b = findViewById(branch.getCheckedRadioButtonId());
-                RadioButton batch_b = findViewById(batch.getCheckedRadioButtonId());
+                //      RadioButton batch_b = findViewById(batch.getCheckedRadioButtonId());
 
                 if (yr_b != null) yr_s = yr_b.getText().toString();
                 else yr_s = getIntent().getStringExtra("year");
                 if (br_b != null) branch_s = br_b.getText().toString();
                 else branch_s = getIntent().getStringExtra("branch");
-                if (batch_b != null) batch_s = batch_b.getText().toString();
-                else batch_s = getIntent().getStringExtra("batch");
+                //    if (batch_b != null) batch_s = batch_b.getText().toString();
+                //    else batch_s = getIntent().getStringExtra("batch");
 
-                post_edited_info(id_s, name_s, email_s, phn_s, yr_s, branch_s, rol_s, batch_s , prof_url);//posting data on server
+                post_edited_info(id_s, name_s, email_s, phn_s, yr_s, branch_s, rol_s , prof_url);//posting data on server
                 Log.i("ID idhar ayega", id_s);
                 //profile_after_edit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 //startActivity(profile_after_edit);
@@ -356,7 +356,7 @@ public class ProfileEdit extends AppCompatActivity {
 //                });
 //    }
 
-    void post_edited_info(String id_s, String name_s, String email_s, String  phn_s, String yr_s , String branch_s, String rol_s, final String batch_s , String profileurl)
+    void post_edited_info(String id_s, String name_s, String email_s, String phn_s, String yr_s, String branch_s, String rol_s, final String batch_s)
     {
         Log.i("volleyABC", "Reached in get info");
 
@@ -365,12 +365,12 @@ public class ProfileEdit extends AppCompatActivity {
             jsonObject.put("id",id_s);
             jsonObject.put("name",name_s);
 //            jsonObject.put("core_role_id",position_s); //actual value will get from loginpage
-//            jsonObject.put("core_email",email_s);
-//            jsonObject.put("core_mobileno",phn_s);
+            jsonObject.put("core_email",email_s);
+            jsonObject.put("core_mobileno",phn_s);
             jsonObject.put("year",yr_s);
-//            jsonObject.put("branch",branch_s);
+            jsonObject.put("branch",branch_s);
             jsonObject.put("rollno",rol_s);
-            jsonObject.put("core_profile_url" , profileurl);
+            //   jsonObject.put("core_profile_url" , profileurl);
 //            jsonObject.put("batch",batch_s);
             Log.i("volleyABC", "Created jason");
         }
@@ -381,7 +381,7 @@ public class ProfileEdit extends AppCompatActivity {
 
         final String requestBody = jsonObject.toString();
         Log.i("final json", requestBody);
-        server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/edit/?id="+id_s+"&name="+name_s+"&year="+yr_s+"&rollno="+rol_s;
+        server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/edit/?id="+id_s+"&name="+name_s+"&core_email="+email_s+"&core_mobileno="+phn_s+"&year="+yr_s+"&branch="+branch_s+"&rollno="+rol_s;
         Log.i("Naya url", server_url);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, server_url, new Response.Listener<String>() {
