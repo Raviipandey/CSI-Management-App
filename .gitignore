@@ -1,2 +1,5 @@
 node_modules
+./serverconfig.js
 
+Database
+tmp_uploads
