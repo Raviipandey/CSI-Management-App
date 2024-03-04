@@ -444,12 +444,12 @@
                 android:id="@+id/tvFileStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Note: Expense file not uploaded yet"
-                android:visibility="visible"
-                android:textColor="@color/colorPrimary"
+                android:layout_gravity="left"
                 android:paddingLeft="20dp"
                 android:paddingBottom="10dp"
-                android:layout_gravity="left"/>
+                android:text="Note: Expense file not uploaded yet"
+                android:textColor="@color/colorPrimary"
+                android:visibility="visible" />
 
             <Button
                 android:id="@+id/select_file_button"
@@ -459,34 +459,38 @@
                 android:text="Select File" />
 
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
                 android:layout_below="@id/select_file_button">
 
                 <Button
                     android:id="@+id/delete_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginStart="28dp"
-                    android:layout_marginLeft="28dp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/ripple_effect"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:text="Delete File"
                     android:visibility="gone" />
 
                 <Button
                     android:id="@+id/download_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_marginStart="15dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="28dp"
-                    android:layout_marginLeft="28dp"
-                    android:layout_toEndOf="@id/delete_button"
-                    android:layout_toRightOf="@id/delete_button"
+                    android:textColor="@color/white"
+                    android:background="@drawable/ripple_effect"
+                    android:clickable="true"
+                    android:focusable="true"
+
                     android:text="Download"
                     android:visibility="invisible" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <TextView
                 android:layout_width="fill_parent"

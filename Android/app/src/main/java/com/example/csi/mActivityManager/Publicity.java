@@ -162,8 +162,6 @@ public class Publicity extends AppCompatActivity {
             findViewById(R.id.pr_m_coll).setEnabled(false);
             findViewById(R.id.pr_m_spent).setEnabled(false);
             findViewById(R.id.delete_button).setEnabled(false);
-
-
         }
 
         edit_pr.setOnClickListener(new View.OnClickListener() {
@@ -210,10 +208,8 @@ public class Publicity extends AppCompatActivity {
         });
 
         deleteButton = findViewById(R.id.delete_button);
-        if (!urole1.equals("PR Head")) {
-            deleteButton.setVisibility(View.GONE);
 
-        }
+
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -233,7 +229,12 @@ public class Publicity extends AppCompatActivity {
             selectFileButton.setEnabled(false); // Disable the select file button
             Button downloadButton = findViewById(R.id.download_button);
             downloadButton.setVisibility(View.VISIBLE); // Show the download button
-            deleteButton.setVisibility(View.VISIBLE);
+//            deleteButton.setVisibility(View.VISIBLE);
+            if ("PR Head".equalsIgnoreCase(urole1)) {
+                deleteButton.setVisibility(View.VISIBLE);
+            } else {
+                deleteButton.setVisibility(View.GONE);
+            }
             downloadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
