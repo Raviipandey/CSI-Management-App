@@ -468,7 +468,7 @@
 
                 <Button
                     android:id="@+id/delete_button"
-                    android:layout_width="100dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:background="@drawable/ripple_effect"
@@ -479,7 +479,7 @@
 
                 <Button
                     android:id="@+id/download_button"
-                    android:layout_width="100dp"
+                    android:layout_width="115dp"
                     android:layout_marginStart="15dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"

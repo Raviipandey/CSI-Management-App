@@ -219,7 +219,12 @@ public class Technical_form extends AppCompatActivity {
             techselectFileButton.setEnabled(false); // Disable the select file button
             Button techdownloadButton = findViewById(R.id.tech_download_button);
             techdownloadButton.setVisibility(View.VISIBLE); // Show the download button
-            techdeleteButton.setVisibility(View.VISIBLE);
+//            techdeleteButton.setVisibility(View.VISIBLE);
+            if ("Tech Head".equalsIgnoreCase(urole1)) {
+                techdeleteButton.setVisibility(View.VISIBLE);
+            } else {
+                techdeleteButton.setVisibility(View.GONE);
+            }
             techdownloadButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
