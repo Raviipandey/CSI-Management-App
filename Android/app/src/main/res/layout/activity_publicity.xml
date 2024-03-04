@@ -488,7 +488,8 @@
                     android:focusable="true"
 
                     android:text="Download"
-                    android:visibility="invisible" />
+                    android:visibility="invisible"
+                    android:layout_marginLeft="15dp" />
 
             </LinearLayout>
 
