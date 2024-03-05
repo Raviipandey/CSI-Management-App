@@ -102,6 +102,7 @@ public class Profile extends Fragment {
                 Log.i("volleyABC", "onClick: reached here");
 
                 TextView id = rootView.findViewById(R.id.id);
+                TextView role = rootView.findViewById(R.id.role);
                 TextView name = rootView.findViewById(R.id.profile_name);
                 TextView email = rootView.findViewById(R.id.email);
                 TextView phn = rootView.findViewById(R.id.phn);
@@ -115,6 +116,7 @@ public class Profile extends Fragment {
 
                 //passing data to edit intent so only required data will be changed else everything will remain same
                 edit_profile.putExtra("core_id",id.getText().toString());
+                edit_profile.putExtra("role_name",role.getText().toString());
                 edit_profile.putExtra("core_en_fname",name.getText().toString());
                 edit_profile.putExtra("core_role_id",position_s);
                 edit_profile.putExtra("core_email",email.getText().toString());

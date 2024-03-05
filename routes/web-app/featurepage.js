@@ -3,7 +3,6 @@ const connection = require("../../Database/dbConnect");
 var express=require('express');
 const multer = require('multer');
 var app=express();
-const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();

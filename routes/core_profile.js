@@ -189,7 +189,7 @@ router.post('/profileupload', profilePicUpload.single('profilePic'), (req, res) 
     const profilePicUrl = `${server_url}/profile_pic/${filePath}`; // Constructing the full URL
     console.log(profilePicUrl);
     const userId = req.body.userId; // User ID from the request body
-
+    
     // SQL query to update core_profilepic_url in the core_details table
     const updateQuery = 'UPDATE core_details SET core_profilepic_url = ? WHERE core_id = ?';
 

@@ -85,8 +85,13 @@
           <%- include('../templates/footer'); %>
           <!--footer ends-->
       </div>
+      <style>
+        .modal-custom-size {
+            max-width: 800px; /* Set your preferred max width */
+        }
+    </style>
       <div class="modal" tabindex="-1" id="action_modal">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-custom-size modal-dialog-centered">
           <div class="modal-content">
             <form method="get" id="proposal_form">
               <div class="modal-header" id="dynamic_modal_title">
@@ -300,56 +305,67 @@
   </script>
   <script>
     $(document).on('click', '.edit', function () {
-    var id = $(this).data('id');
+        var id = $(this).data('id');
 
-    $.ajax({
-        url: "/fetchcreative",
-        method: "GET",
-        data: { id: id },
-        dataType: "JSON",
-        success: function (creativeData) {
-          console.log(creativeData);
-            // Update modal title
-            $('#dynamic_modal_title').text('Event Proposal - ' + creativeData[0].proposals_event_name);
+        $.ajax({
+            url: "/fetchcreative",
+            method: "GET",
+            data: { id: id },
+            dataType: "JSON",
+            success: function (creativeData) {
+                console.log(creativeData);
+                // Update modal title
+                $('#dynamic_modal_title').text('Event Proposal - ' + creativeData[0].proposals_event_name);
 
-            // Update feedback input field
-            $('#first_name').val(creativeData[0].proposals_comment);
+                // Update feedback input field
+                $('#first_name').val(creativeData[0].proposals_comment);
 
-            // Update carousel content
-            updateCarousel(creativeData);
+                // Update carousel content
+                updateCarousel(creativeData);
 
-            // Update hidden input field for id
-            $('#id').val(creativeData[0].cpm_id);
+                // Update hidden input field for id
+                $('#id').val(creativeData[0].cpm_id);
 
-            // Show the modal
-            $('#action_modal').modal('show');
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            console.log("Error fetching creative data: " + textStatus);
-            alert("Error fetching creative data: " + errorThrown);
-        }
+                // Show the modal
+                $('#action_modal').modal('show');
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Error fetching creative data: " + textStatus);
+                alert("Error fetching creative data: " + errorThrown);
+            }
         });
     });
 
-// Function to update the carousel content
-function updateCarousel(creativeData) {
-    var carouselInner = $('#imageCarousel .carousel-inner');
-    carouselInner.empty(); // Clear existing carousel items
+    // Function to update the carousel content
+    function updateCarousel(creativeData) {
+        var carouselInner = $('#imageCarousel .carousel-inner');
+        carouselInner.empty(); // Clear existing carousel items
 
-    // Add new carousel items based on creativeData
-    for (var i = 0; i < creativeData.length; i++) {
-        var activeClass = i === 0 ? 'active' : ''; // Set 'active' class for the first item
+        // Add new carousel items based on creativeData
+        for (var i = 0; i < creativeData.length; i++) {
+            var activeClass = i === 0 ? 'active' : ''; // Set 'active' class for the first item
 
-        var carouselItem = `
-            <div class="carousel-item ${activeClass}">
-                <img src="${creativeData[i].creative_url}" class="d-block w-100" alt="Image ${i + 1}">
-            </div>
-        `;
+            var mediaContent = '';
 
-        carouselInner.append(carouselItem);
+            if (creativeData[i].creative_url.endsWith('.mp4')) {
+                mediaContent = `
+                    <video class="d-block w-100" controls>
+                        <source src="${creativeData[i].creative_url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>`;
+            } else {
+                mediaContent = `<img src="${creativeData[i].creative_url}" class="d-block w-100" alt="Image ${i + 1}">`;
+            }
+
+            var carouselItem = `
+                <div class="carousel-item ${activeClass}">
+                    ${mediaContent}
+                </div>`;
+
+            carouselInner.append(carouselItem);
+        }
     }
-}
-  </script>
+</script>
 
     <!-- jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
