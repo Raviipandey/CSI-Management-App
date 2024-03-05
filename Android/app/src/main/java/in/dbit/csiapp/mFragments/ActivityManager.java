@@ -30,7 +30,7 @@ import in.dbit.csiapp.mActivityManager.praposal_recycler;
 import in.dbit.csiapp.mActivityManager.publcity_recycler;
 import in.dbit.csiapp.Gallery.Activities.DisplayEventName;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import org.json.JSONException;
 

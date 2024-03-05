@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mFragments.About_us;

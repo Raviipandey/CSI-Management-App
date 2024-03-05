@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import org.apache.commons.io.IOUtils;

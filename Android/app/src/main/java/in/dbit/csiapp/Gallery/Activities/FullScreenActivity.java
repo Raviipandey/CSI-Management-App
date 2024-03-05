@@ -8,7 +8,7 @@ import android.util.Log;
 
 import in.dbit.csiapp.Gallery.DisplayImageAdapter.FullSizeAdapter;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import java.util.ArrayList;
 

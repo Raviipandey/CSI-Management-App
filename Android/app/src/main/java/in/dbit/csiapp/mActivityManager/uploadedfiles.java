@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.List;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> {
 

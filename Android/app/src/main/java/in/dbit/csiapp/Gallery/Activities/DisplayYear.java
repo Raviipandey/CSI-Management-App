@@ -20,7 +20,7 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.Gallery.EventNameAdapter.EventItem;
 import in.dbit.csiapp.Gallery.EventNameAdapter.EventNameAdapter;
 import in.dbit.csiapp.Gallery.ExampleDialogue;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

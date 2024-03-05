@@ -33,7 +33,7 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.AddMinute;
 import in.dbit.csiapp.Prompts.DetailActivity;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.mAdapter.ExampleAdapter;
 import in.dbit.csiapp.mAdapter.ExampleItem;

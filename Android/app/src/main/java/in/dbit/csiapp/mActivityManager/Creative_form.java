@@ -49,7 +49,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import in.dbit.csiapp.Prompts.Manager;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 import in.dbit.csiapp.mAdapter.MediaPagerAdapter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;

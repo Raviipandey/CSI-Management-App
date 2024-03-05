@@ -35,7 +35,7 @@ import in.dbit.csiapp.Gallery.Interfaces.IRecyclerViewClickListener;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Gallery.ImageFilePath;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

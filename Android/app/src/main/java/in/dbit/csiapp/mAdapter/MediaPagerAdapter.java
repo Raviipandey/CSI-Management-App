@@ -1,5 +1,5 @@
 package in.dbit.csiapp.mAdapter;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 // MediaPagerAdapter.java
 
 

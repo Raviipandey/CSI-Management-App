@@ -3,7 +3,7 @@ package in.dbit.csiapp.mActivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 public class Gallery extends AppCompatActivity {
 

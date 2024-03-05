@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 
 import in.dbit.csiapp.Prompts.attendance_list;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 public class AttendanceSBC extends Fragment {
 

@@ -21,7 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.Prompts.Manager;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 import in.dbit.csiapp.mFragments.datePickerFrag_min;
 
 import org.json.JSONException;

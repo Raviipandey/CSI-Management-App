@@ -17,7 +17,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import java.util.ArrayList;
 

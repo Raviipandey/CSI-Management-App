@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.EditText;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 public class SharedPreferenceConfig {
 

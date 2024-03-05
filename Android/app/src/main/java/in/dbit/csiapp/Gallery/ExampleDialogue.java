@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 public class ExampleDialogue extends AppCompatDialogFragment {
     private EditText eventName;

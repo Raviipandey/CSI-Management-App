@@ -39,7 +39,7 @@ import com.android.volley.toolbox.Volley;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.Manager;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

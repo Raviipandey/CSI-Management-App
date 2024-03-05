@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 public class role_intent extends AppCompatActivity {
 

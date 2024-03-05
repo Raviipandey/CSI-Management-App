@@ -23,7 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.Prompts.ProfileEdit;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 import com.joooonho.SelectableRoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;

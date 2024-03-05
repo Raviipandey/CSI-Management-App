@@ -28,7 +28,7 @@ import com.bumptech.glide.request.target.Target;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Gallery.Interfaces.IRecyclerViewClickListener;
-import com.example.csi.R;
+import in.dbit.csiapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
