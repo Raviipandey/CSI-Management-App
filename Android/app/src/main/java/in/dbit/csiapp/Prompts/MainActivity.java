@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                 try {
                     JSONObject jsonObject1 = new JSONObject(response);
                     // Log.i("tracking uid","main Activity "+UID);
+                    Log.i("Profile response" , String.valueOf(jsonObject1));
                     USERNAME = jsonObject1.getString("name");
                     UROLE = jsonObject1.getString("role");
                     ProfileURL = jsonObject1.getString("dp");
