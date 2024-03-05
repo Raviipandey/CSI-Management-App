@@ -608,34 +608,37 @@
                     android:text="Select File" />
 
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_below="@id/tech_select_file_button">
 
                     <Button
                         android:id="@+id/tech_delete_button"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginStart="28dp"
-                        android:layout_marginLeft="28dp"
+                        android:textColor="@color/white"
+                        android:background="@drawable/ripple_effect"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:text="Delete File"
                         android:visibility="gone" />
 
                     <Button
                         android:id="@+id/tech_download_button"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
+                        android:layout_marginStart="15dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="28dp"
-                        android:layout_marginLeft="28dp"
-                        android:layout_toEndOf="@id/tech_delete_button"
-                        android:layout_toRightOf="@id/tech_delete_button"
+                        android:textColor="@color/white"
+                        android:background="@drawable/ripple_effect"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:text="Download"
                         android:visibility="invisible" />
 
-                </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
 
 

@@ -51,6 +51,8 @@
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
                 <p class="mb-0">ADD CORE MEMBERS</p>
+
+                
                 
               </div>
             </div>
@@ -63,6 +65,32 @@
             <div class="container bg-white">
               <div class="signup-content">
                 <div class="signup-form">
+                  <div class="d-flex align-items-center">
+                    <p class="mb-0"><i class="ni ni-cloud-download-95"></i> Upload CSV File</p>
+                    <button id="downloadBtn" class="btn btn-primary btn-sm ms-auto">Download Template</button>
+                    </div>
+                  <form action="/uploadcsv" method="post" enctype="multipart/form-data" id="csv">
+                    <!-- <div class="form-group">
+                    
+                      <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+                    </div> -->
+                    <div class="form-group">
+                      <!-- <label for="event-image"><i class="ni ni-cloud-download-95"></i></label> -->
+                      <input type="file" name="csvFile" id="csvFile" accept=".csv"  class="form-control form-control-lg" /> <!-- Updated field name -->
+                    </div>
+                    <button type="submit" class="form-submit btn btn-dark btn-sm w-100 mb-3">Upload</button>
+                  </form>
+                  <div style="display: flex; align-items: center; justify-content: center; text-align: center;">
+                    <hr class="horizontal dark" style="flex: 1; margin: 0;"> 
+                    <p style="margin: 0 10px;">or</p>
+                    <hr class="horizontal dark" style="flex: 1; margin: 0;">
+                  </div>
+                  
+                  <div class="d-flex align-items-center">
+                    <p class="mb-0"><i class="ni ni-bullet-list-67"></i> Add Member Details</p>
+                    
+                    </div>
+                    <br>
 
                   <form method="POST" class="register-form" id="add-core-member-form">
                     <div class="form-group">
@@ -113,6 +141,13 @@
                       <input type="text" name="class" id="class" placeholder="Class" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
+                      <label>Gender</label><br>
+                      <input type="radio" id="male" name="gender" value="male">
+                      <label for="male">Male</label><br>
+                      <input type="radio" id="female" name="gender" value="female">
+                      <label for="female">Female</label>
+                    </div>
+                    <div class="form-group">
                       <label for="acad"><i class="ni ni-hat-3"></i> Academic year (note: mention in yy-yy format)</label>
                       <input type="text" name="acad" id="acad" placeholder="Acad" class="form-control form-control-lg" />
                     </div>
@@ -138,7 +173,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
           <div class="card card-profile">
             <img src="../assets/img/dbit-clg.jpg" alt="Image placeholder" class="card-img-top">
      
@@ -158,12 +193,84 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
+        <div class="col-md-4">
+          <div class="card card-profile">
+              <!-- Removed the image part as per your request -->
+              <img src="../assets/img/dbit-clg.jpg" alt="Image placeholder" class="card-img-top">
+      
+              <div class="card-body pt-0">
+                  <div class="text-center mt-4">
+                      <h5>No. of Core Members added</h5>
+                      <h5 class="font-weight-bolder" id="member-count">Loading...</h5>
+      
+                      <!-- Tabs for selecting the academic year -->
+                      <!-- Tabs for selecting the academic year -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="year-23-24-tab" data-toggle="tab" href="#year-23-24" role="tab" aria-controls="year-23-24" aria-selected="true">23-24</a>
+</li>
+  <li class="nav-item">
+      <a class="nav-link" id="year-22-23-tab" data-toggle="tab" href="#year-22-23" role="tab" aria-controls="year-22-23" aria-selected="false">22-23</a>
+  </li>
+  
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="year-23-24" role="tabpanel" aria-labelledby="year-23-24-tab">
+    <!-- Content for 23-24 will be loaded here -->
+</div>
+  <div class="tab-pane fade" id="year-22-23" role="tabpanel" aria-labelledby="year-22-23-tab">
+      <!-- Content for 22-23 will be loaded here -->
+  </div>
+ 
+</div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
       </div>
       <%- include('../templates/footer'); %>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+    // If the file is static, just set the window location to the file path
+    window.location.href = '../../server_uploads/csv_upload/Template_Core_Members_Add.csv';
+
+});
+
+  </script>
+  <script>
+    document.getElementById('csv').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch('/uploadcsv', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert(data.message); // Display an alert box with the success message
+                window.location.reload(); // Reload the page after clicking "OK" on the alert
+            } else {
+                alert('Failed to process CSV file.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while uploading the file.');
+        });
+    });
+    </script>
+    
   <script>
     $(document).ready(function() {
   // Bind an event listener to the form submission
@@ -181,6 +288,7 @@
       password: $('#password').val(),
       branch: $('#branch').val(),
       class_name: $('#class').val(),
+      gender: $('input[name="gender"]:checked').val(),
       acad: $('#acad').val(),
       mem_strt: $('#membership-start').val(),
       mem_end: $('#membership-end').val(),
@@ -211,6 +319,57 @@
 
   });
 });
+
+
+$(document).ready(function() {
+    // Function to make AJAX call and update content
+    function loadCoreMembers(year) {
+        $.ajax({
+            url: `/members/${year}`, // Adjust the URL path to your actual API endpoint
+            type: 'GET',
+            success: function(response) {
+              let tableHtml = '<table class="table"><thead><tr><th>Name</th><th>Role</th></tr></thead><tbody>';
+    response.members.forEach((memberName, index) => {
+        const roleName = response.role[index];
+        tableHtml += `<tr><td>${memberName}</td><td>${roleName}</td></tr>`;
+    });
+    tableHtml += '</tbody></table>';
+    
+    if (response.members.length === 0) {
+        tableHtml = '<p>No core members found for this year.</p>';
+    }
+    $(`#year-${year}`).html(tableHtml);
+            },
+            error: function(error) {
+                $(`#year-${year}`).html('<p>Failed to load data.</p>');
+                
+            }
+        });
+    }
+
+    // Load core members for the year 23-24 on document ready
+    loadCoreMembers('23-24');
+
+    // Event handler for tab clicks to load and display members for the selected year
+    $('#myTab a').on('click', function (e) {
+        e.preventDefault();
+        var selectedYear = $(this).text().trim();
+        loadCoreMembers(selectedYear);
+
+        // Activate the clicked tab
+        if (typeof bootstrap === 'undefined') {
+            // Bootstrap 4 and below
+            $(this).tab('show');
+        } else {
+            // Bootstrap 5
+            var tab = new bootstrap.Tab($(this)[0]);
+            tab.show();
+        }
+    });
+});
+
+
+
 
   </script>
 

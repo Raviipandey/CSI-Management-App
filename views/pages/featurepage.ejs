@@ -110,6 +110,16 @@
     $('#add-feature-images-form').on('submit', function(event) {
   event.preventDefault(); // Prevent the default form submission
 
+  const fileInput = document.getElementById('event-image');
+    const filePath = fileInput.value;
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.HEIC)$/i;
+
+    if (!allowedExtensions.exec(filePath)) {
+      alert('Invalid file type. Please upload only image files (jpg, jpeg, png, heic).');
+      fileInput.value = ''; // Clear the file input for new selection
+      return false;
+    }
+
   const formData = new FormData(this); // 'this' is the form element
 
   fetch('/featurepage', {

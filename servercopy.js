@@ -141,6 +141,7 @@ app.use('/publicityData', publicity.get);
 app.use('/publicityall', publicity.publicityall);
 app.use('/addmemberspage', addmembers.get);
 // app.use('/featurepage', featurepage.get);
+app.use('/uploadCSV', addmembers.uploadCSV);
 app.use('/featurepage', featurepage);
 app.use('/addmembers', addmembers.addmembers);
 app.use('/countApprovedProposals', proposal.countApprovedProposals);
@@ -148,6 +149,8 @@ app.use('/countRejectedProposals', proposal.countRejectedProposals);
 app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals);
 app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals);
 app.use('/countMembers', addmembers.countMembers);
+app.get('/members/:year', addmembers.fetchCoreMembers);
+
 
 
 
