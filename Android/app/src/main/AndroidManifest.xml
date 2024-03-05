@@ -18,71 +18,71 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".mActivityManager.ReportDisplay"
+        <activity android:name="in.dbit.csiapp.mActivityManager.ReportDisplay"
             android:theme="@style/AppTheme2"/>
-        <activity android:name=".mActivityManager.CreativePosterFull" />
+        <activity android:name="in.dbit.csiapp.mActivityManager.CreativePosterFull" />
         <activity
-            android:name=".mActivityManager.publcity_recycler"
+            android:name="in.dbit.csiapp.mActivityManager.publcity_recycler"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".Prompts.attendance_list"
+            android:name="in.dbit.csiapp.Prompts.attendance_list"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.edit_proposal"
+            android:name="in.dbit.csiapp.mActivityManager.edit_proposal"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.proposal_desc"
+            android:name="in.dbit.csiapp.mActivityManager.proposal_desc"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.praposal_recycler"
+            android:name="in.dbit.csiapp.mActivityManager.praposal_recycler"
             android:theme="@style/AppTheme2" />
-        <activity android:name=".Gallery.Activities.FullScreenActivity" />
+        <activity android:name="in.dbit.csiapp.Gallery.Activities.FullScreenActivity" />
         <activity
-            android:name=".Gallery.Activities.DisplayImage"
-            android:theme="@style/AppTheme2" />
-        <activity
-            android:name=".Gallery.Activities.DisplayYear"
+            android:name="in.dbit.csiapp.Gallery.Activities.DisplayImage"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".Gallery.Activities.DisplayEventName"
+            android:name="in.dbit.csiapp.Gallery.Activities.DisplayYear"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Technical_form"
+            android:name="in.dbit.csiapp.Gallery.Activities.DisplayEventName"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Creative_form"
+            android:name="in.dbit.csiapp.mActivityManager.Technical_form"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Report"
-            android:theme="@style/AppTheme2" />
-        <activity android:name=".mActivityManager.Gallery" />
-        <activity
-            android:name=".mActivityManager.Technical"
+            android:name="in.dbit.csiapp.mActivityManager.Creative_form"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Publicity"
+            android:name="in.dbit.csiapp.mActivityManager.Report"
+            android:theme="@style/AppTheme2" />
+        <activity android:name="in.dbit.csiapp.mActivityManager.Gallery" />
+        <activity
+            android:name="in.dbit.csiapp.mActivityManager.Technical"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Creative"
+            android:name="in.dbit.csiapp.mActivityManager.Publicity"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".mActivityManager.Proposal"
+            android:name="in.dbit.csiapp.mActivityManager.Creative"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".Prompts.ProfileEdit"
+            android:name="in.dbit.csiapp.mActivityManager.Proposal"
             android:theme="@style/AppTheme2" />
         <activity
-            android:name=".Prompts.Manager"
+            android:name="in.dbit.csiapp.Prompts.ProfileEdit"
+            android:theme="@style/AppTheme2" />
+        <activity
+            android:name="in.dbit.csiapp.Prompts.Manager"
             android:label="@string/title_activity_manager"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Prompts.role_intent" />
+        <activity android:name="in.dbit.csiapp.Prompts.role_intent" />
         <activity
-            android:name=".Prompts.AddMinute"
+            android:name="in.dbit.csiapp.Prompts.AddMinute"
             android:theme="@style/AppTheme2" />
 
 
         <activity
-            android:name=".Prompts.MainActivity"
+            android:name="in.dbit.csiapp.Prompts.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

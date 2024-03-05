@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Prompts.attendance_list"
+    tools:context="in.dbit.csiapp.Prompts.attendance_list"
     android:background="@color/white">
 
     <TableLayout

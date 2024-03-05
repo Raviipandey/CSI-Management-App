@@ -6,10 +6,10 @@ dotenv.config();
 // MySQL Connection
 var mysql=require('mysql');
 const connection=mysql.createConnection({
-    	host:'localhost',
-		user: "root",
-		password: "",
-    	database:'csiApp'
+	host: '128.199.23.207',
+    user: "csi",
+    password: "csi",
+    database: 'csiApp2022'
 });
 
 connection.connect(function(err){
