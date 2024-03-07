@@ -391,8 +391,8 @@ public class AttendancePR extends Fragment {
         //Below if else condition is just used to display the data we are sending to server
         if (mRequestListAdapter.mRejectRequestList.size()>0)
         {
-            Toast.makeText(getActivity(),sb.toString(),Toast.LENGTH_SHORT).show();
-            Toast.makeText(getActivity(),rejReq, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(),sb.toString(),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(),rejReq, Toast.LENGTH_SHORT).show();
             Log.i("jsonArray",rejReq);
         }
         else
