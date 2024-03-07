@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     View lay;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/login";
 //        Toast.makeText(this, "this is server_rl from string " + server_url , Toast.LENGTH_SHORT).show();

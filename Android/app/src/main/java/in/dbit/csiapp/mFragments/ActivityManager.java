@@ -1,9 +1,16 @@
 package in.dbit.csiapp.mFragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -53,6 +60,7 @@ public class ActivityManager extends Fragment  {
     private int dotsCount;
     private ImageView[] dots;
     private SharedPreferenceConfig preferenceConfig;
+    private static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 1;
 
     public  static ActivityManager newInstance()
     {
@@ -62,6 +70,25 @@ public class ActivityManager extends Fragment  {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inside onCreate method
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // Permission already granted, proceed with the operation
+            } else {
+                // Request the MANAGE_EXTERNAL_STORAGE permission
+                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
+            }
+        } else {
+            // For Android versions below R, handle WRITE_EXTERNAL_STORAGE permission as usual
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else {
+                // Permission already granted, proceed with the operation
+            }
+        }
+
+
         rootView = inflater.inflate(R.layout.manager_activity,container,false);
 //        ScrollView sv = new ScrollView(this);
 //        sv.addView(rootView);

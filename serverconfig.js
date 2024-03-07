@@ -15,7 +15,7 @@ connection.connect(function(err) {
     }
 });
 
-const server_url = 'http://192.168.0.112:9000';
+const server_url = 'http://10.0.4.222:9000';
 
 module.exports = {
     connection: connection,

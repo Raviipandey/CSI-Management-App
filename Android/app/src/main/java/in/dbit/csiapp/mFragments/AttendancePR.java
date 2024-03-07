@@ -116,6 +116,7 @@ public class AttendancePR extends Fragment {
     }
 
     private void parseJSON() {
+        mRequestList.clear();
         //String url = "http://192.168.43.84:8080/requestlist";
         String url = rootView.getResources().getString(R.string.server_url) + "/attendance/requestlist";   //Main Server URL
         Log.i("AttPR","ParseJSON");
@@ -214,7 +215,15 @@ public class AttendancePR extends Fragment {
             }
         });
 
+        if (mRequestListAdapter == null) {
+            mRequestListAdapter = new RequestListAdapter(getActivity(), mRequestList);
+            mRecyclerView.setAdapter(mRequestListAdapter);
+        } else {
+            // Notify the adapter about the data change
+            mRequestListAdapter.notifyDataSetChanged();
+        }
         mRequestQueue.add(stringRequest);
+
     }
 
     public void parsejson2() {
