@@ -4,92 +4,116 @@ var fs = require("fs");
 var pdfkit = require("pdfkit");
 var dotenv = require('dotenv');
 dotenv.config();
-
+const axios = require('axios');
+const {connection , server_url} = require('../serverconfig');
 // MySQL Connection
-var mysql=require('mysql');
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: "root",
-    password: "",
-	database: 'csiApp'
-});
+// var mysql=require('mysql');
+// const connection = mysql.createConnection({
+// 	host: 'localhost',
+// 	user: "root",
+//     password: "",
+// 	database: 'csiApp'
+// });
 
-connection.connect(function(err) {
-	if (!err){
-        	console.log('Connected to MySql!Report.js');
-    	}
-    	else{
-        	console.log('Not Connected To Mysql!Report.js');
-    	}
-});
+// connection.connect(function(err) {
+// 	if (!err){
+//         	console.log('Connected to MySql!Report.js');
+//     	}
+//     	else{
+//         	console.log('Not Connected To Mysql!Report.js');
+//     	}
+// });
 
 //Listing All events ready for report
 router.get('/list',(req,res)=>{
 
-	connection.query('SELECT events.eid,name,theme,event_date FROM events,(SELECT * FROM(SELECT res1.eid,status,res1.creative_status,res1.publicity_status FROM technical,(SELECT * FROM (SELECT creative.eid,creative.status AS creative_status,publicity.status AS publicity_status FROM creative,publicity WHERE creative.eid=publicity.eid) AS res0  WHERE creative_status=3 AND publicity_status=3) AS res1 WHERE res1.eid=technical.eid) AS res2 WHERE res2.status=3) AS res3 WHERE events.eid=res3.eid',function(err,result){
+	connection.query('SELECT * FROM core_proposals_manager',function(err,result){
 		if(err){
 			console.log("Report listing error");
 			res.sendStatus(400);
 		}
 		else{
 			console.log("Succesully Listed Report");
+			console.log(result);
 			res.status(200).send(result);
 		}
 	});
 });
 
-
 //Download Report
-router.get('/download',(req,res)=>{
+router.get('/generate',(req,res)=>{
 var eid = req.query.eid;
 
-	connection.query('SELECT name,theme,event_date,speaker,venue,reg_fee_c,reg_fee_nc,prize,convert(description using utf8)as description,creative_budget,publicity_budget,guest_budget FROM events WHERE eid= ?',[eid], function( err , result){
+	connection.query('SELECT * FROM core_proposals_manager WHERE cpm_id = ?',[eid], function( err , result){
 		if(err) {
     			throw err;
  			} 
 		else {
 			const a= new pdfkit
-			a.pipe(fs.createWriteStream("report/".concat(result[0].name).concat(".pdf")));
+			a.pipe(fs.createWriteStream("report/".concat(result[0].proposals_event_name).concat(".pdf")));
 			a.fontSize(15).text("Don Bosco Institute of Technology, Kurla(W)",{align: 'center'})
 			a.text("Department of Information Technology",{align: 'center'})
 			a.moveDown(2);
-			a.font('Helvetica-Bold').fontSize(30).text(result[0].name,{align: 'center'})
+			a.font('Helvetica-Bold').fontSize(30).text(result[0].proposals_event_name,{align: 'center'})
 			a.moveDown();
-			a.font('Helvetica-Bold').fontSize(15).text('Name: ', {continued:true}).font('Helvetica').text (result[0].name)
+			a.font('Helvetica-Bold').fontSize(15).text('Name: ', {continued:true}).font('Helvetica').text (result[0].proposals_event_name)
 			a.moveDown();
-			a.font('Helvetica-Bold').text('Theme: ', {continued:true}).font('Helvetica').text (result[0].theme)
+			a.font('Helvetica-Bold').text('Theme: ', {continued:true}).font('Helvetica').text (result[0].proposals_event_category)
 			a.moveDown();
-			a.font('Helvetica-Bold').text('Description: ', {continued:true}).font('Helvetica').text (result[0].description)
+			a.font('Helvetica-Bold').text('Description: ', {continued:true}).font('Helvetica').text (result[0].proposals_desc)
 			a.moveDown();
-			a.font('Helvetica-Bold').text('Event Date: ', {continued:true}).font('Helvetica').text (result[0].event_date)
+			a.font('Helvetica-Bold').text('Event Date: ', {continued:true}).font('Helvetica').text (result[0].proposals_event_date)
 			a.moveDown();
-			a.font('Helvetica-Bold').text('Venue: ', {continued:true}).font('Helvetica').text (result[0].venue)
+			a.font('Helvetica-Bold').text('Venue: ', {continued:true}).font('Helvetica').text (result[0].proposals_venue)
 			a.moveDown();
 			a.font('Helvetica-Bold').text('Speaker: ', {continued:true}).font('Helvetica').text (result[0].speaker)
 			a.moveDown();
 			a.font('Helvetica-Bold').text('Finance Summary ')
-			a.font('Helvetica').text('Registration fee for CSI members: ',{continued:true}).font('Helvetica').text (result[0].reg_fee_c)
+			a.font('Helvetica').text('Registration fee for CSI members: ',{continued:true}).font('Helvetica').text (result[0].proposals_reg_fee_csi)
 			a.moveDown(2);
-			a.text('Registration fee for Non-CSI members: ', {continued:true}).font('Helvetica').text (result[0].reg_fee_nc)
+			a.text('Registration fee for Non-CSI members: ', {continued:true}).font('Helvetica').text (result[0].proposals_reg_fee_noncsi)
 			a.moveDown(2);
-			a.font('Helvetica-Bold').text('Prize: ', {continued:true}).font('Helvetica').text (result[0].prize)
+			a.font('Helvetica-Bold').text('Prize: ', {continued:true}).font('Helvetica').text (result[0].proposals_prize)
 			a.moveDown();
 
-		connection.query('SELECT poster_link FROM creative WHERE eid= ?',[eid], function( err , result){
-			if(err) {
-					throw err;
-				} 
-			else {
-				result[0].poster_link=result[0].poster_link.substr(31);
-				result[0].poster_link='creative/'+result[0].poster_link;
-				a.addPage();
-				a.moveDown(2);
-				a.font('Helvetica-Bold').fontSize(25).text('Marketing: ')
-				a.moveDown();
-				a.font('Helvetica').fontSize(15).text('Poster: ')
-				a.image(result[0].poster_link,{width: 250, height: 350})
-				}
-		connection.query('SELECT creative_budget,publicity_budget,guest_budget,total_budget FROM events WHERE eid= ?',[eid], function( err , result){
+		connection.query('SELECT creative_url FROM csiApp2022.core_creative_manager WHERE cpm_id= ?',[eid], function( err , result){
+			if (err) {
+				throw err;
+			} else {
+				const imageUrls = result.map(result => result.creative_url);
+
+				const rows = 2;
+                const cols = 2;
+                const gridSize = 250;
+
+                let currentRow = 0;
+                let currentCol = 0;
+
+				imageUrls.forEach(imageUrl => {
+					axios.get(imageUrl, { responseType: 'arraybuffer' })
+						.then(response => {
+							const imageData = Buffer.from(response.data, 'binary');
+
+							if (currentCol === cols) {
+								currentCol = 0;
+								currentRow++;
+							}
+
+							const x = currentCol * gridSize;
+							const y = currentRow * gridSize;
+
+							a.addPage();
+							a.image(imageData, x, y, { width: 250, height: 250 });
+
+							currentCol++;
+						})
+						.catch(error => {
+							console.error('Error downloading image:', error);
+						});
+				});
+				
+			}
+		connection.query('SELECT proposals_creative_budget,proposals_publicity_budget,proposals_guest_budget,proposals_total_budget FROM csiApp2022.core_proposals_manager WHERE cpm_id= ?',[eid], function( err , result){
 			if(err) {
 					throw err;
 				} 
@@ -110,10 +134,10 @@ var eid = req.query.eid;
 				textInRowFirst(a, 'Publicity budget', 137.5);
 				textInRowFirst(a, 'Guest budget', 160);
 				textInRowFirst(a, 'Total budget', 182.5);
-				textInRowSecond(a,result[0].creative_budget, 115);
-				textInRowSecond(a,result[0].publicity_budget, 137.5);
-				textInRowSecond(a,result[0].guest_budget, 160);
-				textInRowSecond(a,result[0].total_budget, 182.5);
+				textInRowSecond(a,result[0].proposals_creative_budget, 115);
+				textInRowSecond(a,result[0].proposals_publicity_budget, 137.5);
+				textInRowSecond(a,result[0].proposals_guest_budget, 160);
+				textInRowSecond(a,result[0].proposals_total_budget, 182.5);
 
 			function textInRowFirst(a, text, heigth) {
 				a.y = heigth;
@@ -149,7 +173,7 @@ var eid = req.query.eid;
 					.stroke()
 				return a
 				}
-		connection.query('SELECT collected,spent,target FROM publicity WHERE eid= ?',[eid], function( err , result){
+		connection.query('SELECT pr_rcd_amount,pr_spent,pr_member_count FROM csiApp2022.core_pr_manager WHERE cpm_id= ?',[eid], function( err , result){
 			if(err) {
 					throw err;
 				} 
@@ -157,18 +181,19 @@ var eid = req.query.eid;
 				a.moveDown(4);
 				a.font('Helvetica-Bold').fontSize(25).text('Summary: ',{indent:45})
 				a.moveDown(0.5);
-				a.font('Helvetica-Bold').fontSize(15).text('Money collected: ', {indent:45,continued:true}).font('Helvetica').text (result[0].collected)
+				a.font('Helvetica-Bold').fontSize(15).text('Money collected: ', {indent:45,continued:true}).font('Helvetica').text (result[0].pr_rcd_amount)
 				a.moveDown();
-				a.font('Helvetica-Bold').text('Money spent: ', {indent:45,continued:true}).font('Helvetica').text (result[0].spent)
+				a.font('Helvetica-Bold').text('Money spent: ', {indent:45,continued:true}).font('Helvetica').text (result[0].pr_spent)
 				a.moveDown();
 				
 			a.end()  
-		connection.query('SELECT name FROM events WHERE eid= ?',[eid], function( err , result){
+
+		connection.query('SELECT proposals_event_name FROM csiApp2022.core_proposals_manager WHERE cpm_id= ?',[eid], function( err , result){
 			if(err) {
 					throw err;
 				} 
 			else {
-				var file = 'report/'.concat(result[0].name).concat('.pdf');
+				var file = 'report/'.concat(result[0].proposals_event_name).concat('.pdf');
 				var data=fs.readFileSync(file);
 				res.status(200).send(data); // Set disposition and send it.
 				}

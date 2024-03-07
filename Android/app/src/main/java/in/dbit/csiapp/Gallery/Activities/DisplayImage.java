@@ -54,6 +54,10 @@ import okhttp3.RequestBody;
 
 public class DisplayImage extends AppCompatActivity {
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_PICKER = 2;
+    private static final String FILE_PROVIDER_AUTHORITY = "in.dbit.csiapp.fileprovider";
+
     String PARENT_PATH = "";
     private SharedPreferenceConfig preferenceConfig;
     String urole;
@@ -112,13 +116,13 @@ public class DisplayImage extends AppCompatActivity {
         }
 
 
-
         Fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Intent intent = new Intent(getApplicationContext(), Upload.class);
                 //intent.putExtra("PATH", PARENT_PATH);
                 //startActivity(intent);
+                Log.d("FabClickListener", "FAB button clicked!");
                 UploadImages();
             }
         });

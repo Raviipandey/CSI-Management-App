@@ -1,5 +1,4 @@
 package in.dbit.csiapp.mActivityManager;
-
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -18,12 +17,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import in.dbit.csiapp.R;
 import com.github.barteksc.pdfviewer.PDFView;
-
 import org.apache.commons.io.IOUtils;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,20 +29,25 @@ import java.net.URL;
 public class ReportDisplay extends AppCompatActivity {
 
     PDFView pdfView;
-    String url = "http://tayyabali.in:9091/report/";
+    String url = "http://192.168.1.106:9000/report/";
+
     String eName;
+    String eid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("Log of report new url"  ,url);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_display);
         getSupportActionBar().setTitle("Report");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
+        eid = intent.getStringExtra("eid");
         eName = intent.getStringExtra("eName");
         eName = eName + ".pdf";
+//        url = url + eid;
         url += eName;
-        Log.i("url testing", url);
+        Log.i("url testing report", url);
 
         pdfView = (PDFView)findViewById(R.id.pdfView);
 
@@ -55,8 +56,13 @@ public class ReportDisplay extends AppCompatActivity {
         //pdfView.fromAsset("Student FAQs.pdf").load();
 
         //This is function read PDF from URL
-        new RetrievePDFStream().execute(url);
 
+//      String pdfurl = "http://localhost:9000/server_uploads/publicity_pdf/1_Mumbai%20Hackathon_publicity.pdf";
+
+
+        new GenerateReportTask().execute(eid);
+
+//        new RetrievePDFStream().execute(url);
         //This is function read PDF from bytes
         //new RetrievePDFBytes().execute("http://ancestralauthor.com/download/sample.pdf");
 
@@ -71,6 +77,37 @@ public class ReportDisplay extends AppCompatActivity {
         });
     }
 
+    private class GenerateReportTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            HttpURLConnection urlConnection = null;
+            try {
+                // Construct the URL for the generate route with the eid parameter
+                String generateUrl = "http://192.168.1.106:9000/generate?eid=" + params[0];
+
+                // Open a connection to the generate route URL (you can use HttpURLConnection or any other HTTP library)
+                URL url = new URL(generateUrl);
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                // Handle the response if needed (e.g., check for HTTP success codes)
+
+            } catch (IOException e) {
+                Log.e("GenerateReportTask", "Error sending request to generate route", e);
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // After generating the report, start the download task
+            new RetrievePDFStream().execute(url);
+        }
+    }
     public void StartDownloading(View view) {
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -132,7 +169,7 @@ public class ReportDisplay extends AppCompatActivity {
         }
     }
 
-    class RetrievePDFStream extends AsyncTask<String, Void, InputStream> {
+    private class RetrievePDFStream extends AsyncTask<String, Void, InputStream> {
 
         @Override
         protected InputStream doInBackground(String... strings) {
@@ -140,11 +177,11 @@ public class ReportDisplay extends AppCompatActivity {
             try {
                 URL url = new URL(strings[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                if(urlConnection.getResponseCode() == 200) {
+                if (urlConnection.getResponseCode() == 200) {
                     inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 }
             } catch (IOException e) {
-                Log.i("sank","sanket");
+                Log.i("sank", "sanket");
                 return null;
             }
             return inputStream;
@@ -153,7 +190,6 @@ public class ReportDisplay extends AppCompatActivity {
         @Override
         protected void onPostExecute(InputStream inputStream) {
             pdfView.fromStream(inputStream).load();
-
         }
     }
     @Override

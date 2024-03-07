@@ -52,7 +52,7 @@ app.use('/creative', express.static('./creative'));
 
 
 app.use('/profile_pic', express.static('./profile_pic'));
-
+app.use('/report', express.static(path.join(__dirname, 'report')));
 
 var login=require('./routes/core_login.js');
 var minutes=require('./routes/core_minutes.js');

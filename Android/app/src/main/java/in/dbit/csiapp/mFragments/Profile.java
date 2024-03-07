@@ -118,7 +118,7 @@ public class Profile extends Fragment {
                 edit_profile.putExtra("core_id",id.getText().toString());
                 edit_profile.putExtra("role_name",role.getText().toString());
                 edit_profile.putExtra("core_en_fname",name.getText().toString());
-                edit_profile.putExtra("core_role_id",position_s);
+                edit_profile.putExtra("core_id",position_s);
                 edit_profile.putExtra("core_email",email.getText().toString());
                 edit_profile.putExtra("core_mobileno",phn.getText().toString());
                 edit_profile.putExtra("core_class",yr.getText().toString());
@@ -228,7 +228,7 @@ public class Profile extends Fragment {
             role.setText(fetchedData.getString("role_name"));
             id.setText(fetchedData.getString("core_id"));
             name.setText(fetchedData.getString("core_en_fname"));
-            position_s= fetchedData.getString("core_role_id");
+            position_s= fetchedData.getString("core_id");
             Log.i("volleyABC", "position value in main"+position_s);
             email.setText(fetchedData.getString("core_email"));
             phn.setText(fetchedData.getString("core_mobileno"));

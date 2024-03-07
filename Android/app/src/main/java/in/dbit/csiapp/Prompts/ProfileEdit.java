@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -87,59 +88,114 @@ public class ProfileEdit extends AppCompatActivity {
         return result;
     }
 
+//    private void uploadImageToServer(String filePath, String fileName) {
+//
+//        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/profileupload";
+//        OkHttpClient client = new OkHttpClient();
+//
+//        File file = new File(filePath);
+//        MediaType mediaType = MediaType.parse("image/jpeg"); // Adjust this according to your image type
+//
+//        // Create RequestBody instance from file
+//        RequestBody fileBody = RequestBody.create(mediaType, file);
+//
+//        // MultipartBody Builder
+//        MultipartBody.Builder builder = new MultipartBody.Builder()
+//                .setType(MultipartBody.FORM)
+//                .addFormDataPart("profilePic", fileName, fileBody); // Ensure this field name matches with the server's expected field name
+//
+//        // Adding additional data if needed
+//        // For example, if you need to send the user ID
+//        builder.addFormDataPart("userId", getIntent().getStringExtra("core_role_id"));
+//
+//        RequestBody requestBody = builder.build();
+//
+//        // Build your request
+//        okhttp3.Request request = new okhttp3.Request.Builder()
+//                .url(url)
+//                .post(requestBody)
+//                .build();
+//
+//        // Making the request
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
+//                runOnUiThread(() -> {
+//                    try {
+//                        if (response.isSuccessful() && response.body() != null) {
+//                            String responseData = response.body().string();
+//                            // Handle the server response
+//                            Toast.makeText(ProfileEdit.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(ProfileEdit.this, "Server responded with error: " + response.code(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Toast.makeText(ProfileEdit.this, "Error handling server response", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                runOnUiThread(() -> Toast.makeText(ProfileEdit.this, "Failed to Upload Image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+//            }
+//        });
+//    }
+
+    private class UploadImageTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            String filePath = params[0];
+            String fileName = params[1];
+
+            String url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/profileupload";
+            OkHttpClient client = new OkHttpClient();
+
+            File file = new File(filePath);
+            MediaType mediaType = MediaType.parse("image/jpeg");
+
+            RequestBody fileBody = RequestBody.create(mediaType, file);
+
+            MultipartBody.Builder builder = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("profilePic", fileName, fileBody);
+
+            builder.addFormDataPart("userId", getIntent().getStringExtra("core_id"));
+
+            RequestBody requestBody = builder.build();
+
+            okhttp3.Request request = new okhttp3.Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+
+            try {
+                okhttp3.Response response = client.newCall(request).execute();
+                if (response.isSuccessful() && response.body() != null) {
+                    String responseData = response.body().string();
+                    // Handle the server response
+                    Log.i("AsyncTask", "Image Uploaded Successfully");
+                } else {
+                    Log.e("AsyncTask", "Server responded with error: " + response.code());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("AsyncTask", "Error handling server response: " + e.getMessage());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // You can perform UI updates here if needed
+        }
+    }
     private void uploadImageToServer(String filePath, String fileName) {
+        new UploadImageTask().execute(filePath, fileName);
 
-        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/profile/profileupload";
-        OkHttpClient client = new OkHttpClient();
-
-        File file = new File(filePath);
-        MediaType mediaType = MediaType.parse("image/jpeg"); // Adjust this according to your image type
-
-        // Create RequestBody instance from file
-        RequestBody fileBody = RequestBody.create(mediaType, file);
-
-        // MultipartBody Builder
-        MultipartBody.Builder builder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("profilePic", fileName, fileBody); // Ensure this field name matches with the server's expected field name
-
-        // Adding additional data if needed
-        // For example, if you need to send the user ID
-        builder.addFormDataPart("userId", getIntent().getStringExtra("core_role_id"));
-
-        RequestBody requestBody = builder.build();
-
-        // Build your request
-        okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build();
-
-        // Making the request
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
-                runOnUiThread(() -> {
-                    try {
-                        if (response.isSuccessful() && response.body() != null) {
-                            String responseData = response.body().string();
-                            // Handle the server response
-                            Toast.makeText(ProfileEdit.this, "Image Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(ProfileEdit.this, "Server responded with error: " + response.code(), Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(ProfileEdit.this, "Error handling server response", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(ProfileEdit.this, "Failed to Upload Image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            }
-        });
     }
 
 
@@ -151,11 +207,9 @@ public class ProfileEdit extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri selectedImageUri = data.getData();
-//            loadImageUrl(selectedImageUri.toString());
-
-            String filePath = getRealPathFromURI(selectedImageUri); // Obtain the real file path
+            String filePath = getRealPathFromURI(selectedImageUri);
             String fileName = getFileNameFromUri(selectedImageUri);
-            uploadImageToServer(filePath, fileName); // Upload using the file path
+            uploadImageToServer(filePath, fileName);
         }
     }
 
@@ -195,6 +249,7 @@ public class ProfileEdit extends AppCompatActivity {
         final EditText rol = findViewById(R.id.rollNo_E);
         //final RadioGroup batch = findViewById(R.id.batch_E);
         SelectableRoundedImageView imageView = findViewById(R.id.profile_photo_E);
+
 
         //getting data from profile
 
@@ -273,7 +328,7 @@ public class ProfileEdit extends AppCompatActivity {
 //                break;
 //        }
 //        Log.i("check data incoming", getIntent().getStringExtra("year") + " " + getIntent().getStringExtra("branch") + " " + getIntent().getStringExtra("batch"));
-        Log.i("volleyABC", "position value" + position_s + getIntent().getStringExtra("core_role_id"));
+        Log.i("volleyABC", "position value" + position_s + getIntent().getStringExtra("core_id"));
 
 
 

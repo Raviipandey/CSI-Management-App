@@ -226,6 +226,4 @@ router.post('/editproposal', (req, res) => {
         }
     });
 });
-
-
 module.exports = router;

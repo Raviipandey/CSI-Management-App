@@ -79,11 +79,12 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
                     for(int i=0; i< jsonArray.length(); i++) {
                         JSONObject minutes = jsonArray.getJSONObject(i);
 
-                        eid = minutes.getString("eid");
-                        String date = minutes.getString("event_date");
-                        Name = minutes.getString("name");
+                        Log.d("Jsonresponse for report" , String.valueOf(minutes));
+                        eid = minutes.getString("cpm_id");
+                        String date = minutes.getString("proposals_event_date");
+                        Name = minutes.getString("proposals_event_name");
 //                        String status = minutes.getString("status");
-                        String theme =minutes.getString("theme");
+                        String theme =minutes.getString("proposals_event_category");
                         //String points = minutes.getString("minute");
 
                         //in the above variable date we are not getting date in DD:MM:YYYY
@@ -144,7 +145,10 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
         Intent intent = new Intent(Report.this,ReportDisplay.class);
         PraposalItem clickedItem = mPraposalList.get(position);
         String EventName = clickedItem.getmName();
+        String EventId = clickedItem.getmEid();
         intent.putExtra("eName", EventName);
+        Log.i("Passing eid to Display" , EventId);
+        intent.putExtra("eid" , EventId);
         startActivity(intent);
     }
 }

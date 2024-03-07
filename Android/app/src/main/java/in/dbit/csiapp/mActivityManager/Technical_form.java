@@ -1,12 +1,16 @@
 package in.dbit.csiapp.mActivityManager;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,6 +45,7 @@ import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,11 +54,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -64,6 +73,11 @@ public class Technical_form extends AppCompatActivity {
     private String urole1,eid , BoxStatus;
     LinearLayout tech_lay;
     private SharedPreferenceConfig preferenceConfig;
+    public static final String READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
+    public static final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
+    public static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    public static final String MANAGE_EXTERNAL_STORAGE = Manifest.permission.MANAGE_EXTERNAL_STORAGE;
+    private static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 1;
     private TextView name , theme , e_date,speaker,csi_f,ncsi_f,worth_prize , description, cr_budget, pub_budget, guest_budget , tech_req, techFileStatus;
     CheckBox question , internet , software;
     EditText comments;
@@ -76,8 +90,27 @@ public class Technical_form extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Inside onCreate method
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                // Permission already granted, proceed with the operation
+            } else {
+                // Request the MANAGE_EXTERNAL_STORAGE permission
+                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
+            }
+        } else {
+            // For Android versions below R, handle WRITE_EXTERNAL_STORAGE permission as usual
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else {
+                // Permission already granted, proceed with the operation
+            }
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_technical_form);
         getSupportActionBar().setTitle("Technical");
@@ -206,8 +239,8 @@ public class Technical_form extends AppCompatActivity {
             }
         });
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        if (ContextCompat.checkSelfPermission(this, MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES , READ_EXTERNAL_STORAGE , WRITE_EXTERNAL_STORAGE , MANAGE_EXTERNAL_STORAGE}, 1);
         }
 
         // Check if a file has already been uploaded for this eid
@@ -233,32 +266,60 @@ public class Technical_form extends AppCompatActivity {
                             .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid)
                             .build();
 
-                    // Execute the download request asynchronously
-                    client.newCall(downloadRequest).enqueue(new okhttp3.Callback() {
+                    client.newCall(downloadRequest).enqueue(new Callback() {
                         @Override
-                        public void onFailure(Call call, IOException e) {
-                            e.printStackTrace();
-                            Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                        public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
                             if (!response.isSuccessful()) {
                                 throw new IOException("Unexpected code " + response);
                             }
 
-                            // Create a file with the downloaded content
-                            byte[] bytes = response.body().bytes();
-                            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                            String fileName = response.header("Content-Disposition").replaceAll("attachment; filename=", "");
-                            File file = new File(downloadsDir, fileName);
-                            FileOutputStream outputStream = new FileOutputStream(file);
-                            outputStream.write(bytes);
-                            outputStream.close();
+                            // Extract filename from the Content-Disposition header
+                            String contentDisposition = response.header("Content-Disposition");
+                            String fileName = extractFileName(contentDisposition);
+
+                            // Get the content resolver
+                            ContentResolver resolver = getContentResolver();
+
+                            // Set up the ContentValues to insert into the MediaStore
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
+
+                            // For Android Q and above, use the Downloads directory
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                            }
+
+                            // Insert the file into the MediaStore
+                            Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+
+                            if (uri != null) {
+                                try (OutputStream outputStream = resolver.openOutputStream(uri)) {
+                                    outputStream.write(response.body().bytes());
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(Technical_form.this, "Error saving file", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            e.printStackTrace();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -267,6 +328,20 @@ public class Technical_form extends AppCompatActivity {
             });
         }
 
+    }
+
+    // Helper method to extract filename from Content-Disposition header
+    private String extractFileName(String contentDisposition) {
+        String fileName = "default_filename.pdf";  // Default filename if extraction fails
+
+        if (contentDisposition != null) {
+            Matcher matcher = Pattern.compile("filename\\s*=\\s*\"([^\"]+)\"").matcher(contentDisposition);
+            if (matcher.find()) {
+                fileName = matcher.group(1);
+            }
+        }
+
+        return fileName;
     }
 
     @Override
@@ -456,6 +531,8 @@ public class Technical_form extends AppCompatActivity {
                                             if (contentDisposition != null && contentDisposition.contains("filename=")) {
                                                 downloadedFileName = contentDisposition.split("filename=")[1].replaceAll("\"", "");
                                             }
+
+
 
                                             // Create a file with the downloaded content
                                             byte[] bytes = response.body().bytes();
