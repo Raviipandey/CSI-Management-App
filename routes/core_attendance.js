@@ -99,7 +99,7 @@ router.post('/finallist', (req, res) => {
   
 	// Update each accepted ID in the database
 	acceptedIds.forEach(ad_id => {
-	  connection.query('UPDATE attendance_details SET status = "ACCEPTED" WHERE core_id = ?', [ad_id], (error, results) => {
+	  connection.query('UPDATE attendance_details SET status = "ACCEPTED" WHERE ad_id = ?', [ad_id], (error, results) => {
 		completedQueries++;
 		if (error) {
 		  encounteredError = true;
@@ -177,7 +177,7 @@ router.post('/reject', (req, res) => {
 
     const promises = ids.map(id =>
         new Promise((resolve, reject) => {
-            connection.query('UPDATE attendance_details SET status = "REJECTED" WHERE core_id = ?', [id], (error, result) => {
+            connection.query('UPDATE attendance_details SET status = "REJECTED" WHERE ad_id = ?', [id], (error, result) => {
                 if (error) {
                     console.error(`Error updating core_id ${id}:`, error);
                     return reject(error);
