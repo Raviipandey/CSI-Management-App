@@ -62,45 +62,36 @@ public class DetailActivity extends Fragment {
         mPoints.setText("Points: "+points);
         mAbsentee.setText("Absentee members: "+absentee);
 
-        for (int i=0; i<task.size(); i++) {
+        for (int i = 0; i < task.size(); i++) {
             TableRow tableRow = new TableRow(getContext());
+            tableRow.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+
             TextView tv1 = new TextView(getContext());
             TextView tv2 = new TextView(getContext());
 
+            // Configure tv1 for tasks
             tv1.setText(task.get(i));
             tv1.setGravity(Gravity.CENTER);
-            tv1.setBackgroundColor(getResources().getColor(R.color.white));
             tv1.setTextColor(getResources().getColor(R.color.colorPrimary));
             tv1.setTextSize(17);
-           // tv1.setBackground(getResources().getDrawable(R.drawable.tableborder)); //this will apply border
-            tv1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
-            TableRow.LayoutParams param = new TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    1.0f
-            );
-            param.setMargins(1, 0, 1, 1);
-            tv1.setLayoutParams(param);
+            tv1.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)); // Set weight
+            tv1.setPadding(8, 8, 8, 8); // Adjust padding as needed
+             // Assuming you want borders
 
+            // Configure tv2 similarly for persons
             tv2.setText(person.get(i));
             tv2.setGravity(Gravity.CENTER);
-            tv2.setBackgroundColor(getResources().getColor(R.color.white));
             tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
             tv2.setTextSize(17);
+            tv2.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)); // Set weight
+            tv2.setPadding(8, 8, 8, 8); // Adjust padding as needed
 
-            TableRow.LayoutParams param1 = new TableRow.LayoutParams(
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    TableRow.LayoutParams.WRAP_CONTENT,
-                    1.0f
-            );
-            param1.setMargins(1, 0, 1, 1);
-            tv2.setLayoutParams(param1);
-
+            // Add TextViews to the TableRow, then add the row to the TableLayout
             tableRow.addView(tv1);
             tableRow.addView(tv2);
-
             tableLayout.addView(tableRow);
         }
+
 
         return rootView;
     }

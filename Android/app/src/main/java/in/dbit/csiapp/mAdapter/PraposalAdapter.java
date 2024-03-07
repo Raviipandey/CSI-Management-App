@@ -10,17 +10,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import in.dbit.csiapp.R;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.ExampleViewHolder> {
+public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.ExampleViewHolder> implements Filterable {
 
     private Context mContext;
     private ArrayList<PraposalItem> mPraposalList;
+    private ArrayList<PraposalItem> mExampleListFiltered;
     private OnItemClickedListener mListener;
     private String AC="Approved By Chairperson";
     private String RC="Rejected By Chairperson";
@@ -28,6 +32,37 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
     private String RS="Rejected By SBC";
     private String AH="Approved By HOD";
     private String RH="Rejected By HOD";
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String key =  constraint.toString();
+                if(key.isEmpty()){
+                    mExampleListFiltered = mPraposalList;
+                }
+                else {
+                    ArrayList<PraposalItem> lstFiltered = new ArrayList<>();
+                    for (PraposalItem row  : mPraposalList){
+                        if (row.getmName().toLowerCase().contains(key.toLowerCase()) || row.getDate().toLowerCase().contains(key.toLowerCase())|| row.getmStatus().toLowerCase().contains(key.toLowerCase())|| row.getmExtra().toLowerCase().contains(key.toLowerCase())){
+                            lstFiltered.add(row);
+                        }
+                    }
+                    mExampleListFiltered = lstFiltered;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values= mExampleListFiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mExampleListFiltered = (ArrayList<PraposalItem>) results.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
 
 
     public interface OnItemClickedListener {
@@ -41,6 +76,7 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
     public PraposalAdapter(Context context, ArrayList<PraposalItem> PraposalList) {
         mContext = context;
         mPraposalList = PraposalList;
+        this.mExampleListFiltered = mPraposalList;
 
     }
 
@@ -54,7 +90,7 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
 
     @Override
     public void onBindViewHolder(@NonNull ExampleViewHolder exampleViewHolder, int i) {
-        PraposalItem currentItem = mPraposalList.get(i);
+        PraposalItem currentItem = mExampleListFiltered.get(i);
 
         String Eid = currentItem.getmEid();
         String date = currentItem.getDate();
@@ -89,12 +125,14 @@ public class PraposalAdapter extends RecyclerView.Adapter<PraposalAdapter.Exampl
 //            exampleViewHolder.ll.setBackgroundColor(Color.parseColor("#80ffffff"));//white ,this one is for creative and technical recycler
         }
         exampleViewHolder.mTextViewPoints.setText(extra );
+
+
     }
 
     @Override
     public int getItemCount() {
         //Edited By Afif
-        return mPraposalList.size();
+        return mExampleListFiltered.size();
     }
 
     public class ExampleViewHolder extends RecyclerView.ViewHolder {

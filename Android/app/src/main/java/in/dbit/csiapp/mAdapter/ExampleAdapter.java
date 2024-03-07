@@ -22,7 +22,7 @@ public class ExampleAdapter extends RecyclerView.Adapter<ExampleAdapter.ExampleV
     private ArrayList<ExampleItem> mExampleList;
     private ArrayList<ExampleItem> mExampleListFiltered;
     private OnItemClickedListener mListener;
-    //Afif's Code
+
     @Override
     public Filter getFilter() {
         return new Filter() {

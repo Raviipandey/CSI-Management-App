@@ -47,7 +47,7 @@ app.use(express.static(__dirname + "/views"));
 
 // Correctly configure the path to your static files
 app.use('/server_uploads', express.static(path.join(__dirname, 'server_uploads')));
-
+app.use('/report', express.static(path.join(__dirname, 'report')));
 app.use('/creative', express.static('./creative'));
 
 
@@ -131,7 +131,6 @@ app.use('/feedbackall', creative.feedbackall);
 app.use('/feedbacksingle', creative.feedbacksingle);
 app.use('/feedbackupdate', creative.feedbackupdate);
 app.use('/fetchcreative', creative.fetchcreative);
-
 app.use('/minuteData', minute.get);
 app.use('/minuteall', minute.minuteall);
 app.use('/minutesingle', minute.minutesingle);
@@ -150,6 +149,9 @@ app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals);
 app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals);
 app.use('/countMembers', addmembers.countMembers);
 app.get('/members/:year', addmembers.fetchCoreMembers);
+app.get('/privacy.html', (req, res) => {
+    res.render('pages/privacy');
+  });
 
 
 

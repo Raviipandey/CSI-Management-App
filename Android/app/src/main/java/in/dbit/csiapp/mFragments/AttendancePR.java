@@ -72,6 +72,7 @@ public class AttendancePR extends Fragment {
         Log.i("AttPR","Started");
         parseJSON();  //Get list of requests
 
+
         Button confirm = (Button) rootView.findViewById(R.id.confirm_requests);
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,12 +150,12 @@ public class AttendancePR extends Fragment {
                             JSONObject request = jsonArray.getJSONObject(i);
                             Log.i("AttPR", "got response" + request);
 
-                            String requestId = request.getString("RID");
+                            String requestId = request.getString("ad_id");
                             Log.i("AttPR", "got response" + requestId);
                             //String requestId = request.getString("id");
-                            String name = request.getString("Name");
+                            String name = request.getString("core_en_fname");
                             Log.i("AttPR", "got response" + name);
-                            String date = request.getString("date");
+                            String date = request.getString("core_date");
                             String date1 = date.substring(8, 10) + "/" + date.substring(5, 7) + "/" + date.substring(0, 4);
                             Log.i("AttPR", "got response" + date);
                             int lec1 = request.getInt("s1");
@@ -165,7 +166,9 @@ public class AttendancePR extends Fragment {
                             int lec6 = request.getInt("s6");
                             int lec7 = request.getInt("s7");
                             Log.i("AttPR", "got response" + lec1 + lec2 + lec3 + lec4 + lec5 + lec6 + lec7);
-                            String reason = request.getString("reason");
+                            String missed = request.getString("core_lecsmissed_sub");
+                            Log.i("AttPR", "got response" + missed);
+                            String reason = request.getString("core_reason");
                             Log.i("AttPR", "got response" + reason);
 
                             //We can't display the lecture slots in the s1 s2 s3... format to PR Head
@@ -186,7 +189,7 @@ public class AttendancePR extends Fragment {
                             if (lec7 == 1)
                                 timeSlot = timeSlot + "04:00PM - 05:00PM ";
 
-                            mRequestList.add(new RequestListItem(requestId, name, date1, timeSlot, reason));
+                            mRequestList.add(new RequestListItem(requestId, name, date1, timeSlot, missed, reason));
                         }
 
                         mRequestListAdapter = new RequestListAdapter(getActivity(), mRequestList);
@@ -303,7 +306,7 @@ public class AttendancePR extends Fragment {
     }
 
     public void parsejson3() {
-        String server_url = R.string.server_url + "/attendance/reject";
+        String server_url = rootView.getResources().getString(R.string.server_url) + "/attendance/reject";
 
         sb = new StringBuffer();
         ArrayList finalRejReq = new ArrayList();

@@ -1,4 +1,4 @@
-package in.example.csi;
+package in.dbit.csiapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.csi", appContext.getPackageName());
+        assertEquals("in.dbit.csiapp", appContext.getPackageName());
     }
 }

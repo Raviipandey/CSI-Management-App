@@ -7,10 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +26,10 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
+import in.dbit.csiapp.mAdapter.ExampleAdapter;
 import in.dbit.csiapp.mAdapter.PraposalAdapter;
 import in.dbit.csiapp.mAdapter.PraposalItem;
+import in.dbit.csiapp.mFragments.MinuteManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +48,12 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
     private ArrayList<PraposalItem> mPraposalList;
     private RequestQueue mRequestQueue;
     private String server_url;
+
+    EditText SearchInput;
+    CharSequence search="";
     SwipeRefreshLayout swipeRefreshLayout;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,17 +62,45 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         urole1=preferenceConfig.readRoleStatus();
+
+        SearchInput = findViewById(R.id.search_bar);
+        rv = findViewById(R.id.recycler_view_praposal);
         mPraposalList = new ArrayList<>();
-        rv=findViewById(R.id.recycler_view_praposal);
-        Log.i("info123","p2");
+        mPraposalAdapter = new PraposalAdapter(praposal_recycler.this, mPraposalList);
+
         rv.setLayoutManager(new LinearLayoutManager(praposal_recycler.this));
+        rv.setAdapter(mPraposalAdapter);
         mRequestQueue = Volley.newRequestQueue(praposal_recycler.this);
+
+
+        Log.i("info123","p2");
+
         Log.i("info123","p3");
         swipe();
         parseJSON(); //This method is used to get list of Agendas from server
         Log.i("info123","p4");
-        rv.setAdapter(new PraposalAdapter(praposal_recycler.this,mPraposalList));
+
         Log.i("info123","p5");
+
+
+
+        SearchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mPraposalAdapter.getFilter().filter(s);
+                search = s;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
 
 
@@ -157,15 +195,15 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
                             }
                             else if(!urole1.equals("HOD") && !urole1.equals("SBC") && !urole1.equals("Chairperson")) {
                                 mPraposalList.add(new PraposalItem(eid,"Date: "+date1, Name, status,"Theme: "+ theme));
+
                             }
 
 
                     }
 
-                    mPraposalAdapter = new PraposalAdapter(praposal_recycler.this, mPraposalList);
-                    rv.setAdapter(mPraposalAdapter);
-                    mPraposalAdapter.setOnItemClickListener(praposal_recycler.this);
+                    mPraposalAdapter.notifyDataSetChanged();
 
+                    mPraposalAdapter.setOnItemClickListener(praposal_recycler.this);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -192,6 +230,7 @@ public class praposal_recycler extends AppCompatActivity implements  PraposalAda
         PraposalItem clickedItem = mPraposalList.get(position);
          eid =clickedItem.getmEid();
          st = clickedItem.getmStatus();
+
 
         Intent proposal_desc = new Intent(praposal_recycler.this,proposal_desc.class);
         proposal_desc.putExtra(st,st);

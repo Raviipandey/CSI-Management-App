@@ -33,7 +33,7 @@ import java.net.URL;
 public class ReportDisplay extends AppCompatActivity {
 
     PDFView pdfView;
-    String url = "http://tayyabali.in:9091/report/";
+    String url = "http://192.168.0.104:9000/report/";
     String eName;
 
     @Override

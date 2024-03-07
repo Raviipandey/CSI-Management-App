@@ -190,7 +190,7 @@ router.post('/viewproposal', (req, res) => {
 //Listing All proposal
 router.get('/viewlistproposal', (req, res) => {
 
-    connection.query('SELECT cpm_id, proposals_event_name, proposals_event_category ,proposals_status , proposals_event_date from core_proposals_manager order by proposals_event_date DESC ;', function(error, results) {
+    connection.query('SELECT cpm_id, proposals_event_name, proposals_event_category ,proposals_status , proposals_event_date from core_proposals_manager order by cpm_id DESC ;', function(error, results) {
         // console.log(results)
         if (error) {
             console.log("Fail to list proposal");

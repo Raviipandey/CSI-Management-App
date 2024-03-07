@@ -13,6 +13,7 @@
         android:id="@+id/praposal_recycler_relative"
         tools:context=".Manager">
 
+
         <TextView
             android:id="@+id/no_pro"
             android:layout_width="match_parent"
@@ -31,8 +32,10 @@
             android:id="@+id/recycler_view_praposal"
             android:layout_width="match_parent"
             android:layout_height="709dp"
-            android:layout_alignParentTop="true"
+            android:layout_below="@+id/search_bar"
             android:layout_alignParentBottom="true"
+            android:layout_marginTop="-2dp"
+            android:layout_marginBottom="1dp"
             android:visibility="gone">
         </android.support.v7.widget.RecyclerView>
 
@@ -50,6 +53,35 @@
             android:textSize="25dp"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold" />
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.design.widget.CoordinatorLayout>
+
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="search"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
+            android:drawablePadding="10dp"
+            android:paddingLeft="20dp"
+            android:drawableTint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"/>
+
 
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
