@@ -43,6 +43,7 @@ public class Attendance extends Fragment {
     String server_url; //Main Server URL
     //String server_url="http://192.168.43.84:8080/request";
     String rsn="";
+    String miss="";
     String slots="";
     String UID="";
 
@@ -85,6 +86,10 @@ public class Attendance extends Fragment {
         reason.setMaxLines(5);
         reason.setVerticalScrollBarEnabled(true);
         reason.setMovementMethod(new ScrollingMovementMethod());
+        EditText missed = rootView.findViewById(R.id.sub_miss);
+        missed.setMaxLines(5);
+        missed.setVerticalScrollBarEnabled(true);
+        missed.setMovementMethod(new ScrollingMovementMethod());
 
         Button timeslotOK = rootView.findViewById(R.id.CheckBoxOK);
         timeslotOK.setOnClickListener(new View.OnClickListener() {
@@ -157,13 +162,16 @@ public class Attendance extends Fragment {
             public void onClick(View v) {
                 EditText reason = rootView.findViewById(R.id.reason);
                 rsn = reason.getText().toString();
+                EditText missed = rootView.findViewById(R.id.sub_miss);
+                miss = missed.getText().toString();
 
                 if(date==null)  {
                     Toast.makeText(getActivity(),"Enter Date",Toast.LENGTH_SHORT).show(); }
                 else if(checkboxData==null)  {Toast.makeText(getActivity(),"Enter Timeslots",Toast.LENGTH_SHORT).show();}
+                else  if (miss.length()==0) {Toast.makeText(getActivity(),"Enter Subjects Missed",Toast.LENGTH_SHORT).show();}
                 else  if (rsn.length()==0) {Toast.makeText(getActivity(),"Enter Reason",Toast.LENGTH_SHORT).show();}
 
-                else  customDialog("Date:  "+date+"\n"+"Slots: "+slots+"\n"+"Reason: "+rsn+"\n");
+                else  customDialog("Date:  "+date+"\n"+"Slots: "+slots+"\n"+"Subjects missed: "+miss+ "\n" + "Reason: "+rsn+"\n");
 
 
 
@@ -198,6 +206,7 @@ public class Attendance extends Fragment {
 
         if(date==null)  {Toast.makeText(getActivity(),"Enter Date",Toast.LENGTH_SHORT).show(); return  2;}
         else if(checkboxData==null)  {Toast.makeText(getActivity(),"Enter Timeslots",Toast.LENGTH_SHORT).show(); return 2;}
+        else  if (miss.length()==0) {Toast.makeText(getActivity(),"Enter Subject Missed",Toast.LENGTH_SHORT).show(); return 2;}
         else  if (rsn.length()==0) {Toast.makeText(getActivity(),"Enter Reason",Toast.LENGTH_SHORT).show(); return 2;}
 
         try {
@@ -216,6 +225,8 @@ public class Attendance extends Fragment {
 
                 Log.i("info123", String.valueOf(jsonObject));
             }
+            jsonObject.put("missed", miss);
+            Log.i("info123", String.valueOf(jsonObject));
 
             jsonObject.put("reason",rsn);
             Log.i("info123", String.valueOf(jsonObject));

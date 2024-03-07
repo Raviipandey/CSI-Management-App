@@ -1,4 +1,4 @@
-package in.example.csi;
+package in.dbit.csiapp;
 
 import org.junit.Test;
 

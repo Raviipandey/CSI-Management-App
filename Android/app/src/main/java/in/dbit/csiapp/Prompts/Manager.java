@@ -236,7 +236,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         } else if (id == R.id.nav_attendance) {
             //Toast.makeText(Manager.this,String.valueOf(getSupportFragmentManager().getBackStackEntryCount()),Toast.LENGTH_SHORT).show();
-            if(urole.equals("PR Head"))
+            if(urole.equals("Chairperson") || urole.equals("Vice Chairperson"))
             {
                 if(getSupportFragmentManager().getBackStackEntryCount() > 1){
                     getSupportFragmentManager().popBackStack();

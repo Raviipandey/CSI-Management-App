@@ -6,15 +6,17 @@ public class RequestListItem {
     private String mName;
     private String mDate;
     private String mTimeSlots;
+    private String msubMissed;
     private String mReason;
     //private boolean mAccept;
     //private boolean mReject;
 
-    public RequestListItem(String RequestID, String Name, String Date, String TimeSlots, String Reason) {
+    public RequestListItem( String RequestID, String Name, String Date, String TimeSlots, String Missed, String Reason) {
         this.mRequestID = RequestID;
         this.mName = Name;
         this.mDate = Date;
         this.mTimeSlots = TimeSlots;
+        this.msubMissed = Missed;
         this.mReason = Reason;
     }
 
@@ -32,6 +34,10 @@ public class RequestListItem {
 
     public String getTimeSlots() {
         return mTimeSlots;
+    }
+
+    public String getsubMissed() {
+        return msubMissed;
     }
 
     public String getReason() {

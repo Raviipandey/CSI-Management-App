@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import in.dbit.csiapp.R;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 
 public class RequestListAdapter extends RecyclerView.Adapter<RequestListAdapter.RequestListViewHolder> {
@@ -42,12 +43,14 @@ public class RequestListAdapter extends RecyclerView.Adapter<RequestListAdapter.
         String name = currentItem.getName();
         String date = currentItem.getDate();
         String timeSlots = currentItem.getTimeSlots();
+        String missed = currentItem.getsubMissed();
         String reason = currentItem.getReason();
         holder.container.setAnimation(AnimationUtils.loadAnimation(mContext,R.anim.fade_scale_animation_recycler));
         holder.mRequestID.setText("Request ID: "+ requestID);
         holder.mName.setText("Name: "+ name);
         holder.mDate.setText("Date: " + date);
         holder.mTimeSlots.setText("Time Slots: " + timeSlots);
+        holder.msubMissed.setText("Subject Missed: " + missed);
         holder.mReason.setText("Reason: " + reason);
 
         holder.mAcceptCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -129,6 +132,7 @@ public class RequestListAdapter extends RecyclerView.Adapter<RequestListAdapter.
         public TextView mReason;
         public CheckBox mAcceptCheck;
         public CheckBox mRejectCheck;
+        public TextView msubMissed;
         CardView container;
         ItemClickListener itemClickListener;
 
@@ -139,7 +143,9 @@ public class RequestListAdapter extends RecyclerView.Adapter<RequestListAdapter.
             mName = itemView.findViewById(R.id.stud_name);
             mDate = itemView.findViewById(R.id.request_date);
             mTimeSlots = itemView.findViewById(R.id.request_slots);
+            msubMissed = itemView.findViewById(R.id.sub_miss);
             mReason = itemView.findViewById(R.id.reason);
+
             mAcceptCheck = itemView.findViewById(R.id.chk_accept);
             mRejectCheck = itemView.findViewById(R.id.chk_reject);
 

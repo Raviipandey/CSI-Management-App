@@ -69,7 +69,7 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/example/csi/Prompts/ProfileEdit.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/in/dbit/csiapp/Prompts/ProfileEdit.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="129">
               <caret line="48" column="55" selection-start-line="48" selection-start-column="55" selection-end-line="48" selection-end-column="55" />
@@ -78,7 +78,7 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/example/csi/mFragments/Profile.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/in/dbit/csiapp/mFragments/Profile.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="187">
               <caret line="41" column="13" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
@@ -93,8 +93,8 @@
       <list>
         <option value="$PROJECT_DIR$/src/main/res/layout/nav_header_manager.xml" />
         <option value="$PROJECT_DIR$/src/main/res/layout/manager_activity.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/com/example/csi/Prompts/ProfileEdit.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/example/csi/mFragments/Profile.java" />
+        <option value="$PROJECT_DIR$/src/main/java/in/dbit/csiapp/Prompts/ProfileEdit.java" />
+        <option value="$PROJECT_DIR$/src/main/java/in/dbit/csiapp/mFragments/Profile.java" />
         <option value="$PROJECT_DIR$/src/main/res/layout/activity_profile.xml" />
         <option value="$PROJECT_DIR$/src/main/res/layout/activity_profile_edit.xml" />
       </list>
@@ -268,7 +268,7 @@
       <provider selected="true" editor-type-id="text-editor" />
       <provider editor-type-id="android-designer2" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/example/csi/mFragments/Profile.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/in/dbit/csiapp/mFragments/Profile.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="41" column="13" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
@@ -302,7 +302,7 @@
       </provider>
       <provider editor-type-id="android-designer2" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/example/csi/Prompts/ProfileEdit.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/in/dbit/csiapp/Prompts/ProfileEdit.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="129">
           <caret line="48" column="55" selection-start-line="48" selection-start-column="55" selection-end-line="48" selection-end-column="55" />

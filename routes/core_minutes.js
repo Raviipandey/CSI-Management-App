@@ -53,7 +53,17 @@ router.post('/create',(req,res)=>{
 	// 	}
 	// });
 
+
 	//demoooo
+
+	// Assume $_POST['date'] contains the date and time in 'yyyy-MM-dd HH:mm:ss' format
+$date = $_POST['date'];
+
+// Your SQL query to insert the date into the database
+$query = "INSERT INTO your_table_name (date_column) VALUES ('$date')";
+
+// Execute the query using your preferred method
+
 
 	//fetching creator from users table
 	connection.query('SELECT core_en_fname FROM core_details where core_id=?',[id],function(error,creator){
