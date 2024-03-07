@@ -27,114 +27,114 @@
             android:layout_height="1dp"
             android:layout_margin="0dp"
             android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Name"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:text="Name  "
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:id="@+id/name_pd"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#fff"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Theme"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:text="Theme"
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:id="@+id/theme_pd"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Description"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="40dp"
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:text="Description "
-        android:justificationMode="inter_word"
-        android:id="@+id/desc_pd"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#fff"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Event Date"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:text="Event Date"
-        android:id="@+id/ed_pd"/>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Name"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Name  "
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:id="@+id/name_pd"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#fff"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Theme"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Theme"
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:id="@+id/theme_pd"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Description"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="40dp"
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:text="Description "
+                android:justificationMode="inter_word"
+                android:id="@+id/desc_pd"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#fff"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Event Date"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:text="Event Date"
+                android:id="@+id/ed_pd"/>
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -189,74 +189,74 @@
             android:textStyle="bold"
             android:layout_marginVertical="10dp"
             android:textColor="@color/colorPrimary"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Creative Budget"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:text="Creative Budget."
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:id="@+id/cb_pd"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#fff"
-        android:padding="5dp">
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20sp"
-        android:text="Publicity Budget"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:text="Publicity budget "
-        android:id="@+id/pb_pd"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="0dp"
-        android:background="#EDEDED" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Creative Budget"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:text="Creative Budget:  "
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:id="@+id/cb_pd"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#fff"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20sp"
+                android:text="Publicity Budget"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/colorAccent"/>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:text="Publicity Budget: "
+                android:id="@+id/pb_pd"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
 
         <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="5dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="5dp">
 
             <TextView
                 android:layout_width="399dp"
@@ -266,15 +266,16 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:textSize="17sp"
-        android:textColor="@color/colorAccent"
-        android:text="guest budget:"
-        android:id="@+id/gb_pd"/>
-    </LinearLayout>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:textSize="17sp"
+                android:textColor="@color/colorAccent"
+                android:text="Guest Budget: "
+                android:id="@+id/gb_pd"/>
+
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -286,23 +287,50 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
+
+            <!--            <TextView-->
+            <!--                android:layout_width="400dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:paddingLeft="20sp"-->
+            <!--                android:text="Total Budget"-->
+            <!--                android:textColor="@color/colorAccent"-->
+            <!--                android:textSize="20sp"-->
+            <!--                android:textStyle="bold" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tb_pd"-->
+            <!--                android:layout_width="fill_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:paddingLeft="40dp"-->
+            <!--                android:text="Total Budget: Rs"-->
+            <!--                android:textColor="@color/colorAccent"-->
+            <!--                android:textSize="17sp" />-->
             <TextView
-                android:layout_width="400dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="20sp"
-                android:text="Total Budget"
+                android:gravity="center"
+                android:padding="08px"
+                android:text=" Total Budget "
                 android:textColor="@color/colorAccent"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tb_pd"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:text="total budget:"
+                android:gravity="center"
+                android:padding="08px"
+                android:text="Rs"
                 android:textColor="@color/colorAccent"
                 android:textSize="17sp" />
+
         </LinearLayout>
 
         <View
@@ -335,7 +363,7 @@
                 android:paddingLeft="40dp"
                 android:textSize="17sp"
                 android:textColor="@color/colorAccent"
-                android:text="comments"
+                android:text="Comments here"
                 android:id="@+id/comment_t"
                 android:visibility="visible"/>
 
@@ -366,40 +394,40 @@
         </LinearLayout>
 
         <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="5dp"
-        android:layout_gravity="center">
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="approve"
-        android:id="@+id/approve_pd"
-        android:background="@drawable/ripple_effect"
-        android:textColor="@color/_light_green"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="reject"
-        android:id="@+id/reject_pd"
-        android:background="@drawable/ripple_effect"
-        android:textColor="@color/red"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/edit_pd"
-        android:text="edit"
-        android:background="@drawable/ripple_effect"
-        android:textColor="@color/white"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="5dp"
+            android:layout_gravity="center">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="approve"
+                android:id="@+id/approve_pd"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@color/_light_green"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="reject"
+                android:id="@+id/reject_pd"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@color/red"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/edit_pd"
+                android:text="edit"
+                android:background="@drawable/ripple_effect"
+                android:textColor="@color/white"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
 </ScrollView>
