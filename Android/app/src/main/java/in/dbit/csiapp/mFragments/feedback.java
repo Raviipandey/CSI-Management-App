@@ -1,26 +1,43 @@
 package in.dbit.csiapp.mFragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
-
+//import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mReqAdapter.RequestListItem;
+
+import android.content.SharedPreferences;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class feedback extends Fragment {
     View rootView;
@@ -30,12 +47,15 @@ public class feedback extends Fragment {
     private String usrid, usrname = "";
     EditText feedback_text;
     TextView name_text_v;
+
     //Button save_feedback;
+    private Button feedbackButton;
+    private WebView feedbackWebView;
+
     String feedback = null;
-    JSONObject jsonObject =new JSONObject();
+    JSONObject jsonObject = new JSONObject();
     private RequestQueue mRequestQueue;
     private ArrayList<RequestListItem> mRequestList;
-
 
 
     public static feedback newInstance() {
@@ -55,11 +75,50 @@ public class feedback extends Fragment {
         Log.i("volleyABC", "to feedback section" + usrid + usrname);
 //        Toast.makeText(getActivity(), "Feedback section" + usrid + usrname, Toast.LENGTH_SHORT).show();
 
-      //  feedback_text = rootView.findViewById(R.id.text_feedback);
+        //  feedback_text = rootView.findViewById(R.id.text_feedback);
         name_text_v = rootView.findViewById(R.id.name_feedback);
-      //  save_feedback = rootView.findViewById(R.id.feedback_save);
+        feedbackButton = rootView.findViewById(R.id.feedback_button);
+        feedbackWebView = rootView.findViewById(R.id.feedback_webview);
+        //  save_feedback = rootView.findViewById(R.id.feedback_save);
         mRequestList = new ArrayList<>();
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+
+
+        name_text_v.setText(usrname);
+        // Set up the onClickListener for the feedback button
+        feedbackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFeedbackForm();
+            }
+        });
+        return rootView;
+    }
+    private boolean feedbackFormOpened = false;
+    private void showFeedbackForm() {
+
+        if (!feedbackFormOpened) {
+            // Configure WebView settings
+            WebSettings webSettings = feedbackWebView.getSettings();
+            webSettings.setJavaScriptEnabled(true); // Enable JavaScript if needed
+
+            // Google Form URL
+            String googleFormUrl = "https://forms.gle/sa2LGBrWCLmorzCW6";
+
+            // Load the Google Forms page into the WebView
+            feedbackWebView.loadUrl(googleFormUrl);
+
+            feedbackWebView.setVisibility(View.VISIBLE);
+            feedbackButton.setVisibility(View.VISIBLE);
+
+            feedbackFormOpened = true; // Set the flag to true to prevent multiple clicks
+        }else {
+            // If the form is already opened, reset the WebView and show the button
+            feedbackWebView.setVisibility(View.GONE);
+            feedbackButton.setVisibility(View.VISIBLE);
+            feedbackFormOpened = false; // Reset the flag to allow clicking again
+        }
+    }
 
 //        save_feedback.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -78,7 +137,7 @@ public class feedback extends Fragment {
 //            }
 //        });
 
-        name_text_v.setText(usrname);
+    //name_text_v.setText(usrname);
 
 
 //        SharedPreferenceConfig preferenceConfig;
@@ -87,8 +146,6 @@ public class feedback extends Fragment {
 //        String stored_usrid=mpref.getString("username","");
 //
 
-        return rootView;
-    }
 
     public void setJason() {
 
@@ -101,7 +158,7 @@ public class feedback extends Fragment {
                 jsonObject.put("name", usrname);
                 jsonObject.put("feedback", feedback);
 
-                Log.i("info123", String.valueOf(jsonObject));
+                Log.i("info123json obj", String.valueOf(jsonObject));
 
             } catch (JSONException e) {
                 e.printStackTrace();

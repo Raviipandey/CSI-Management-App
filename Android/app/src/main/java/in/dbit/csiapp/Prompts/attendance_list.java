@@ -1,6 +1,7 @@
-package in.dbit.csiapp.Prompts;
+ package in.dbit.csiapp.Prompts;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,14 +20,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
+//import in.dbit.csiapp.mAdapter.ExampleItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
-import in.dbit.csiapp.mFragments.AttendanceSBC;
+import static in.dbit.csiapp.mFragments.AttendanceSBC.EXTRA_CLASS;
 
 public class attendance_list extends AppCompatActivity {
 
@@ -44,7 +47,7 @@ public class attendance_list extends AppCompatActivity {
         tableLayout = findViewById(R.id.display_table);
 
         Intent intent = getIntent();
-        sam = intent.getStringExtra(AttendanceSBC.EXTRA_CLASS);
+        sam = intent.getStringExtra(EXTRA_CLASS);
 
         //Toast.makeText(this, "Your selected " + sam, Toast.LENGTH_SHORT).show();
 

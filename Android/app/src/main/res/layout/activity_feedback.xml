@@ -5,18 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="15dp">
 
         <LinearLayout
-            android:layout_width="372dp"
-            android:layout_height="699dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="WebViewLayout">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -29,7 +31,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="NAME"
+                    android:text="Name"
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -43,6 +45,23 @@
                     android:textColor="@color/colorAccent"
                     android:textSize="17sp" />
 
+
+                <TextView
+                    android:id="@+id/textView14"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="0dp"
+                    android:background="#EDEDED" />
+
                 <TextView
                     android:id="@+id/textView11"
                     android:layout_width="match_parent"
@@ -51,32 +70,31 @@
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-
                 <TextView
                     android:id="@+id/textView9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
                     android:text="How can I download media?"
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:gravity="start|center_vertical"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textView5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
                     android:paddingLeft="20dp"
                     android:text="In case of reel video, video for YouTube, poster, banner, and post (Creative), long pressing on the media will initiate the downloading procedure immediately."
-                    android:gravity="start|center_vertical"
                     android:textColor="@color/colorAccent"
-                    android:textSize="17sp"
-                    />
+                    android:textSize="17sp" />
+
 
                 <TextView
                     android:id="@+id/textView13"
                     android:layout_width="match_parent"
-                    android:layout_height="12dp"
+                    android:layout_height="8dp"
                     android:text=""
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp"
@@ -95,27 +113,177 @@
                     android:id="@+id/textView10"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
                     android:paddingLeft="20dp"
                     android:text="In Technical and Publicity, the maximum size for uploading a PDF is 10MB."
-                    android:gravity="start|center_vertical"
                     android:textColor="@color/colorAccent"
                     android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/textView26"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <!--                <TextView-->
+                <!--                    android:id="@+id/textView14"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="2dp"-->
+                <!--                    android:background="@color/colorAccent"-->
+                <!--                    android:text=""-->
+                <!--                    android:textColor="@color/colorAccent"-->
+                <!--                    android:textSize="20sp"-->
+                <!--                    android:textStyle="bold" />-->
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="0dp"
+                    android:background="#EDEDED" />
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Note"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView27"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="> To ensure proper functionality, the app requires mandatory access to all files permissions from the user's phone, and specific permissions alone may result in limited or non-functional app features."
+                    android:textColor="@color/colorAccent"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/textView28"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView17"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text='> The Total Budget in the proposals view is the sum of the Publicity, Creative, and Guest Budget amounts, excluding any additional budget information stored in the "others" column.'
+                    android:textColor="@color/colorAccent"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/textView29"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <!--                <TextView-->
+                <!--                    android:id="@+id/textView32"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="2dp"-->
+                <!--                    android:background="@color/colorAccent"-->
+                <!--                    android:text=""-->
+                <!--                    android:textColor="@color/colorAccent"-->
+                <!--                    android:textSize="20sp"-->
+                <!--                    android:textStyle="bold" />-->
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_margin="0dp"
+                    android:background="#EDEDED" />
+
+                <TextView
+                    android:id="@+id/textView31"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView18"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="For feedback or bug reports, please click below."
+                    android:textColor="@color/colorAccent"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView30"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:text=""
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
             <Button
-                android:id="@+id/feedback_save"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="251dp"
-                android:layout_height="49dp"
+                android:id="@+id/feedback_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="40dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/ripple_effect"
-                android:text="DONE"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:visibility="gone"/>
+                android:onClick="showFeedbackForm"
+                android:text="Open Feedback Form"
+                android:textColor="@color/white" />
+
+            <!-- Make the WebView dynamic with respect to screen size -->
+            <WebView
+                android:id="@+id/feedback_webview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!--            <Button-->
+            <!--                android:id="@+id/feedback_save"-->
+            <!--                style="?android:attr/borderlessButtonStyle"-->
+            <!--                android:layout_width="251dp"-->
+            <!--                android:layout_height="49dp"-->
+            <!--                android:layout_gravity="center_horizontal"-->
+            <!--                android:layout_marginTop="40dp"-->
+            <!--                android:layout_marginBottom="10dp"-->
+            <!--                android:background="@drawable/ripple_effect"-->
+            <!--                android:text="DONE"-->
+            <!--                android:textColor="@color/white"-->
+            <!--                android:textSize="20sp"-->
+            <!--                android:visibility="gone"/>-->
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
