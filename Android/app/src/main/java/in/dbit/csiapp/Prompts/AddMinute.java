@@ -33,12 +33,16 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddMinute extends AppCompatActivity {
 
     AutoCompleteTextView mCreateAgenda;
     Button mAddMinute, mAddTask;
-    String Agenda, Points, Creator, Absentee, server_url;
+    String Agenda, Points, Creator, Absentee, server_url, date, time;
     EditText  mCreatePoints, mTask, mAbsentee;
     Spinner spinner;
     TableLayout tableLayout;
@@ -52,6 +56,19 @@ public class AddMinute extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
         Creator = intent.getStringExtra("id"); //getting User ID from MinuteManager
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+         date = dateFormat.format(calendar.getTime());
+        Log.i("date",date);
+         time = timeFormat.format(calendar.getTime());
+        Log.i("time",time );
+
+
+
 
         server_url=getApplicationContext().getResources().getString(R.string.server_url) + "/minutes/create";  //Main Server URL
         //server_url="http://192.168.43.84:8080/minutes/create";
@@ -265,6 +282,8 @@ public class AddMinute extends AppCompatActivity {
             jsonObject.put("points", Points);
             jsonObject.put("absentee", Absentee);
             jsonObject.put("work", jsonObject1);
+            jsonObject.put("date", date);
+            jsonObject.put("time", time);
         } catch (JSONException e) {
             e.printStackTrace();
         }

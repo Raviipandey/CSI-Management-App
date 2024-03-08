@@ -2,6 +2,10 @@ var express=require('express');
 var router=express.Router();
 var dotenv = require('dotenv');
 dotenv.config();
+const bodyParser = require('body-parser');
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.json()); // for parsing application/json
 
 
 // MySQL Connection
@@ -31,38 +35,14 @@ router.post('/create',(req,res)=>{
 	var points = req.body.points;
 	var work=JSON.stringify(req.body.work);
 	var absentee = req.body.absentee;
+	var date = req.body.date; // Received from Android
+    var time = req.body.time; // Received from Android
+	// var dateTime = `${date} ${time}`;
 
-	//fetching creator from users table
-	// connection.query('SELECT core_en_fname FROM core_details where core_id=?',[id],function(error,creator){
-	// 	if(error){
-	// 		//console.log("Error");
-	// 		res.sendStatus(400);
-	// 	}
-	// 	else{
-	// 		//pushing into minute table 
-	// 		connection.query('INSERT INTO core_minute_manager(cmm_id,minute_date,minute_starttime,minute_endtime,minute_objective,minute_details) VALUES (?,?,?,?,?,?);',[id, date , s_time , e_time , obj , details],function(err,result){
-	// 			if(err){
-	// 				console.log(err);
-	// 				res.sendStatus(400);
-	// 			}
-	// 			else{
-	// 				//console.log("Data Inserted");
-	// 				res.sendStatus(200);
-	// 			}
-	// 		});
-	// 	}
-	// });
 
 
 	//demoooo
 
-	// Assume $_POST['date'] contains the date and time in 'yyyy-MM-dd HH:mm:ss' format
-$date = $_POST['date'];
-
-// Your SQL query to insert the date into the database
-$query = "INSERT INTO your_table_name (date_column) VALUES ('$date')";
-
-// Execute the query using your preferred method
 
 
 	//fetching creator from users table
@@ -73,7 +53,7 @@ $query = "INSERT INTO your_table_name (date_column) VALUES ('$date')";
 		}
 		else{
 			//pushing into minute table 
-			connection.query('INSERT INTO core_minute_manager(minute_by_core_id, minute_objective,minute_details,core_ab_mem_name,minute_work,creator) VALUES (?, ?, ?, ?, ?, ?);',[id, agenda, points, absentee, work, creator[0].core_en_fname],function(err,result){
+			connection.query('INSERT INTO core_minute_manager(minute_by_core_id, minute_date, minute_objective,minute_details,core_ab_mem_name,minute_time,minute_work,creator) VALUES (?, ?, ?, ?, ?, ?, ?, ?);',[id, date, agenda, points, absentee, time, work, creator[0].core_en_fname],function(err,result){
 				if(err){
 					console.log(err);
 					res.sendStatus(400);

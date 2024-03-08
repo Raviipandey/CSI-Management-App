@@ -196,6 +196,7 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
 
                         //in the above variable date we are not getting date in DD:MM:YYYYY
                         //so we are creating new variable date1 to get our desire format
+//                        String date1 = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
                         String date1 = date.substring(8,10) + "/" + date.substring(5,7) + "/" + date.substring(0,4);
 
                         Log.i("finaltesting", tasks.toString() + " " + person.toString());

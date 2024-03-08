@@ -12,7 +12,7 @@ module.exports = {
         var DashboardPath = path.join(__dirname, "..", "..", "views", "dashboard.ejs");
         console.log(session.userrole);
 
-        if (session.userid != null && (session.userrole == 1) && (session.userrole == 2) && (session.userrole == 3) && (session.userrole == 12)) {
+        if (session.userid != null) {
             res.render(DashboardPath, {userrole : session.userrole});
         } else {
             // Redirect the user or send an error message if they don't have the right role

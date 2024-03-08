@@ -151,12 +151,11 @@ public class Proposal extends AppCompatActivity {
 
     DatePickerDialog.OnDateSetListener onDate = new DatePickerDialog.OnDateSetListener() {
         @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            String formattedMonth = (monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : String.valueOf(monthOfYear + 1);
+            String formattedDay = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
 
-
-            date = String.valueOf(year) + "-" + String.valueOf(monthOfYear+1)
-                    + "-" + String.valueOf(dayOfMonth);
+            date = year + "-" + formattedMonth + "-" + formattedDay;
 
             //TextView outputDate = rootView.findViewById(R.id.date);
             // outputDate.setText(date);
@@ -170,21 +169,19 @@ public class Proposal extends AppCompatActivity {
 
     DatePickerDialog.OnDateSetListener onEDate = new DatePickerDialog.OnDateSetListener() {
         @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            String formattedMonth = (monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : String.valueOf(monthOfYear + 1);
+            String formattedDay = dayOfMonth < 10 ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
 
+            edate = year + "-" + formattedMonth + "-" + formattedDay;
 
-            edate = String.valueOf(year) + "-" + String.valueOf(monthOfYear+1)
-                    + "-" + String.valueOf(dayOfMonth);
-
-            //TextView outputDate = rootView.findViewById(R.id.date);
-            // outputDate.setText(date);
-            Log.i("info1234", edate+"event");
+            Log.i("info1234", edate + "event");
             TextView edate_s = findViewById(R.id.showdate);
-            edate_s.setText((String) edate);
+            edate_s.setText(edate);
             edate_s.setVisibility(View.VISIBLE);
         }
     };
+
 
     public void sendDate( String date)
     {
