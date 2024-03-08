@@ -12,10 +12,12 @@ module.exports = {
     get: (request, response) => {
         var session = request.session;
         var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "addmembers.ejs");
-        if (session.userid != null) {
+        if (session.userid != null && (session.userrole == 1)) {
             response.render(FeedbackPath, { role: session.userrole });
         } else {
-            response.redirect('/');
+            // Redirect the user or send an error message if they don't have the right role
+            // res.status(403).send('Access Denied: You do not have permission to view this page.');
+            response.redirect('/error?message=access-denied');
         }
     },
     addmembers: (request, response) => {

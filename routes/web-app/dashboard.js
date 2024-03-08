@@ -8,13 +8,16 @@ module.exports = {
     get: (req, res, next) => {
 
         var session = req.session;
+        console.log(req.session); 
         var DashboardPath = path.join(__dirname, "..", "..", "views", "dashboard.ejs");
         console.log(session.userrole);
 
-        if (session.userid != null) {
-            res.render(DashboardPath, {role : session.userrole});
+        if (session.userid != null && (session.userrole == 1) && (session.userrole == 2) && (session.userrole == 3) && (session.userrole == 12)) {
+            res.render(DashboardPath, {userrole : session.userrole});
         } else {
-            res.redirect('/');
+            // Redirect the user or send an error message if they don't have the right role
+            // res.status(403).send('Access Denied: You do not have permission to view this page.');
+            response.redirect('/error?message=access-denied');
         }
     },
     pydata: (request, response) => {

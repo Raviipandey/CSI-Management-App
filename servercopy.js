@@ -15,7 +15,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
-const oneDay = 1000 * 60 * 5;
+const fifteenMinutes = 1000 * 60 * 15; // Milliseconds in a minute * 15
 const router = express.Router();
 var flash = require("connect-flash");
 const multer = require('multer');
@@ -28,9 +28,16 @@ app.use(
         resave: true,
         saveUninitialized: true,  
         secret: "secret",
-        cookie: { maxAge: oneDay }
+        cookie: { maxAge: fifteenMinutes }
     })
 );
+
+// Middleware to make user role available globally to all views
+app.use((req, res, next) => {
+    res.locals.userrole = req.session.userrole;
+    next();
+  });
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -108,7 +115,10 @@ const upload = multer({ storage: storage });
 
 var authUser = require('./routes/web-app/authUser');
 var dashboard = require('./routes/web-app/dashboard');
-var proposal = require('./routes/web-app/proposal');
+var hodproposal = require('./routes/web-app/hodproposal.js');
+var sbcproposal = require('./routes/web-app/sbcproposal.js');
+var chairproposal = require('./routes/web-app/chairproposal.js');
+var testproposal = require('./routes/web-app/testproposal.js');
 var creative = require('./routes/web-app/creative.js');
 var minute = require('./routes/web-app/minutes');
 var technical = require('./routes/web-app/technical');
@@ -121,11 +131,22 @@ app.use('/authUser', authUser.post);
 app.use('/dashboard', dashboard.get);
 app.use('/pydata', dashboard.pydata);
 app.use('/confirmedall', dashboard.confirmall);
-app.use('/proposalData', proposal.get);
-app.use('/fetchall', proposal.fetchall);
-app.use('/fetchsingle', proposal.fetchsingle);
-app.use('/hodstatusapprove', proposal.hodstatusconf);
-app.use('/hodstatusreject', proposal.hodstatusrej);
+app.use('/hodproposalData', hodproposal.get);
+app.use('/sbcproposalData', sbcproposal.get);
+app.use('/chairproposalData', chairproposal.get);
+app.use('/testproposalData', testproposal.get);
+app.use('/hodfetchall', hodproposal.hodfetchall);
+app.use('/hodfetchsingle', hodproposal.hodfetchsingle);
+app.use('/sbcfetchall', sbcproposal.sbcfetchall);
+app.use('/sbcfetchsingle', sbcproposal.sbcfetchsingle);
+app.use('/chairfetchall', chairproposal.chairfetchall);
+app.use('/chairfetchsingle', chairproposal.chairfetchsingle);
+app.use('/hodstatusapprove', hodproposal.hodstatusconf);
+app.use('/hodstatusreject', hodproposal.hodstatusrej);
+app.use('/sbcstatusapprove', sbcproposal.sbcstatusconf);
+app.use('/sbcstatusreject', sbcproposal.sbcstatusrej);
+app.use('/chairstatusapprove', chairproposal.chairstatusconf);
+app.use('/chairstatusreject', chairproposal.chairstatusrej);
 app.use('/feedbackData', creative.get);
 app.use('/feedbackall', creative.feedbackall);
 app.use('/feedbacksingle', creative.feedbacksingle);
@@ -143,10 +164,10 @@ app.use('/addmemberspage', addmembers.get);
 app.use('/uploadCSV', addmembers.uploadCSV);
 app.use('/featurepage', featurepage);
 app.use('/addmembers', addmembers.addmembers);
-app.use('/countApprovedProposals', proposal.countApprovedProposals);
-app.use('/countRejectedProposals', proposal.countRejectedProposals);
-app.use('/countApprovedSBCProposals', proposal.countApprovedSBCProposals);
-app.use('/countRejectedSBCProposals', proposal.countRejectedSBCProposals);
+app.use('/countApprovedProposals', hodproposal.countApprovedProposals);
+app.use('/countRejectedProposals', hodproposal.countRejectedProposals);
+app.use('/countApprovedSBCProposals', hodproposal.countApprovedSBCProposals);
+app.use('/countRejectedSBCProposals', hodproposal.countRejectedSBCProposals);
 app.use('/countMembers', addmembers.countMembers);
 app.get('/members/:year', addmembers.fetchCoreMembers);
 app.get('/privacy.html', (req, res) => {
@@ -167,8 +188,11 @@ app.get("/",(req,res)=>{
         }
 });
 
-
-
+// And in your server setup, handle the route to render the error page
+app.get('/error', (req, res) => {
+    const message = req.query.message;
+    res.render(__dirname + "/views/pages/error.ejs", { message: message });
+});
 
 
 app.get("/logout", (req, res, next)=>{

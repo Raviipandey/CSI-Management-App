@@ -50,11 +50,18 @@ router.get('/', (req, res, next) => {
     var DashboardPath = path.join(__dirname, "..", "..", "views","pages",  "featurepage.ejs");
     console.log(session.userrole);
 
-    if (session.userid != null) {
-        res.render(DashboardPath, {role : session.userrole});
-    } else {
-        res.redirect('/');
-    }
+  //   if (session.userid != null) {
+  //     res.render(DashboardPath, {userrole : session.userrole});
+  // } else {
+  //     res.redirect('/');
+  // }
+  if (req.session.userrole === 1) {
+    res.render(DashboardPath);
+} else {
+    // Redirect the user or send an error message if they don't have the right role
+    // res.status(403).send('Access Denied: You do not have permission to view this page.');
+    res.redirect('/error?message=access-denied');
+}
     // Your GET handler code
 });
 

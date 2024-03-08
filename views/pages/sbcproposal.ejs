@@ -1,0 +1,381 @@
+<!--
+=========================================================
+* Argon Dashboard 2 - v2.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/icons/favicon-16x16.png">
+  <title>CSI Management App</title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="./assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+
+</head>
+<body class="g-sidenav-show bg-gray-100">
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    <!--aside bar starts-->
+    <!-- Aside bar content here -->
+    <%- include('../templates/asidebar'); %>
+    <!--aside bar ends-->
+  <main class="main-content position-relative border-radius-lg ">
+      <!-- Content here -->
+      <div class="container-fluid py-4">
+        <div class="row">
+          <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-header pb-0">
+                <h6>Event Proposals Table</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-bordered" id="proposal_data" >
+                    <thead>
+                      <tr style="vertical-align: middle; text-align: center; color: black;">
+                        <th>Event Name</th>
+                        <th>Theme</th>
+                        <th>Description</th>
+                        <th>Venue</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- Modal and other content here -->
+              <div class="modal" tabindex="-1" id="action_modal">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form method="get" id="proposal_form">
+                      <div class="modal-header" id="dynamic_modal_title">
+                        <h5 class="modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label class="form-label">Event Name</label>
+                          <input type="text" name="first_name" id="first_name" class="form-control" readonly />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Theme</label>
+                          <input type="text" name="last_name" id="last_name" class="form-control" readonly />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Agenda</label>
+                          <input type="text" name="gender" id="gender" class="form-control" readonly />
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Venue</label>
+                          <input type="text" name="age" id="age" class="form-control" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Speaker</label>
+                          <input type="text" name="speaker" id="speaker" class="form-control" readonly />
+                        </div>
+
+                        <!--creative budget-->
+                        <div class="mb-3">
+                          <label class="form-label">Creative budget</label>
+                          <input type="text" name="cb" id="cb" class="form-control" readonly />
+                        </div>
+
+                        <!--publicity budget-->
+                        <div class="mb-3">
+                          <label class="form-label">Publicity budget</label>
+                          <input type="text" name="pb" id="pb" class="form-control" readonly />
+                        </div>
+
+
+                        <!--prize-->
+                        <div class="mb-3">
+                          <label class="form-label">Prize</label>
+                          <input type="text" name="prize" id="prize" class="form-control" readonly />
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <input type="hidden" name="id" id="id" />
+                        <input type="hidden" name="action" id="action" value="Add" />
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger eventreject" id="action_button">Reject</button>
+                        <button type="submit" class="btn btn-success eventapprove" id="action_button">Approve</button>
+
+
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+         <!--footer starts-->
+         <!-- Footer content here -->
+         <%- include('../templates/footer'); %>
+         <!--footer ends-->
+      </div>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script> <!-- Not needed for CSV, included for completeness -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    // Script for complete table fetch from mysql starts
+    $(document).ready(function () {
+
+      load_data();
+
+      function load_data() {
+        $.ajax({
+          url: "/sbcfetchall",
+          method: "GET",
+          dataType: "JSON",
+          success: function (data) {
+            console.log("fetched");
+            var html = '';
+            var status_message = '';
+            console.log(data.data[0].proposals_event_name)
+
+            if (data.data.length > 0) {
+
+              for (var count = 0; count < data.data.length; count++) {
+
+                // var desc_data = JSON.parse(data.data[count].description);
+
+                // console.log(Buffer.from(desc_data["data"]).toString());
+
+
+               
+                if (data.data[count].proposals_status == 1) {
+                  status_message = "Approved by Chairperson";
+                  color_type = "#CBC3E3";
+                }
+                else if (data.data[count].proposals_status == 2) {
+                  status_message = "Approved by SBC";
+                  color_type = 'yellow';
+                }
+                else if (data.data[count].proposals_status == -2) {
+                  status_message = "Rejected by SBC";
+                  color_type = 'red';
+                }
+             
+
+                // var blob = new Blob([data.data[count].description],{type:'text/plain'});
+                // //link.href = URL.createObjectURL(blob);
+
+                //  var reader = new FileReader();
+                //  reader.readAsDataURL(blob);
+
+                // reader.onload = function(){
+                //     alert(reader.result);
+                // }
+
+
+                // console.log(data.data[count].description);
+                // let abc = new Uint32Array(data.data[count].description);
+                // console.log(abc);
+                //  var abc = new Blob([data.data[count].description],{ type: 'text/plain' });
+
+                html += `
+                                  <tr>
+                                      
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_name + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_category + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_desc + `</td>
+                                      <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_venue + `</td>
+                                      
+                                      <td style="vertical-align: middle; text-align: center;"> <span class="badge badge-sm" style="background-color:`+ color_type + `; color: black;">` + status_message + `</span></td>
+                                      <td style="vertical-align: middle; text-align: center;"><button type="button" class="btn btn-warning btn-sm edit" data-id="`+ data.data[count].cpm_id + `">View</button></td>
+                                  </tr>
+                                  `;
+              }
+            }
+
+
+            $('tbody').html(html);
+
+            // Initialize DataTable here, after data is loaded and table is updated
+            $('#proposal_data').DataTable({
+                    "paging": true,
+                    "searching": true,
+                    "info": true,
+                    "ordering": true,
+                    "responsive": true,
+                    "autoWidth": true,
+                    destroy: true, // This ensures DataTables reinitializes
+                    dom: 'Bfrtip',
+                buttons: ['csv']
+                });
+
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("inside AJAX function: Err");
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+          }
+        });
+      }
+
+      // Script for complete table fetch from mysql ends
+
+      // Script for single row fetch starts
+
+      $(document).on('click', '.edit', function () {
+
+        var id = $(this).data('id');
+
+
+        $('#dynamic_modal_title').text('Event Proposal');
+
+        $('#action').val('Edit');
+
+        // $('#action_button').text('Close');
+
+        $('#action_modal').modal('show');
+
+        $.ajax({
+          url: "/sbcfetchsingle",
+          method: "GET",
+          data: { id: id },
+          dataType: "JSON",
+          success: function (data) {
+            console.log(data);
+            $('#first_name').val(data.proposals_event_name);
+            $('#last_name').val(data.proposals_event_category);
+            $('#gender').val(data.proposals_desc);
+            $('#age').val(data.proposals_venue);
+            // $('#date').val(data.event_date);
+            $('#speaker').val(data.speaker);
+            $('#cb').val(data.proposals_creative_budget);
+            $('#pb').val(data.proposals_publicity_budget);
+            // $('#tb').val(data.total_budget);
+            // $('#rf').val(data.reg_fee_c);
+            $('#prize').val(data.proposals_prize);
+            $('#id').val(data.cpm_id);
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("inside AJAX function: Err");
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+          }
+
+        });
+
+      });
+      // Script for single row fetch ends
+
+
+      //Script for status approval starts
+
+      $(document).on('click', '.eventapprove', function () {
+
+        var id = $('#id').val();
+        // var first_name = $('#first_name').val();
+
+        $.ajax({
+          url: "/sbcstatusapprove",
+          method: "GET",
+          data: { id: id },
+          dataType: "JSON",
+          success: function (data) {
+
+            alert("The Proposal is Accepted by the SBC");
+            // console.log(data);
+            // $('#first_name').val(data.M_agenda);
+            // $('#id').val(data.eid);
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("inside AJAX function: Err");
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+          }
+
+        });
+
+      });
+      //Script for status approval ends
+
+      //Script for status rejection starts
+
+      $(document).on('click', '.eventreject', function () {
+
+        var id = $('#id').val();
+        // var first_name = $('#first_name').val();
+
+        $.ajax({
+          url: "/sbcstatusreject",
+          method: "GET",
+          data: { id: id },
+          dataType: "JSON",
+          success: function (data) {
+
+            alert("The Proposal is Rejected by the SBC");
+            // console.log(data);
+            // $('#first_name').val(data.M_agenda);
+            // $('#id').val(data.eid);
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            console.log("inside AJAX function: Err");
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+          }
+
+        });
+
+      });
+      //Script for status rejection ends
+
+    });
+
+  </script>
+
+      <!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+
+
+
+  <!--   Core JS Files   -->
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+
+</body>
+</html>

@@ -942,52 +942,6 @@ public class Publicity extends AppCompatActivity {
     }
 
 
-//    get data to set values
-//    public void getData(){
-//
-//        final JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("eid", eid);
-//        }
-//        catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        //creating jsonobject ends
-//
-//        //checking data inserted into json object
-////        String response = volley(jsonObject, getApplicationContext().getResources().getString(R.string.server_url) + "/creative/viewpropdetail");
-//
-//
-//
-//    } Log.i("volleyABC" ,"reposnsde"+response);
-//        if(response != null){
-//        try {
-//            JSONObject jsonObject1 = new JSONObject(response);
-//            // Log.i("tracking uid","main Activity "+UID);
-//
-//            eventName.setText(jsonObject1.getString("name"));
-//            eventTheme.setText(jsonObject1.getString("theme"));
-//
-//            speaker.setText(jsonObject1.getString("speaker"));
-//            venue.setText(jsonObject1.getString("venue"));
-//            fee_csi.setText(jsonObject1.getString("reg_fee_c"));
-//            fee_non_csi.setText(jsonObject1.getString("reg_fee_nc"));
-//            prize.setText(jsonObject1.getString("prize"));
-//            eventDescription.setText(jsonObject1.getString("description"));
-//
-//
-//            String eventDate=jsonObject1.getString("event_date");
-//            String date = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
-//            event_date.setText(date);
-//
-//            //Send data to Manager.java starts
-//            // Call manager.java file i.e. Activity with navigation drawer activity
-//        }
-//        catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 
 
 

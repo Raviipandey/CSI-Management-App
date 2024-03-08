@@ -7,7 +7,7 @@ module.exports = {
     var username = req.body.username;
     var password = req.body.password;
     //will only allow admin to login, for everyone else it will be invalid
-    connection.query("select * from core_details where (core_role_id = 1 or core_role_id = 2) and core_id = ? and core_pwd = ?",[username,password],function(error,results,fields){
+    connection.query("select * from core_details where (core_role_id = 1 or core_role_id = 2 or core_role_id = 3 or core_role_id = 12) and core_id = ? and core_pwd = ?",[username,password],function(error,results,fields){
         if (results.length > 0) {
             // console.log(results);
             var data = JSON.parse(JSON.stringify(results));
@@ -20,7 +20,7 @@ module.exports = {
             console.log(req.session);
             console.log(req.session.id);
         } else {
-            req.flash("Emsg", "Invalid Credentials");
+            req.flash("Emsg", "Access Not Granted!");
             res.redirect("/");
         }
         res.end();

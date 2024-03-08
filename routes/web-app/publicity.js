@@ -8,11 +8,13 @@ module.exports = {
     get: (request, response) => {
         var session = request.session;
         var PublicityPath = path.join(__dirname, "..", "..", "views", "pages", "publicity.ejs");
-        if (session.userid != null && (session.userrole == 1)) {
+        if (session.userid != null && (session.userrole == 1) && (session.userrole == 2) && (session.userrole == 3) && (session.userrole == 12)) {
             response.render(PublicityPath, {role : session.userrole});
           } else {
-            response.redirect('/');
-          }
+            // Redirect the user or send an error message if they don't have the right role
+            // res.status(403).send('Access Denied: You do not have permission to view this page.');
+            response.redirect('/error?message=access-denied');
+        }
     
     },
 

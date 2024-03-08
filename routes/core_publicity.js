@@ -86,6 +86,22 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
     });
 });
 
+router.get("/fetchpr", function (req, res) {
+    const eid = req.query.eid;
+    console.log(eid);
+    // Retrieve the file metadata from the database
+    const query = "SELECT filename, url FROM publicity_files WHERE eid = ?";
+    connection.query(query, [eid], function (error, results, fields) {
+        if (error) return res.status(500).json({ error: "Error retrieving file details from database" });
+        if (!results.length) return res.status(404).json({ error: "File not found" });
+
+        const { filename, url } = results[0];
+
+        // Send the file details as JSON response
+        res.json({ filename, url });
+    });
+});
+
 router.get("/download", function (req, res) {
     const eid = req.query.eid;
 
@@ -215,6 +231,30 @@ router.post('/editPublicity', (req, res) => {
         else {
             console.log("Sucessfully updated publicty event");
             res.sendStatus(200);
+        }
+    });
+});
+
+// Define a route to fetch uploaded files using a POST request
+router.post('/fetch', (req, res) => {
+    var eid = req.body.eid;
+  
+    // Query the database to fetch uploaded files associated with the event ID
+    const query = 'SELECT filepath, filename, url FROM publicity_files WHERE eid = ?';
+    
+    connection.query(query, [eid], (err, results) => {
+        if (err) {
+            console.log('Failed to fetch files');
+            res.status(500).json({ error: 'Failed to fetch files' });
+        } else {
+            console.log('Successfully fetched files');
+
+            // Extract creative URLs from the database results
+            const pdfUrls = results.map(result => result.url);
+            console.log("pdf url for pub", pdfUrls);
+
+            // Send the image URLs as a JSON response
+            res.status(200).json({ pdfUrls });
         }
     });
 });
