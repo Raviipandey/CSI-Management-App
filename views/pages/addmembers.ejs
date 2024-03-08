@@ -61,8 +61,6 @@
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
                 <p class="mb-0">ADD CORE MEMBERS</p>
-
-                
                 
               </div>
             </div>
@@ -77,7 +75,56 @@
                 <div class="signup-form">
                   <div class="d-flex align-items-center">
                     <p class="mb-0"><i class="ni ni-cloud-download-95"></i> Upload CSV File</p>
-                    <button id="downloadBtn" class="btn btn-primary btn-sm ms-auto">Download Template</button>
+
+                     <!-- Download Template Button -->
+                     <button id="downloadBtn" class="btn btn-primary btn-sm ms-auto">Download Template</button>
+
+                      <!-- Information Modal Button -->
+                      <button class="btn btn-primary btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#informationModal">
+                        <i class="fa fa-info-circle" aria-hidden="true" style="font-size: 17px;"></i>
+                      </button>
+                
+                      
+                      <!-- Information Modal -->
+                      <div class="modal fade" id="informationModal" tabindex="-1" aria-labelledby="informationModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header" id="dynamic_modal_title">Note</div>
+                                <div class="modal-body">
+                                  <ul>
+                                    
+                                      <ul>
+                                          <li>Please do not change the column names</li>
+                                          <li>mem_start (membership start) and mem_end (membership end) should be added in yyyy-mm-dd format</li>
+                                          <li>Academic year should be mentioned in yy-yy format (eg: 22-23) in the acad column</li>
+                                          <li>class_name column has to be filled with the year of the student (eg: TE, BE)</li>
+                                          <li>In gender column enter either 'female' or 'male' (with no capital letters)</li>
+                                          <li>In role column, the role_id should be added (refer to the role id below)</li>
+                                      </ul>
+                                      <li>Role IDs:</li>
+                                      <ul>
+                                          <li>3-Chairperson</li>
+                                          <li>4-Vice Chairperson</li>
+                                          <li>5-Event Head</li>
+                                          <li>6-Technical Head</li>
+                                          <li>7-Web Development Head</li>
+                                          <li>8-Public Relations Head</li>
+                                          <li>9-Creative Head</li>
+                                          <li>10-Secretary</li>
+                                          <li>11-Documentation Head</li>
+                                          <li>12-Test Login</li>
+                                      </ul>
+                                  </ul>
+                              </div>
+                              
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                     
                     </div>
                   <form action="/uploadcsv" method="post" enctype="multipart/form-data" id="csv">
                     <!-- <div class="form-group">
