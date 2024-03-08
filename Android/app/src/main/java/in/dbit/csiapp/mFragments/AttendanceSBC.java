@@ -56,6 +56,11 @@ public class AttendanceSBC extends Fragment {
                             intent.putExtra(EXTRA_CLASS, "TE");
                             startActivity(intent);
                             break;
+                        case 2:
+                            intent = new Intent(getActivity(), attendance_list.class);
+                            intent.putExtra(EXTRA_CLASS, "BE");
+                            startActivity(intent);
+                            break;
                     }
                 }
             });
