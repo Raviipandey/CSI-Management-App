@@ -100,7 +100,7 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
                         Log.i("event" ,"event " + i + " :- " + jsonArray.getString(i));
                         mEventList.add(new EventItem(event));
                     }
-                    mEventList.add(new EventItem("+\nAdd New File"));
+                    mEventList.add(new EventItem("+\nAdd new event"));
 
                     mEventNameAdapter = new EventNameAdapter(DisplayYear.this, mEventList);
                     mRecyclerView.setAdapter(mEventNameAdapter);

@@ -119,9 +119,10 @@ public class DisplayImage extends AppCompatActivity {
         Fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getApplicationContext(), Upload.class);
-                //intent.putExtra("PATH", PARENT_PATH);
-                //startActivity(intent);
+                Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                photoPickerIntent.setType("image/*");
+                photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), 1);
                 Log.d("FabClickListener", "FAB button clicked!");
                 UploadImages();
             }
@@ -266,8 +267,8 @@ public class DisplayImage extends AppCompatActivity {
 
         //calling requestMethod
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.READ_MEDIA_IMAGES},100);
                 return;
             }
         }

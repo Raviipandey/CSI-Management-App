@@ -101,7 +101,7 @@ public class DisplayEventName extends AppCompatActivity implements EventNameAdap
                         Log.i("event" ,"event " + i + " :- " + jsonArray.getString(i));
                         mEventList.add(new EventItem(event));
                     }
-                    mEventList.add(new EventItem("+\nAdd New File"));
+                    mEventList.add(new EventItem("+\nAdd academic year"));
 
                     mEventNameAdapter.notifyDataSetChanged();
                     //mEventNameAdapter = new EventNameAdapter(MainActivity.this, mEventList);
