@@ -15,7 +15,7 @@ connection.connect(function(err) {
     }
 });
 
-const server_url = 'http://10.0.4.222:9000';
+const server_url = 'https://csiapp.dbit.in';
 
 module.exports = {
     connection: connection,

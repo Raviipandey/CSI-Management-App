@@ -3,6 +3,7 @@ package in.dbit.csiapp.mActivityManager;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,7 +43,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
@@ -52,10 +52,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -72,7 +74,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
-import okhttp3.OkHttpClient;
 
 
 public class Publicity extends AppCompatActivity {
@@ -87,7 +88,11 @@ public class Publicity extends AppCompatActivity {
     String urole1;
     LinearLayout pr_lay;
     Button edit_pr, submit_pr;
-    String eid;
+//    String eid;
+    private static String eid;
+    private static String apiurl;
+
+
     TextView eventName, eventTheme, event_date, eventDescription, speaker, venue, fee_csi, fee_non_csi, prize, cr_budget, pub_budget, guest_budget, tvFileStatus;
     EditText target_aud, comments, money_c, money_s;
     CheckBox reg_desk, inclass_pub;
@@ -99,14 +104,19 @@ public class Publicity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1;
 
+    private static final String TAG = "YourActivity";
+//    private static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 123;
+//    private static final int REQUEST_CODE = 456;
     private Button selectFileButton, deleteButton;
     private String currentFileName = null;
 
     private Button downloadButtonForOthers;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_publicity);
 
         // Inside onCreate method
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -126,8 +136,7 @@ public class Publicity extends AppCompatActivity {
             }
         }
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_publicity);
+
         getSupportActionBar().setTitle("Publicity");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
@@ -138,7 +147,7 @@ public class Publicity extends AppCompatActivity {
         checkboxContainer = findViewById(R.id.pub_checkbox_container);
 //        Toast.makeText(Publicity.this,"role: "+urole1,Toast.LENGTH_SHORT).show();
 //        Log.i("volleyABC ", urole1);
-
+        Button downloadButton = findViewById(R.id.download_button);
 
         eventName = (TextView) findViewById(R.id.name_pl);
         tvFileStatus = findViewById(R.id.tvFileStatus);
@@ -223,6 +232,7 @@ public class Publicity extends AppCompatActivity {
 
 
         selectFileButton = findViewById(R.id.select_file_button);
+//        Button downloadButton = findViewById(R.id.download_button);
         if (!urole1.equals("PR Head")) {
             selectFileButton.setVisibility(View.GONE);
 
@@ -250,93 +260,196 @@ public class Publicity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES , READ_EXTERNAL_STORAGE , WRITE_EXTERNAL_STORAGE , MANAGE_EXTERNAL_STORAGE}, 1);
         }
 
-        // Check if a file has already been uploaded for this eid
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        boolean isFileUploaded = sharedPreferences.getBoolean(eid, false);
-        if (isFileUploaded) {
-            tvFileStatus.setVisibility(View.GONE); // Hide the status message
-            selectFileButton.setEnabled(false); // Disable the select file button
-            Button downloadButton = findViewById(R.id.download_button);
-            downloadButton.setVisibility(View.VISIBLE); // Show the download button
-//            deleteButton.setVisibility(View.VISIBLE);
-            if ("PR Head".equalsIgnoreCase(urole1)) {
-                deleteButton.setVisibility(View.VISIBLE);
-            } else {
-                deleteButton.setVisibility(View.GONE);
-            }
-            downloadButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Build the download request
-                    OkHttpClient client = new OkHttpClient();
-                    okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
-                            .url(getApplicationContext().getResources().getString(R.string.server_url) + "/publicity/download?eid=" + eid)
-                            .build();
-
-                    // Execute the download request asynchronously
-                    client.newCall(downloadRequest).enqueue(new Callback() {
-                        @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
-                        @Override
-                        public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
-                            if (!response.isSuccessful()) {
-                                throw new IOException("Unexpected code " + response);
-                            }
-
-                            String contentDisposition = response.header("Content-Disposition");
-                            String fileName = extractFileName(contentDisposition);
-
-                            // Create a file with the downloaded content
-                            byte[] bytes = response.body().bytes();
-
-                            // Get the content resolver
-                            ContentResolver resolver = getContentResolver();
-
-                            // Set up the ContentValues to insert into the MediaStore
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-
-                            // For Android Q and above, use the Downloads directory
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                            }
-
-                            // Insert the file into the MediaStore
-                            Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
-
-                            if (uri != null) {
-                                try (OutputStream outputStream = resolver.openOutputStream(uri)) {
-                                    outputStream.write(bytes);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(Publicity.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(Publicity.this, "Error saving file", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            e.printStackTrace();
-                            Toast.makeText(Publicity.this, "Error downloading file", Toast.LENGTH_SHORT).show();
-                        }
-
-
-                    });
+        // Execute ApiRequestTask to fetch data and handle UI accordingly
+        new ApiRequestTask(this, new ApiRequestTask.ApiRequestCallback() {
+            @Override
+            public void onApiResult(String[] result) {
+                if (result != null) {
+                    if (result.length == 2) {
+                        // File exists, update UI accordingly
+                        handleFileExistence(result[0], result[1]);
+                    } else if (result.length == 1) {
+                        // File not found, update UI accordingly
+                        handleFileNotFound(result[0]);
+                    }
                 }
-            });
-        }
+            }
+        }).execute();
 
     }
+
+
+
+    public static class ApiRequestTask extends AsyncTask<Void, Void, String[]> {
+
+        private final Context context;
+        private static final String TAG = "ApiRequestTask";
+
+//        private final String apiUrl = "https://csiapp.dbit.in/publicity/fetchpr?eid=" + eid;
+
+        private final ApiRequestCallback callback;
+
+        public ApiRequestTask(Context context, ApiRequestCallback callback) {
+            this.context = context;
+            this.callback = callback;
+        }
+        public interface ApiRequestCallback {
+            void onApiResult(String[] result);
+        }
+
+        @Override
+        protected String[] doInBackground(Void... voids) {
+            try {
+                String apiUrl = context.getString(R.string.server_url) + "/publicity/fetchpr?eid="+ eid;
+                URL url = new URL(apiUrl);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                try {
+                    InputStream in = urlConnection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    return parseApiResponse(response.toString());
+                } finally {
+                    urlConnection.disconnect();
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Error making API request: " + e.getMessage());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (callback != null) {
+                callback.onApiResult(result);
+            }
+        }
+
+        private String[] parseApiResponse(String response) {
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+
+                if (jsonResponse.has("filename") && jsonResponse.has("url")) {
+                    String filename = jsonResponse.getString("filename");
+                    String url = jsonResponse.getString("url");
+                    return new String[]{filename, url};
+                } else if (jsonResponse.has("error")) {
+                    String error = jsonResponse.getString("error");
+                    return new String[]{error};
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing JSON response: " + e.getMessage());
+            }
+
+            return null;
+        }
+    }
+
+
+    private void handleFileExistence(String filename, String url) {
+        tvFileStatus.setVisibility(View.GONE); // Hide the status message
+        selectFileButton.setEnabled(false); // Disable the select file button
+        Button downloadButton = findViewById(R.id.download_button);
+        downloadButton.setVisibility(View.VISIBLE); // Show the download button
+
+        if ("PR Head".equalsIgnoreCase(urole1)) {
+            deleteButton.setVisibility(View.VISIBLE);
+        } else {
+            deleteButton.setVisibility(View.GONE);
+        }
+
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Build the download request
+                OkHttpClient client = new OkHttpClient();
+                okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
+                        .url(getApplicationContext().getResources().getString(R.string.server_url) + "/publicity/download?eid=" + eid)
+                        .build();
+
+                // Execute the download request asynchronously
+                client.newCall(downloadRequest).enqueue(new Callback() {
+                    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
+
+                        if (!response.isSuccessful()) {
+                            throw new IOException("Unexpected code " + response);
+                        }
+
+                        String contentDisposition = response.header("Content-Disposition");
+                        String fileName = extractFileName(contentDisposition);
+
+                        // Create a file with the downloaded content
+                        byte[] bytes = response.body().bytes();
+
+                        // Get the content resolver
+                        ContentResolver resolver = getContentResolver();
+
+                        // Set up the ContentValues to insert into the MediaStore
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
+
+                        // For Android Q and above, use the Downloads directory
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                        }
+
+                        // Insert the file into the MediaStore
+                        Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+
+                        if (uri != null) {
+                            try (OutputStream outputStream = resolver.openOutputStream(uri)) {
+                                outputStream.write(bytes);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(Publicity.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(Publicity.this, "Error saving file", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+
+
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(Publicity.this, "Error downloading file", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void handleFileNotFound(String error) {
+        // File not found, update UI accordingly
+        // Enable the select file button or take appropriate action
+        Button downloadButton = findViewById(R.id.download_button);
+        selectFileButton.setEnabled(true);
+        deleteButton.setVisibility(View.GONE);
+        downloadButton.setVisibility(View.GONE);
+
+        // You may also display an error message using Toast or any other UI component
+        Toast.makeText(Publicity.this, "File not found: " + error, Toast.LENGTH_SHORT).show();
+    }
+
 
     // Helper method to extract filename from Content-Disposition header
     private String extractFileName(String contentDisposition) {

@@ -106,6 +106,23 @@ router.get("/download", function (req, res) {
     });
 });
 
+router.get("/fetchpr", function (req, res) {
+    const eid = req.query.eid;
+    console.log(eid);
+    // Retrieve the file metadata from the database
+    const query = "SELECT filename, url FROM publicity_files WHERE eid = ?";
+    connection.query(query, [eid], function (error, results, fields) {
+        if (error) return res.status(500).json({ error: "Error retrieving file details from database" });
+        if (!results.length) return res.status(404).json({ error: "File not found" });
+
+        const { filename, url } = results[0];
+
+        // Send the file details as JSON response
+        res.json({ filename, url });
+    });
+});
+
+
 router.post("/delete", function (req, res) {
     const eid = req.body.eid;
 
