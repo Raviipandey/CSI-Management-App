@@ -8,7 +8,7 @@ module.exports = {
     get: (request, response) => {
         var session = request.session;
         var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "creative.ejs");
-        if (session.userid != null && (session.userrole == 1) && (session.userrole == 2) && (session.userrole == 3) && (session.userrole == 12)) {
+        if (session.userid != null ) {
             response.render(FeedbackPath, {role : session.userrole});
           } else {
             // Redirect the user or send an error message if they don't have the right role
