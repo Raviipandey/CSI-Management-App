@@ -125,7 +125,7 @@ public class attendance_list extends AppCompatActivity {
 //                        param2.setMargins(1, 0, 1, 1);
 //                        tv3.setLayoutParams(param2);
 
-                        tv4.setText(students.getString("Class"));
+                        tv4.setText(students.getString("RollNo"));
                         tv4.setGravity(Gravity.CENTER);
                         tv4.setBackgroundColor(getResources().getColor(R.color.white));
                         tv4.setTextColor(getResources().getColor(R.color.colorPrimary));

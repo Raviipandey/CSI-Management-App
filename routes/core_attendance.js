@@ -285,7 +285,7 @@ router.post('/view',(req,res)=>{
 	var name=req.body.name;
 	var hours_spent=req.body.hours_spent;
 
-connection.query('SELECT cd.core_en_fname as Name,cd.core_class as Class ,sum(ad.s1+ad.s2+ad.s3+ad.s4+ad.s5+ad.s6+ad.s7) as hours_spent from core_details cd inner join attendance_details ad on cd.core_id=ad.core_id AND status="ACCEPTED"  where cd.core_class = ? group by cd.core_id',[year],function(error,result){
+connection.query('SELECT cd.core_en_fname as Name,cd.core_rollno as RollNo ,sum(ad.s1+ad.s2+ad.s3+ad.s4+ad.s5+ad.s6+ad.s7) as hours_spent from core_details cd inner join attendance_details ad on cd.core_id=ad.core_id AND status="ACCEPTED"  where cd.core_class = ? group by cd.core_id',[year],function(error,result){
 	//connection.query('SELECT cd.core_en_fname as Name,cd.core_class ,sum(ad.s1+ad.s2+ad.s3+ad.s4+ad.s5+ad.s6+ad.s7) as hours_spent from core_details cd inner join attendance_details ad on cd.core_id=ad.core_id AND status="ACCEPTED" group by cd.core_id',function(error,result){
 		if(error){
 			res.sendStatus(400);
