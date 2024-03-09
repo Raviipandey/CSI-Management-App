@@ -82,8 +82,7 @@ public class Publicity extends AppCompatActivity {
     public static final String READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES;
     public static final String READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     public static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-    public static final String MANAGE_EXTERNAL_STORAGE = Manifest.permission.MANAGE_EXTERNAL_STORAGE;
-    private static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 1;
+
 
     String urole1;
     LinearLayout pr_lay;
@@ -105,8 +104,7 @@ public class Publicity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
 
     private static final String TAG = "YourActivity";
-//    private static final int REQUEST_MANAGE_EXTERNAL_STORAGE = 123;
-//    private static final int REQUEST_CODE = 456;
+
     private Button selectFileButton, deleteButton;
     private String currentFileName = null;
 
@@ -118,23 +116,6 @@ public class Publicity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_publicity);
 
-        // Inside onCreate method
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                // Permission already granted, proceed with the operation
-            } else {
-                // Request the MANAGE_EXTERNAL_STORAGE permission
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                startActivityForResult(intent, REQUEST_MANAGE_EXTERNAL_STORAGE);
-            }
-        } else {
-            // For Android versions below R, handle WRITE_EXTERNAL_STORAGE permission as usual
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            } else {
-                // Permission already granted, proceed with the operation
-            }
-        }
 
 
         getSupportActionBar().setTitle("Publicity");
@@ -240,8 +221,9 @@ public class Publicity extends AppCompatActivity {
         selectFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("application/pdf");
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf"); // Specify the desired MIME type
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
@@ -256,9 +238,6 @@ public class Publicity extends AppCompatActivity {
             }
         });
 
-        if (ContextCompat.checkSelfPermission(this, MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES , READ_EXTERNAL_STORAGE , WRITE_EXTERNAL_STORAGE , MANAGE_EXTERNAL_STORAGE}, 1);
-        }
 
         // Execute ApiRequestTask to fetch data and handle UI accordingly
         new ApiRequestTask(this, new ApiRequestTask.ApiRequestCallback() {
@@ -561,7 +540,11 @@ public class Publicity extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            showUploadConfirmationDialog(uri);
+            try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
+                showUploadConfirmationDialog(uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
