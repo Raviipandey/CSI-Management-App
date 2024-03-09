@@ -59,7 +59,6 @@ public class ProfileEdit extends AppCompatActivity {
     ImageView imageButton;
 
 
-
     public void onEditProfilePhotoClick(View view) {
         // Open the gallery for image selection
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -200,7 +199,6 @@ public class ProfileEdit extends AppCompatActivity {
 
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -262,6 +260,7 @@ public class ProfileEdit extends AppCompatActivity {
         rol.setText(getIntent().getStringExtra("core_rollno"));
         position_s = getIntent().getStringExtra("core_role_id");
         String Year = getIntent().getStringExtra("core_class");
+        String Branch = getIntent().getStringExtra("core_branch");
         String profileImageUrl = getIntent().getStringExtra("core_profilepic_url");
         Picasso.get().load(profileImageUrl)
                 .placeholder(R.drawable.ic_person_black_24dp)
@@ -286,27 +285,25 @@ public class ProfileEdit extends AppCompatActivity {
         }
 
 
+        switch (Branch) {
+            case "EXTC":
+                RadioButton EXTC = findViewById(R.id.radio_extc);
+                EXTC.setChecked(true);
+                break;
+            case "COMPS":
+                RadioButton Comps = findViewById(R.id.radio_comps);
+                Comps.setChecked(true);
+                break;
+            case "MECH":
+                RadioButton MECH = findViewById(R.id.radio_mech);
+                MECH.setChecked(true);
+                break;
+            default:
+                RadioButton IT = findViewById(R.id.radio_IT);
+                IT.setChecked(true);
+                break;
 
-
-//        String Branch = getIntent().getStringExtra("branch");
-//        switch (Branch) {
-//            case "IT":
-//                RadioButton IT = findViewById(R.id.radio_IT);
-//                IT.setChecked(true);
-//                break;
-//            case "COMPS":
-//                RadioButton Comps = findViewById(R.id.radio_comps);
-//                Comps.setChecked(true);
-//                break;
-//            case "MECH":
-//                RadioButton MECH = findViewById(R.id.radio_mech);
-//                MECH.setChecked(true);
-//                break;
-//            default:
-//                RadioButton EXTC = findViewById(R.id.radio_extc);
-//                EXTC.setChecked(true);
-//                break;
-//        }
+        }
 
 //        String Batch = getIntent().getStringExtra("batch");
 //        switch (Batch) {
