@@ -267,7 +267,7 @@ public class DisplayImage extends AppCompatActivity {
 
         //calling requestMethod
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.READ_MEDIA_IMAGES},100);
                 return;
             }
