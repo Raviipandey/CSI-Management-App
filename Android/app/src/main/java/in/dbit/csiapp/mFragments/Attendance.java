@@ -3,9 +3,9 @@ package in.dbit.csiapp.mFragments;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -290,7 +290,7 @@ public class Attendance extends Fragment {
     }
 
     public void customDialog(String message){
-        final androidx.appcompat.app.AlertDialog.Builder builderSingle = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
+        final android.support.v7.app.AlertDialog.Builder builderSingle = new android.support.v7.app.AlertDialog.Builder(getActivity());
         //builderSingle.setIcon(R.drawable.ic_notification);
         builderSingle.setTitle("Preview");
         builderSingle.setMessage(message);

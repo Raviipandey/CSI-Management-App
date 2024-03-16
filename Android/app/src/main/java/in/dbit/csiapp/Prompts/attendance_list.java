@@ -1,8 +1,8 @@
  package in.dbit.csiapp.Prompts;
 
 import android.content.Intent;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import static in.dbit.csiapp.mFragments.AttendanceSBC.EXTRA_CLASS;
 

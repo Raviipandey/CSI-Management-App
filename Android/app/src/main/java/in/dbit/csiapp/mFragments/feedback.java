@@ -1,11 +1,13 @@
 package in.dbit.csiapp.mFragments;
 
+import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,17 +16,28 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
 //import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mReqAdapter.RequestListItem;
 
+import android.content.SharedPreferences;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class feedback extends Fragment {
     View rootView;

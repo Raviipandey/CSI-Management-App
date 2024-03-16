@@ -1,6 +1,6 @@
 package in.dbit.csiapp.Gallery;
 
-import androidx.viewpager.widget.ViewPager;
+import android.support.v4.view.ViewPager;
 
 public class CircularViewPagerHandler implements ViewPager.OnPageChangeListener {
     private ViewPager   mViewPager;

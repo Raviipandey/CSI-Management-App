@@ -2,7 +2,7 @@ package in.dbit.csiapp.Prompts;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
@@ -35,6 +35,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddMinute extends AppCompatActivity {
 
