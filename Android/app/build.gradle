@@ -9,6 +9,15 @@ android {
         versionCode 4
         versionName "1.0.3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        signingConfigs {
+            release {
+                storeFile file("csiapp.jks")
+                storePassword System.getenv("CSIDBIT")
+                keyAlias System.getenv("key0")
+                keyPassword System.getenv("CSIDBIT")
+            }
+        }
     }
     buildTypes {
         release {
