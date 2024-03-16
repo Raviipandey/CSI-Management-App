@@ -154,7 +154,7 @@ router.post('/viewEvents', (req, res) =>{
     var eid = req.body.eid;
     var checkboxStatus = req.body.checkboxStatus;
 
-	const sql = "SELECT e.proposals_event_name, e.proposals_event_category, tech_comment, e.proposals_event_date, e.speaker, e.proposals_venue, e.proposals_reg_fee_csi, e.proposals_reg_fee_noncsi, e.proposals_prize, e.proposals_desc, e.proposals_creative_budget, e.proposals_publicity_budget, e.proposals_guest_budget, t.qs_set, t.internet, t.tech_comment, t.software_install, tt.tasks, tt.status FROM core_proposals_manager e INNER JOIN core_technical_manager t ON e.cpm_id = t.cpm_id LEFT JOIN ( SELECT cpm_id, GROUP_CONCAT(task) AS tasks, GROUP_CONCAT(status) AS status FROM technical_tasks GROUP BY cpm_id ) tt ON t.cpm_id = tt.cpm_id WHERE t.cpm_id = ?"
+	const sql = "SELECT e.proposals_event_name, e.proposals_event_category, e.proposals_event_date, e.speaker, e.proposals_venue, e.proposals_reg_fee_csi, e.proposals_reg_fee_noncsi, e.proposals_prize, e.proposals_desc, e.proposals_creative_budget, e.proposals_publicity_budget, e.proposals_guest_budget, t.qs_set, t.internet, t.tech_comment, t.software_install, tt.tasks, tt.status FROM core_proposals_manager e INNER JOIN core_technical_manager t ON e.cpm_id = t.cpm_id LEFT JOIN ( SELECT cpm_id, GROUP_CONCAT(task) AS tasks, GROUP_CONCAT(status) AS status FROM technical_tasks GROUP BY cpm_id ) tt ON t.cpm_id = tt.cpm_id WHERE t.cpm_id = ?"
     connection.query(sql, [eid], function (error, results) {
         if (error){
             console.log("Failed To view Technical events");

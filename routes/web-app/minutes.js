@@ -9,7 +9,7 @@ module.exports = {
         var session = request.session;
         var MinutePath = path.join(__dirname, "..", "..", "views", "pages", "minutes.ejs");
         if (session.userid != null ) {
-            response.render(MinutePath, {role : session.userrole});
+            response.render(MinutePath, {role : session.userrole, rolename: session.rolename});
           } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');

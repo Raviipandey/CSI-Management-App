@@ -10,7 +10,7 @@ module.exports = {
         var TechnicalPath = path.join(__dirname, "..", "..", "views", "pages", "technical.ejs");
 
         if (session.userid != null ) {
-            response.render(TechnicalPath, {role : session.userrole});
+            response.render(TechnicalPath, {role : session.userrole, rolename: session.rolename});
           } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');
@@ -28,6 +28,7 @@ module.exports = {
             } else {
                 response.json({
                     data: results
+                    
                 });
             }
         });

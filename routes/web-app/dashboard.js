@@ -13,11 +13,11 @@ module.exports = {
         console.log(session.userrole);
 
         if (session.userid != null) {
-            res.render(DashboardPath, {userrole : session.userrole});
+            res.render(DashboardPath, {userrole : session.userrole, rolename: session.rolename});
         } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');
-            response.redirect('/error?message=access-denied');
+            res.redirect('/error?message=access-denied');
         }
     },
     pydata: (request, response) => {

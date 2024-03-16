@@ -107,11 +107,17 @@
                   <td>${row.pr_spent}</td>
                   <td>${row.pr_desk_publicity}</td>
                   <td>${row.pr_member_count}</td>
-                  <td>
-                    <a href="${row.documentUrl}" target="_blank" class="btn btn-primary btn-sm">View</a>
-                    
-                  </td>
-                </tr>`;
+                  <td>`;
+
+// Check if file_url is not undefined or empty before creating the View button
+if (row.documentUrl) {
+    html += `<a href="${row.documentUrl}" target="_blank" class="btn btn-primary btn-sm">View</a>`;
+} else {
+    // Display a message or a disabled button if the file_url is empty or undefined
+    html += `<button class="btn btn-secondary btn-sm" disabled>No Document</button>`;
+}
+html += `</td>
+      </tr>`;
       });
       $('#publicity_data tbody').html(html);
      

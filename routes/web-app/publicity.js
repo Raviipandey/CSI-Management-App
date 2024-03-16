@@ -9,7 +9,7 @@ module.exports = {
         var session = request.session;
         var PublicityPath = path.join(__dirname, "..", "..", "views", "pages", "publicity.ejs");
         if (session.userid != null ) {
-            response.render(PublicityPath, {role : session.userrole});
+            response.render(PublicityPath, {role : session.userrole, rolename: session.rolename});
           } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');
