@@ -2,4 +2,3 @@ node_modules
 ./serverconfig.js
 Database
 tmp_uploads
-google-services.json

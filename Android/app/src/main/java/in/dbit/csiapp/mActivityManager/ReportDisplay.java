@@ -8,10 +8,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -29,7 +29,7 @@ import java.net.URL;
 public class ReportDisplay extends AppCompatActivity {
 
     PDFView pdfView;
-    String url = "http://10.0.4.222:9000/report/generate?eid=";
+    String url = "http://192.168.1.106:9000/report/";
 
     String eName;
     String eid;
@@ -45,8 +45,8 @@ public class ReportDisplay extends AppCompatActivity {
         eid = intent.getStringExtra("eid");
         eName = intent.getStringExtra("eName");
         eName = eName + ".pdf";
-        url = url + eid;
-//        url += eName;
+//        url = url + eid;
+        url += eName;
         Log.i("url testing report", url);
 
         pdfView = (PDFView)findViewById(R.id.pdfView);

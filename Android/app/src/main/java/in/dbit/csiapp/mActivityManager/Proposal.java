@@ -2,7 +2,7 @@ package in.dbit.csiapp.mActivityManager;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -465,7 +465,7 @@ public class Proposal extends AppCompatActivity {
 
 
     public void customDialog(String message , final JSONObject jsonobject){
-        final androidx.appcompat.app.AlertDialog.Builder builderSingle = new androidx.appcompat.app.AlertDialog.Builder(Proposal.this);
+        final android.support.v7.app.AlertDialog.Builder builderSingle = new android.support.v7.app.AlertDialog.Builder(Proposal.this);
         //builderSingle.setIcon(R.drawable.ic_notification);
         builderSingle.setTitle("Preview");
         builderSingle.setMessage(message);

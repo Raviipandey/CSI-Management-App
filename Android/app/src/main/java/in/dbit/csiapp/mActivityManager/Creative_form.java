@@ -9,20 +9,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.documentfile.provider.DocumentFile;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.provider.DocumentFile;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -38,7 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.viewpager.widget.ViewPager;
+import android.support.v4.view.ViewPager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -260,37 +259,8 @@ public class Creative_form extends AppCompatActivity {
                         List<String> mediaUrls = parseResponse(response);
                         Log.i("Media ke urlsss", String.valueOf(mediaUrls));
 
-                        // Check if mediaUrls is null or contains only null
-                        if (mediaUrls.size() == 1 || mediaUrls.get(0) == "null") {
-                            // Show default image or text message
-                            Log.i("Empty urls " , "Null");
-                            viewPager.setVisibility(View.INVISIBLE);
-                            showDefaultImageOrText();
-                        } else {
-                            // Set up ViewPager with the fetched media URLs
-                            viewPager.setVisibility(View.VISIBLE);
-                            setupViewPager(mediaUrls);
-
-                            // Set up GestureDetector inside the response listener
-                            GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
-                                @Override
-                                public void onLongPress(MotionEvent e) {
-                                    // Handle long press event
-                                    int currentItem = viewPager.getCurrentItem();
-                                    if (currentItem >= 0 && currentItem < mediaUrls.size()) {
-                                        String videoUrl = mediaUrls.get(currentItem);
-
-                                        // Start the download process
-                                        downloadVideo(videoUrl);
-                                    }
-                                }
-                            });
-
-                            viewPager.setOnTouchListener((v, event) -> {
-                                gestureDetector.onTouchEvent(event);
-                                return false;
-                            });
-                        }
+                        // Set up ViewPager with the fetched media URLs
+                        setupViewPager(mediaUrls);
 
                         // Set up GestureDetector inside the response listener
                         GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
@@ -326,16 +296,7 @@ public class Creative_form extends AppCompatActivity {
 
     }
 
-    private void showDefaultImageOrText() {
-        // Assuming you have a TextView named defaultTextView in your layout XML file
-        TextView defaultTextView = findViewById(R.id.defaultTextView);
 
-        // Set the text to "Image/Video not uploaded"
-        defaultTextView.setText("Image/Video not uploaded");
-
-        // Set text color to highlight the message
-        defaultTextView.setTextColor(Color.RED); // You can change the color as per your preference
-    }
 
     private void downloadVideo(String videoUrl) {
         // Show a toast indicating that the download has started

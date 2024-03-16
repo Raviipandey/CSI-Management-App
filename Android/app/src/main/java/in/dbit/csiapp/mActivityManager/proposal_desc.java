@@ -2,7 +2,7 @@ package in.dbit.csiapp.mActivityManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -241,7 +241,7 @@ public class proposal_desc extends AppCompatActivity {
     }
 
     public void customDialog(String message , String st){
-        final androidx.appcompat.app.AlertDialog.Builder builderSingle = new androidx.appcompat.app.AlertDialog.Builder(proposal_desc.this);
+        final android.support.v7.app.AlertDialog.Builder builderSingle = new android.support.v7.app.AlertDialog.Builder(proposal_desc.this);
         //builderSingle.setIcon(R.drawable.ic_notification);
         builderSingle.setTitle("NOTE");
         builderSingle.setMessage(message);

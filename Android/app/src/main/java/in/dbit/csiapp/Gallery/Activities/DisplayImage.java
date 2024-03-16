@@ -8,13 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -119,6 +119,11 @@ public class DisplayImage extends AppCompatActivity {
         Fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                photoPickerIntent.setType("image/*");
+                photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), 1);
+                Log.d("FabClickListener", "FAB button clicked!");
                 UploadImages();
             }
         });
@@ -260,7 +265,13 @@ public class DisplayImage extends AppCompatActivity {
         //button = findViewById(R.id.pick_image);
         //tv = findViewById(R.id.textView);
 
-
+        //calling requestMethod
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.READ_MEDIA_IMAGES},100);
+                return;
+            }
+        }
 
         enable_button();
     }
