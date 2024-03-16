@@ -1,5 +1,4 @@
-name: Github Publish
-	
+name: Github Publish	
 	on:
 	  workflow_dispatch:
 	jobs:
