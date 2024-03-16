@@ -40,6 +40,10 @@ public class ViewPagerAdapter extends PagerAdapter {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, container, false);
         ImageView imageView = view.findViewById(R.id.imageView);
+        // Ensuring scaleType is set programmatically
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+
 
         // Use Glide or similar library to load the image
         Glide.with(context).load(imageUrls.get(position)).into(imageView);

@@ -192,11 +192,11 @@
                     </div>
                     <div class="form-group">
                       <label for="branch"><i class="ni ni-istanbul"></i> Branch</label>
-                      <input type="text" name="branch" id="branch" placeholder="Branch" class="form-control form-control-lg"/>
+                      <input type="text" name="branch" id="branch" placeholder="IT, COMPS, EXTC, MECH" class="form-control form-control-lg"/>
                     </div>
                     <div class="form-group">
                       <label for="class"><i class="ni ni-hat-3"></i> Class</label>
-                      <input type="text" name="class" id="class" placeholder="Class" class="form-control form-control-lg" />
+                      <input type="text" name="class" id="class" placeholder="SE, TE, BE" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
                       <label>Gender</label><br>
@@ -207,15 +207,15 @@
                     </div>
                     <div class="form-group">
                       <label for="acad"><i class="ni ni-hat-3"></i> Academic year (note: mention in yy-yy format)</label>
-                      <input type="text" name="acad" id="acad" placeholder="Acad" class="form-control form-control-lg" />
+                      <input type="text" name="acad" id="acad" placeholder="Academic year (YY-YY)" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
                       <label for="class"><i class="ni ni-calendar-grid-58"></i> Membership Start Date</label>
-                      <input type="date" name="mem_strt" id="membership-start" placeholder="Mem_strt" class="form-control form-control-lg" />
+                      <input type="date" name="mem_strt" id="membership-start" placeholder="Membership start" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group">
                       <label for="class"><i class="ni ni-calendar-grid-58"></i> Membership End Date</label>
-                      <input type="date" name="mem_end" id="membership-end" placeholder="Mem_end" class="form-control form-control-lg" />
+                      <input type="date" name="mem_end" id="membership-end" placeholder="Membership end" class="form-control form-control-lg" />
                     </div>
                     <div class="form-group form-button">
                       <input type="submit" name="add_member" id="add-member" class="form-submit btn btn-dark btn-sm w-100 mb-3" value="Add Member" />
@@ -317,17 +317,29 @@
         .then(data => {
             if(data.success) {
                 alert(data.message); // Display an alert box with the success message
-                window.location.reload(); // Reload the page after clicking "OK" on the alert
+                window.location.reload(); // Optionally reload the page or redirect
             } else {
-                alert('Failed to process CSV file.');
+                // Check if the server responded with detailed error messages and display them
+                if (data.errors && data.errors.length > 0) {
+                    let errorMessage = 'Failed to process CSV file. Please correct the following errors:\n';
+                    errorMessage += data.errors.join('\n');
+                    alert(errorMessage);
+                } else {
+                    // Fallback error message if no detailed errors are provided
+                    alert(data.message || 'Failed to process CSV file.');
+                }
+                document.getElementById('csvFile').value = '';
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while uploading the file.');
+            // Optionally clear the file input in case of fetch error
+        document.getElementById('csvFile').value = '';
         });
     });
-    </script>
+</script>
+
     
   <script>
     $(document).ready(function() {
