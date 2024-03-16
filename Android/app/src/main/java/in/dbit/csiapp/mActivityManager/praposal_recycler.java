@@ -2,11 +2,11 @@ package in.dbit.csiapp.mActivityManager;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,10 +26,8 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
-import in.dbit.csiapp.mAdapter.ExampleAdapter;
 import in.dbit.csiapp.mAdapter.PraposalAdapter;
 import in.dbit.csiapp.mAdapter.PraposalItem;
-import in.dbit.csiapp.mFragments.MinuteManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;

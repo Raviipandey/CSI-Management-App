@@ -27,7 +27,7 @@ const {connection , server_url} = require('../serverconfig');
 //Listing All events ready for report
 router.get('/list',(req,res)=>{
 
-	connection.query('SELECT * FROM core_proposals_manager',function(err,result){
+	connection.query('SELECT cpm_id,proposals_event_name,proposals_event_category,proposals_event_date FROM core_proposals_manager where proposals_status=3 order by cpm_id DESC',function(err,result){
 		if(err){
 			console.log("Report listing error");
 			res.sendStatus(400);

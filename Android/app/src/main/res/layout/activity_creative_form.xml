@@ -774,7 +774,7 @@
                 android:text="Upload" />
 
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_file"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -798,11 +798,20 @@
             android:layout_margin="0dp"
             android:background="#EDEDED" />
 
-        <android.support.v4.view.ViewPager
+        <TextView
+            android:id="@+id/defaultTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Image/Video not uploaded"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
+
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <com.viewpagerindicator.CirclePageIndicator
             android:id="@+id/indicator"

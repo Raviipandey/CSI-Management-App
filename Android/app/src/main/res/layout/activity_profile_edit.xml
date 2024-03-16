@@ -20,8 +20,8 @@
 
             <com.joooonho.SelectableRoundedImageView
                 android:id="@+id/profile_photo_E"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
                 android:background="@color/white"
@@ -39,10 +39,15 @@
 
             <ImageButton
                 android:id="@+id/edit_profile_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="37dp"
+                android:layout_height="37dp"
+                android:layout_below="@id/profile_photo_E"
+                android:layout_marginStart="-45dp"
+                android:layout_marginTop="-30dp"
+                android:layout_toEndOf="@id/profile_photo_E"
+                android:background="@drawable/ripple_effect"
                 android:onClick="onEditProfilePhotoClick"
-                 />
+                android:src="@drawable/baseline_edit_24" />
 
             <TextView
                 android:id="@+id/profile_name_E"
@@ -50,11 +55,11 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="170dp"
+                android:background="@android:color/transparent"
                 android:textColor="@color/colorPrimary"
                 android:textSize="30sp"
-                android:textStyle="bold"
-                android:background="@android:color/transparent"
-                />
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/id_E"
                 android:layout_width="wrap_content"
@@ -67,6 +72,7 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
         </RelativeLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

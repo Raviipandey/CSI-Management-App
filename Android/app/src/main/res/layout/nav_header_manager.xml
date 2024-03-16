@@ -29,7 +29,7 @@
         app:sriv_oval="true"
         app:sriv_right_bottom_corner_radius="50dp"
         app:sriv_right_top_corner_radius="50dp"
-        tools:ignore="VectorDrawableCompat" />
+        tools:ignore="VectorDrawableCompat"/>
 
     <TextView
         android:id="@+id/uname_final"
