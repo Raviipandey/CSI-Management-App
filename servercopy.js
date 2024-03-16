@@ -104,7 +104,7 @@ app.set('view engine', 'ejs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, 'tmp_uploads/'); // Destination folder for temporary uploads
+      cb(null, 'server_uploads/tmp_uploads/'); // Destination folder for temporary uploads
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname); // Keep the original filename
