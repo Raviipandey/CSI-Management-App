@@ -17,7 +17,6 @@ android {
                 keyPassword System.getenv("CSIDBIT")
             }
         }
-
     }
     buildTypes {
         release {
