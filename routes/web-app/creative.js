@@ -9,7 +9,7 @@ module.exports = {
         var session = request.session;
         var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "creative.ejs");
         if (session.userid != null ) {
-            response.render(FeedbackPath, {role : session.userrole});
+            response.render(FeedbackPath, {role : session.userrole, rolename: session.rolename});
           } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');
@@ -18,70 +18,77 @@ module.exports = {
     
     },
 
-    feedbackall : (request, response) => {
+    // creativefetchall : (request, response) => {
 
-        connection.query("SELECT * FROM core_proposals_manager ORDER BY cpm_id DESC",function(error,results,fields){
-            if (results.length > 0) {
-                    // console.log(results);
-                        response.json({
-                data:results
-            });
+    //     connection.query("SELECT * FROM core_proposals_manager where proposals_status = 3 ORDER BY cpm_id DESC;",function(error,results,fields){
+    //         if (results.length > 0) {
+    //                 // console.log(results);
+    //                     response.json({
+    //             data:results
+    //         });
+    //         } else {
+    //             response.redirect("/error");
+    //         }
+    //         response.end();
+    //     })
+    
+    // },
+
+    creativefetchall: (request, response) => {
+        // Adjust the query to also check for the existence of associated creative URLs
+        let query = `SELECT cp.*, 
+                            (SELECT COUNT(*) FROM core_creative_manager ccm WHERE ccm.cpm_id = cp.cpm_id AND (ccm.creative_heading LIKE '%.jpg' OR ccm.creative_heading LIKE '%.png' OR ccm.creative_heading LIKE '%.mp4' OR ccm.creative_heading LIKE '%.avi')) AS creative_count
+                     FROM core_proposals_manager cp
+                     WHERE cp.proposals_status = 3
+                     ORDER BY cp.cpm_id DESC;`;
+    
+        connection.query(query, function(error, results, fields){
+            if (error) {
+                console.log(error);
+                response.redirect("/error");
+            } else if (results.length > 0) {
+                // Modify each entry to include a flag indicating if creative URLs are available
+                let modifiedResults = results.map(entry => ({
+                    ...entry,
+                    hasCreatives: entry.creative_count > 0
+                }));
+    
+                response.json({
+                    data: modifiedResults
+                });
             } else {
                 response.redirect("/error");
             }
             response.end();
-        })
-    
-    },
-
-    feedbacksingle : (request, response) => {
-
-        var id = request.query.id;
-        console.log("This is the id", id);
-        
-    //    console.log("test: "+id);
-       var query = `SELECT * FROM core_proposals_manager WHERE cpm_id = "${id}"`;
-        // var query = `UPDATE events 
-        // SET M_agenda = "${first_name}",  
-        // WHERE eid = "${id}"`;
-        
-        connection.query(query, function(error, data){
-            console.log(data[0]);
-    
-            response.json(data[0]);
-    
-        })
-    
-    }, 
-
-    feedbackupdate : (request, response) => {
-
-        var id = request.query.id;
-        var updated_feedback = request.query.updated_feedback;
-        //console.log("test: "+id+"//"+updated_feedback);
-        var query = `UPDATE core_proposals_manager 
-        SET proposals_comment = "${updated_feedback}"  
-        WHERE cpm_id = "${id}"`;
-        
-        connection.query(query, function(error, data){
-     
-            response.json(data);
-    
-    
         });
+    },
     
-    },
 
-    fetchcreative : (request , response) =>{
-        // console.log("Request recieved" , request);
+
+    creativefetchsingle: (request, response) => {
         var id = request.query.id;
-        var query = `SELECT * FROM (SELECT core_creative_manager.cpm_id,proposals_event_name,proposals_event_category,proposals_event_date,speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget , creative_url FROM core_proposals_manager,core_creative_manager WHERE core_proposals_manager.cpm_id=core_creative_manager.cpm_id) AS creative WHERE cpm_id="${id}"`;
-        connection.query(query , function(err , data){
-            console.log(data);
-            response.json(data)
-        })
-    },
-
+        var type = request.query.type; // Expect 'photo' or 'video'
+    
+        // Determine the file extension patterns based on the type
+        var patterns = type === 'photo' ? ['%.jpg', '%.png'] : ['%.mp4', '%.avi'];
+    
+        // Correct the query to use parameterized values for better security
+        // This approach also fixes the SQL syntax error by properly using the LIKE operator
+        var query = "SELECT * FROM core_creative_manager WHERE cpm_id = ? AND (creative_heading LIKE ? OR creative_heading LIKE ?) ORDER BY cpm_id DESC;";
+    
+        // Execute the query with parameters
+        connection.query(query, [id, ...patterns], function(err, data) {
+            if (err) {
+                console.error("Error fetching creative content", err);
+                response.status(500).send("Internal Server Error");
+            } else {
+                response.json(data);
+            }
+        });
+    }
+    
+    
+    
 
 
 };

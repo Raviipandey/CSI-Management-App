@@ -12,11 +12,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -87,6 +87,7 @@ public class Technical_form extends AppCompatActivity {
     private TextView name , theme , event_date, speaker,venue, csi_f, ncsi_f, worth_prize, description, cr_budget, pub_budget, guest_budget , tech_req, techFileStatus;
     CheckBox question , internet , software;
     EditText comments;
+    String eventDate;
     LinearLayout comments_layout;
     private LinearLayout checkboxContainer;
     private ArrayList<String> checkboxNames = new ArrayList<>();
@@ -447,7 +448,7 @@ public class Technical_form extends AppCompatActivity {
 
 
     private void showUploadConfirmationDialog(final Uri fileUri) {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setTitle("Confirm Upload");
         builder.setMessage("Do you want to upload the selected file?");
 
@@ -749,17 +750,21 @@ public class Technical_form extends AppCompatActivity {
                         // Log.i("tracking uid","main Activity "+UID);
                         name.setText(jsonObject1.getString("proposals_event_name"));
                         theme.setText(jsonObject1.getString("proposals_event_category"));
-                        event_date.setText(jsonObject1.getString("proposals_event_date"));
+//                        event_date.setText(jsonObject1.getString("proposals_event_date"));
                         speaker.setText(jsonObject1.getString("speaker"));
                         venue.setText(jsonObject1.getString("proposals_venue"));
                         csi_f.setText(jsonObject1.getString("proposals_reg_fee_csi"));
                         ncsi_f.setText(jsonObject1.getString("proposals_reg_fee_noncsi"));
                         worth_prize.setText(jsonObject1.getString("proposals_prize"));
                         description.setText(jsonObject1.getString("proposals_desc"));
-
                         cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
                         pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
                         guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
+
+                        eventDate=jsonObject1.getString("proposals_event_date");
+                        eventDate = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
+                        event_date.setText(eventDate);
+                        Log.i("event tech date: ", eventDate);
 
 //                        addCheckbox(jsonObject1.getString("tasks"));
 
@@ -809,10 +814,7 @@ public class Technical_form extends AppCompatActivity {
                         }
 
 
-                        String eventDate=jsonObject1.getString("proposals_event_date");
-                        if(eventDate!=null)
-                            eventDate = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
-                        event_date.setText(eventDate);
+
                         getSupportActionBar().setTitle(jsonObject1.getString("proposals_event_name"));
                         //Send data to Manager.java starts
                         // Call manager.java file i.e. Activity with navigation drawer activity

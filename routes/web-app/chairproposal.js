@@ -13,7 +13,7 @@ module.exports = {
         console.log(ProposalPath);
 
         if (request.session.userrole === 3) {
-            response.render(ProposalPath);
+            response.render(ProposalPath, {role : session.userrole, rolename: session.rolename});
         } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');

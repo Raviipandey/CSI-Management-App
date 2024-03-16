@@ -8,12 +8,15 @@ const csv = require('fast-csv');
 const fs = require('fs');
 
 const upload = multer({ dest: 'server_uploads/csv_upload' });
+
+const requiredColumns = ['role', 'first_name', 'last_name', 'roll_no', 'mob_no', 'email', 'password', 'branch', 'class_name', 'mem_strt', 'mem_end', 'acad', 'gender'];
+
 module.exports = {
     get: (request, response) => {
         var session = request.session;
         var FeedbackPath = path.join(__dirname, "..", "..", "views", "pages", "addmembers.ejs");
         if (session.userid != null && (session.userrole == 1)) {
-            response.render(FeedbackPath, { role: session.userrole });
+            response.render(FeedbackPath, { role: session.userrole, rolename: session.rolename });
         } else {
             // Redirect the user or send an error message if they don't have the right role
             // res.status(403).send('Access Denied: You do not have permission to view this page.');
@@ -119,13 +122,33 @@ module.exports = {
             } else if (err) {
                 return response.status(500).json(err);
             }
+
+            let validationErrors = [];
     
             const fileRows = [];
             fs.createReadStream(request.file.path)
                 .pipe(csv.parse({ headers: true }))
                 .on('error', error => console.error(error))
-                .on('data', row => fileRows.push(row))
+                .on('data', row => {
+                    const missingColumns = requiredColumns.filter(column => !row[column] || row[column].trim() === '');
+                    if (missingColumns.length > 0) {
+                        validationErrors.push(`Missing or empty required fields: ${missingColumns.join(', ')}`);
+                    } else {
+                        fileRows.push(row);
+                    }
+                })
                 .on('end', () => {
+
+                    if (validationErrors.length > 0) {
+                        // Cleanup uploaded file
+                        fs.unlinkSync(request.file.path);
+                        return response.status(400).json({
+                            success: false,
+                            message: 'Validation errors in uploaded CSV file',
+                            errors: validationErrors
+                        });
+                    }
+                    
                     // Process the fileRows array
                     fileRows.forEach(row => {
                         const { role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name, mem_strt, mem_end, acad, gender } = row;

@@ -15,12 +15,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.provider.Settings;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -84,7 +84,7 @@ public class Publicity extends AppCompatActivity {
     public static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
-    String urole1;
+    String urole1, eventDate;
     LinearLayout pr_lay;
     Button edit_pr, submit_pr;
 //    String eid;
@@ -783,6 +783,8 @@ public class Publicity extends AppCompatActivity {
                         prize.setText(jsonObject1.getString("proposals_prize"));
                         eventDescription.setText(jsonObject1.getString("proposals_desc"));
 
+
+
                         if((int) jsonObject1.get("pr_desk_publicity")==1) {
                             reg_desk.setChecked(true);
                         }
@@ -799,6 +801,11 @@ public class Publicity extends AppCompatActivity {
                         cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
                         pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
                         guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
+
+                        eventDate=jsonObject1.getString("proposals_event_date");
+                        eventDate = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
+                        event_date.setText(eventDate);
+                        Log.i("event tech date: ", eventDate);
 
                         LinearLayout tasksContainer = findViewById(R.id.pub_tasks_container);
                         String tasksString = jsonObject1.getString("tasks");
@@ -840,10 +847,6 @@ public class Publicity extends AppCompatActivity {
                         }
 
 
-
-                        String eventDate=jsonObject1.getString("proposals_event_date");
-                        String date = eventDate.substring(8,10) + "/" + eventDate.substring(5,7) + "/" + eventDate.substring(0,4);
-                        event_date.setText(date);
                         getSupportActionBar().setTitle(jsonObject1.getString("name"));
 
 

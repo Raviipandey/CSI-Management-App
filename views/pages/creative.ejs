@@ -14,16 +14,13 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/icons/favicon-16x16.png">
-  <title>
-    CSI Management App
-  </title>
+  <title>CSI Management App</title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <!-- Nucleo Icons -->
@@ -44,34 +41,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-</head>
 
-<body class="g-sidenav-show   bg-gray-100">
+</head>
+<body class="g-sidenav-show bg-gray-100">
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
     <!--aside bar starts-->
+    <!-- Aside bar content here -->
     <%- include('../templates/asidebar'); %>
     <!--aside bar ends-->
   <main class="main-content position-relative border-radius-lg ">
-    <!-- Navbar -->
-
-      <!-- End Navbar -->
+      <!-- Content here -->
       <div class="container-fluid py-4">
         <div class="row">
           <div class="col-12">
             <div class="card mb-4">
               <div class="card-header pb-0">
-                <h6>Creative Requirement Table</h6>
+                <h6>Event Proposals Table</h6>
               </div>
               <div class="card-body">
                 <div class="table-responsive">
-                  <table class="table table-striped table-bordered" id="creative_data">
+                  <table class="table table-striped table-bordered" id="proposal_data" >
                     <thead>
                       <tr style="vertical-align: middle; text-align: center; color: black;">
                         <th>Event Name</th>
                         <th>Theme</th>
-                        <!-- <th>Agenda</th>
-                              <th>Venue</th> -->
-                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Budget Alloted</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -79,152 +74,112 @@
                   </table>
                 </div>
               </div>
+              <!-- Modal and other content here -->
+              <div class="modal fade" id="mediaModal" tabindex="-1" role="dialog" aria-labelledby="mediaModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="mediaModalLabel">Media Gallery</h5>
+                      <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                      <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button> -->
+                    </div>
+                    <div class="modal-body">
+                      <div id="mediaCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner"></div>
+                        <a class="carousel-control-prev" href="#mediaCarousel" role="button" data-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                          <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#mediaCarousel" role="button" data-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="sr-only">Next</span>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                   
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                
+
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>
-          <!--footer starts-->
-          <%- include('../templates/footer'); %>
-          <!--footer ends-->
-      </div>
-      <style>
-        .modal-custom-size {
-            max-width: 800px; /* Set your preferred max width */
-        }
-    </style>
-      <div class="modal" tabindex="-1" id="action_modal">
-        <div class="modal-dialog modal-custom-size modal-dialog-centered">
-          <div class="modal-content">
-            <form method="get" id="proposal_form">
-              <div class="modal-header" id="dynamic_modal_title">
-                <h5 class="modal-title">Feedback Modal</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <!-- Add your carousel component here -->
-                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
-                  <div class="carousel-inner">
-                    
-                    <!-- Add more carousel items as needed -->
-                  </div>
-                  <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                  </a>
-                  <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                  </a>
-                </div>
-      
-                <div class="mb-3">
-                  <label class="form-label">Feedback</label>
-                  <input type="text" name="first_name" id="first_name" class="form-control" />
-                </div>
-              </div>
-              <div class="modal-footer">
-                <input type="hidden" name="id" id="id" />
-                <input type="hidden" name="action" id="action" value="Add" />
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-light submitreview" id="action_button">Submit Feedback</button>
-              </div>
-            </form>
-          </div>
-        </div>
+         <!--footer starts-->
+         <!-- Footer content here -->
+         <%- include('../templates/footer'); %>
+         <!--footer ends-->
       </div>
   </main>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script> <!-- Not needed for CSV, included for completeness -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script>
     // Script for complete table fetch from mysql starts
-
     $(document).ready(function () {
 
       load_data();
 
-
       function load_data() {
         $.ajax({
-          url: "/feedbackall",
+          url: "/creativefetchall",
           method: "GET",
-          //           data:{action:'fetch'},
           dataType: "JSON",
           success: function (data) {
-            // console.log(data);
+            console.log("fetched");
             var html = '';
             var status_message = '';
+            console.log(data.data[0].proposals_event_name)
 
             if (data.data.length > 0) {
-              //  console.log(data.data.length);
+
               for (var count = 0; count < data.data.length; count++) {
+                let buttonsDisabled = !data.data[count].hasCreatives ? 'disabled' : '';
+              
 
-
-                if (data.data[count].proposals_status == 0) {
-                  status_message = "Approval Pending";
-                  color_type = 'yellow';
-                }
-                else if (data.data[count].proposals_status == 1) {
-                  status_message = "Approved by Chairperson";
-                  color_type = "cyan";
-                }
-                else if (data.data[count].proposals_status == 2) {
-                  status_message = "Approved by SBC";
-                  color_type = 'chartreuse';
-                }
-                else if (data.data[count].proposals_status == 3) {
-                  status_message = "Approved by HOD";
-                  color_type = 'chartreuse';
-                }
-                else if (data.data[count].proposals_status == -1) {
-                  status_message = "Rejected by Chairperson";
-                  color_type = 'chartreuse';
-                }
-                else if (data.data[count].proposals_status == -2) {
-                  status_message = "Rejected by SBC";
-                  color_type = 'chartreuse';
-                }
-                else if (data.data[count].proposals_status == -3) {
-                  status_message = "Rejected By HOD";
-                  color_type = 'red';
-                }
-
-                // var blob = new Blob([data.data[count].description],{type:'text/plain'});
-                // //link.href = URL.createObjectURL(blob);
-
-                //  var reader = new FileReader();
-                //  reader.readAsDataURL(blob);
-
-                // reader.onload = function(){
-                //     alert(reader.result);
-                // }
-
-
-                // console.log(data.data[count].description);
-                // let abc = new Uint32Array(data.data[count].description);
-                // console.log(abc);
-                //  var abc = new Blob([data.data[count].description],{ type: 'text/plain' });
                 html += `
-                             <tr>
-                               
-                                 <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_name + `</td>
-                                 <td style="vertical-align: middle; text-align: center;color: black;">`+ data.data[count].proposals_event_category + `</td>
-                                 <td style="vertical-align: middle; text-align: center;"> <span class="badge badge-sm" style="background-color:`+ color_type + `; color: black;">` + status_message + `</span></td>
-                                 <td style="vertical-align: middle; text-align: center;"><button type="button" class="btn btn-warning btn-sm edit" data-id="`+ data.data[count].cpm_id + `">View poster</button></td>
-                             </tr>
-                             `;
+  <tr>                                      
+    <td style="vertical-align: middle; text-align: center;color: black;">${data.data[count].proposals_event_name}</td>
+    <td style="vertical-align: middle; text-align: center;color: black;">${data.data[count].proposals_event_category}</td>
+    <td style="vertical-align: middle; text-align: center;color: black;">${data.data[count].proposals_desc}</td>
+    <td style="vertical-align: middle; text-align: center;color: black;">${data.data[count].proposals_creative_budget}</td>                                    
+    <td style="vertical-align: middle; text-align: center;">
+                    <button type="button" class="btn btn-primary btn-sm show-photos" data-id="${data.data[count].cpm_id}" ${buttonsDisabled}>Show Photos</button>
+                    <button type="button" class="btn btn-primary btn-sm show-videos" data-id="${data.data[count].cpm_id}" ${buttonsDisabled}>Show Videos</button>
+                </td>
+  </tr>
+`;
+
               }
             }
 
-            // $('#sample_data tbody').html(html);
+
             $('tbody').html(html);
-            $('#creative_data').DataTable({
+
+            // Initialize DataTable here, after data is loaded and table is updated
+            $('#proposal_data').DataTable({
                     "paging": true,
                     "searching": true,
                     "info": true,
                     "ordering": true,
                     "responsive": true,
                     "autoWidth": true,
-                    destroy: true // This ensures DataTables reinitializes
+                    destroy: true, // This ensures DataTables reinitializes
+                    dom: 'Bfrtip',
+                buttons: ['csv']
                 });
-            // console.log(html);
+
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
             console.log("inside AJAX function: Err");
@@ -232,165 +187,78 @@
           }
         });
       }
+
       // Script for complete table fetch from mysql ends
+
       // Script for single row fetch starts
-      $(document).on('click', '.edit', function () {
 
-        var id = $(this).data('id');
-        //alert ("onclick"+id);
+      $(document).ready(function () {
+    load_data(); // Call your function to load and display the data
 
-        $('#dynamic_modal_title').text('Event Proposal');
-
-        $('#action').val('Edit');
-
-        // $('#action_button').text('Edit');
-
-        $('#action_modal').modal('show');
-
-        $.ajax({
-          url: "/feedbacksingle",
-          method: "GET",
-          data: { id: id },
-          dataType: "JSON",
-          success: function (data) {
-            // console.log(data);
-            $('#first_name').val(data.proposals_comment);
-            $('#id').val(data.cpm_id);
-          },
-          error: function (XMLHttpRequest, textStatus, errorThrown) {
-            console.log("inside AJAX function: Err");
-            alert("Status: " + textStatus); alert("Error: " + errorThrown);
-          }
-
-        });
-
-      });
-      // Script for single row fetch ends
-
-
-      //Script for update starts
-      $(document).on('click', '.submitreview', function () {
-
-        var id = $('#id').val();
-        var first_name = $('#first_name').val();
-        // $('#dynamic_modal_title').text('Event Proposal for feedback');
-
-        // $('#action').val('submitreview');
-
-        // $('#action_button').text('Submit Feedback');
-
-        // $('#action_modal').modal('show');
-
-        $.ajax({
-          url: "/feedbackupdate",
-          method: "GET",
-          data: { id: id, updated_feedback: first_name },
-          dataType: "JSON",
-          success: function (data) {
-
-            alert("Feedback Updated Successfully");
-            // console.log(data);
-            // $('#first_name').val(data.M_agenda);
-            // $('#id').val(data.eid);
-          },
-          error: function (XMLHttpRequest, textStatus, errorThrown) {
-            console.log("inside AJAX function: Err");
-            alert("Status: " + textStatus); alert("Error: " + errorThrown);
-          }
-
-        });
-
-      });
-      //Script for update ends                               
-    });                           
-  </script>
-  <script>
-    $(document).on('click', '.edit', function () {
-        var id = $(this).data('id');
-
-        $.ajax({
-            url: "/fetchcreative",
-            method: "GET",
-            data: { id: id },
-            dataType: "JSON",
-            success: function (creativeData) {
-                console.log(creativeData);
-                // Update modal title
-                $('#dynamic_modal_title').text('Event Proposal - ' + creativeData[0].proposals_event_name);
-
-                // Update feedback input field
-                $('#first_name').val(creativeData[0].proposals_comment);
-
-                // Update carousel content
-                updateCarousel(creativeData);
-
-                // Update hidden input field for id
-                $('#id').val(creativeData[0].cpm_id);
-
-                // Show the modal
-                $('#action_modal').modal('show');
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log("Error fetching creative data: " + textStatus);
-                alert("Error fetching creative data: " + errorThrown);
-            }
-        });
+    // Event delegation for dynamically added buttons
+    $('body').on('click', '.show-photos', function() {
+        var cpmId = $(this).data('id');
+        fetchAndShowMedia(cpmId, 'photo');
     });
 
-    // Function to update the carousel content
-    function updateCarousel(creativeData) {
-        var carouselInner = $('#imageCarousel .carousel-inner');
-        carouselInner.empty(); // Clear existing carousel items
+    $('body').on('click', '.show-videos', function() {
+        var cpmId = $(this).data('id');
+        fetchAndShowMedia(cpmId, 'video');
+    });
 
-        // Add new carousel items based on creativeData
-        for (var i = 0; i < creativeData.length; i++) {
-            var activeClass = i === 0 ? 'active' : ''; // Set 'active' class for the first item
-
-            var mediaContent = '';
-
-            if (creativeData[i].creative_url.endsWith('.mp4')) {
-                mediaContent = `
-                    <video class="d-block w-100" controls>
-                        <source src="${creativeData[i].creative_url}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>`;
-            } else {
-                mediaContent = `<img src="${creativeData[i].creative_url}" class="d-block w-100" alt="Image ${i + 1}">`;
-            }
-
-            var carouselItem = `
-                <div class="carousel-item ${activeClass}">
-                    ${mediaContent}
-                </div>`;
-
-            carouselInner.append(carouselItem);
+    function fetchAndShowMedia(cpmId, type) {
+        $.ajax({
+            url: "/creativefetchsingle?id=" + cpmId + "&type=" + type,
+            method: "GET",
+            success: function(data) {
+    var itemsHtml = '';
+    for (var i = 0; i < data.length; i++) {
+        var activeClass = i === 0 ? 'active' : '';
+        if (type === 'photo') {
+            itemsHtml += `<div class="carousel-item ${activeClass}">
+                <img class="d-block w-100" src="${data[i].creative_url}" alt="Media">
+            </div>`;
+        } else if (type === 'video') {
+            itemsHtml += `<div class="carousel-item ${activeClass}">
+                <video class="d-block w-100" controls>
+                    <source src="${data[i].creative_url}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>`;
         }
     }
-</script>
+    $('#mediaCarousel .carousel-inner').html(itemsHtml);
+    $('#mediaModal').modal('show');
+},
 
-    <!-- jQuery -->
+            error: function(error) {
+                console.log("Error fetching media", error);
+            }
+        });
+    }
+});
+
+
+
+
+
+    });
+
+  </script>
+
+      <!-- jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <!-- DataTables JS -->
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+
+
 
   <!--   Core JS Files   -->
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-  <script>
-    var win = navigator.platform.indexOf('Win') > -1;
-    if (win && document.querySelector('#sidenav-scrollbar')) {
-      var options = {
-        damping: '0.5'
-      }
-      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-    }
-  </script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
-</body>
 
+</body>
 </html>
