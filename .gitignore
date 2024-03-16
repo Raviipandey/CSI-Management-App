@@ -2,5 +2,3 @@ node_modules
 ./serverconfig.js
 Database
 tmp_uploads
-csiapp.jks
-encoded_keystore.b64
