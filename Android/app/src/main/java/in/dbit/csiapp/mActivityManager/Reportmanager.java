@@ -44,6 +44,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -53,15 +54,17 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 public class Reportmanager extends AppCompatActivity {
 
     PDFView pdfView;
 
 //    private static final String PDF_URL = "http://192.168.1.101:9000/server_uploads/reports/1_Mumbai%20Hackathon_report.pdf";
     private static final String FILE_NAME = "report.pdf";
+    private SharedPreferenceConfig preferenceConfig;
 
 
-    String eName;
+    String eName , urole;
     String eid;
 
     FloatingActionButton uploadreport;
@@ -78,6 +81,8 @@ public class Reportmanager extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report_manager);
         getSupportActionBar().setTitle("Report");
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        urole = preferenceConfig.readRoleStatus();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
@@ -213,14 +218,20 @@ public class Reportmanager extends AppCompatActivity {
                 // Report exists, show download button
                 noreport.setVisibility(View.INVISIBLE);
                 download.show();
-                deletereport.show();
+
+                if(urole.equals("Documentation Head")){
+                    deletereport.show();
+                }
+
                 filename = result[0];
                 downloadurl = result[1];
                 new DownloadPdfTask().execute(downloadurl);
 
             } else {
                 // Report doesn't exist, show upload button
-                uploadreport.show();
+                if(urole.equals("Documentation Head")){
+                    uploadreport.show();
+                }
             }
         }
     }
@@ -406,6 +417,15 @@ public class Reportmanager extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        // TODO Auto-generated method sub
+        int id= item.getItemId();
+        if (id == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
 }
