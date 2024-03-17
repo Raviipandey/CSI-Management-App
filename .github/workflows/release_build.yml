@@ -28,7 +28,7 @@ jobs:
         run: cd Android && ./gradlew assembleDebug --stacktrace
     
       - name: Upload APK
-        uses: actions/upload-artifact@v2  # Using v2 for the upload step
+        uses: actions/upload-artifact@v2
         with:
           name: apk
           path: Android/app/build/outputs/apk/debug/app-debug.apk
@@ -39,10 +39,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download APK from build
-        uses: actions/download-artifact@v2  # Ensure to use v2 for consistency
+        uses: actions/download-artifact@v2
         with:
           name: apk
-          
+      
+      # This is the added step to help you find the APK
+      - name: List contents after download
+        run: ls -R
+      
       - name: Verify APK Presence
         run: |
           if [ -f Android/app/build/outputs/apk/debug/app-debug.apk ]; then
