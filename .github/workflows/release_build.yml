@@ -43,13 +43,11 @@ jobs:
         with:
           name: apk
       
-      # This is the added step to help you find the APK
-      - name: List contents after download
-        run: ls -R
+      # Removed the listing step as we now know the APK is in the root
       
       - name: Verify APK Presence
         run: |
-          if [ -f Android/app/build/outputs/apk/debug/app-debug.apk ]; then
+          if [ -f app-debug.apk ]; then
             echo "APK exists, proceeding with release."
           else
             echo "APK does not exist, halting workflow."
@@ -61,6 +59,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: Android/app/build/outputs/apk/debug/app-debug.apk
+          files: app-debug.apk  # Adjusted to reflect the correct path
           tag_name: ${{ github.ref_name }}
           release_name: ${{ github.event.repository.name }} v${{ github.ref_name }}
