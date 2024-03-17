@@ -1,47 +1,56 @@
 name: Build and Release
 
 on:
- push:
-   branches:
-     - main
-   tags:
-     - "v*"
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
 
 jobs:
- apk:
-   name: Generate APK
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout
-       uses: actions/checkout@v4
-     - name: Setup JDK
-       uses: actions/setup-java@v4
-       with:
-         distribution: adopt
-         java-version: "8"
-     - name: Set execution flag for gradlew
-       run: chmod +x Android/gradlew
-     - name: Build APK
-       run: cd Android && ./gradlew assembleDebug --stacktrace
+  apk:
+    name: Generate APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: adopt
+          java-version: "8"
+      
+      - name: Set execution flag for gradlew
+        run: chmod +x Android/gradlew
+      
+      - name: Build APK
+        run: cd Android && ./gradlew assembleDebug --stacktrace
     
-     - name: Upload APK
-       uses: actions/upload-artifact@v1
-       with:
-         name: apk
-         path: Android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v2  # Using v2 for the upload step
+        with:
+          name: apk
+          path: Android/app/build/outputs/apk/debug/app-debug.apk
 
- release:
+  release:
     name: Release APK
     needs: apk
     runs-on: ubuntu-latest
     steps:
       - name: Download APK from build
-        uses: actions/download-artifact@v2  # Switched to v2
+        uses: actions/download-artifact@v2  # Ensure to use v2 for consistency
         with:
           name: apk
           
-      - name: List files to verify APK path
-        run: ls -R Android/app/build/outputs/apk/debug/
+      - name: Verify APK Presence
+        run: |
+          if [ -f Android/app/build/outputs/apk/debug/app-debug.apk ]; then
+            echo "APK exists, proceeding with release."
+          else
+            echo "APK does not exist, halting workflow."
+            exit 1
+          fi
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
