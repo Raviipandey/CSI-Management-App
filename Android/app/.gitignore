@@ -1,4 +1,9 @@
 /build
-node_modules
+node_modules/
+Android/app/build
+Android/app/release
 tmp_uploads
 server_uploads
+.github
+csiapp.jks
+encoded_keystore.b64
