@@ -70,7 +70,7 @@ var proposal=require('./routes/core_proposal.js');
 var creative=require('./routes/core_creative.js');
 var publicity=require('./routes/core_publicity.js');
 var technical=require("./routes/core_technical.js");
-var report=require("./routes/report.js");
+var reports=require("./routes/core_reports.js");
 const featured_img = require("./routes/featured_img.js")
 const galleryRouter = require('./gallery.js');
 
@@ -79,6 +79,7 @@ app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images
 
 const uploadsPath = path.join(__dirname, 'server_uploads');
 app.use('/galleryimages', express.static(path.join(uploadsPath, 'gallery')));
+app.use('/reporttemplate', express.static(path.join(__dirname, 'report_template')));
 
 
 app.use('/login',login);
@@ -90,7 +91,7 @@ app.use('/proposal',proposal);
 app.use('/creative',creative);
 app.use('/publicity',publicity);
 app.use('/technical',technical);
-app.use('/report',report);
+app.use('/reports',reports); //new report route
 app.use('/images', featured_img);
 app.use('/gallery', galleryRouter);
 

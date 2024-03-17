@@ -88,6 +88,9 @@
             android:name="in.dbit.csiapp.Prompts.AddMinute"
             android:theme="@style/AppTheme2" />
 
+        <activity android:name=".mActivityManager.Reportmanager"
+            android:theme="@style/AppTheme2"/>
+
 
         <activity
             android:name="in.dbit.csiapp.Prompts.MainActivity"
@@ -99,7 +102,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <service android:name=".Notificationservice" android:exported="false">-->
+
+
+        <!--        <service android:name=".Notificationservice" android:exported="false">-->
 <!--            <intent-filter>-->
 <!--                <action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
 <!--            </intent-filter>-->

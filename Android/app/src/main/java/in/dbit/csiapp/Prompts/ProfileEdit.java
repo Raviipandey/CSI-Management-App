@@ -209,6 +209,7 @@ public class ProfileEdit extends AppCompatActivity {
             Uri selectedImageUri = data.getData();
             String filePath = getRealPathFromURI(selectedImageUri);
             String fileName = getFileNameFromUri(selectedImageUri);
+
             uploadImageToServer(filePath, fileName);
         }
     }

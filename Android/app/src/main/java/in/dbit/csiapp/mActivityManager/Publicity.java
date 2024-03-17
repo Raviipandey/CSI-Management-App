@@ -258,7 +258,6 @@ public class Publicity extends AppCompatActivity {
     }
 
 
-
     public static class ApiRequestTask extends AsyncTask<Void, Void, String[]> {
 
         private final Context context;
@@ -330,7 +329,6 @@ public class Publicity extends AppCompatActivity {
             return null;
         }
     }
-
 
     private void handleFileExistence(String filename, String url) {
         tvFileStatus.setVisibility(View.GONE); // Hide the status message
@@ -404,8 +402,6 @@ public class Publicity extends AppCompatActivity {
                             }
                         }
                     }
-
-
 
                     @Override
                     public void onFailure(Call call, IOException e) {

@@ -28,12 +28,28 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_report"
             android:layout_width="match_parent"
-            android:layout_height="709dp"
-            android:layout_alignParentTop="true"
-            android:visibility="gone"
-            android:layout_alignParentBottom="true">
+            android:layout_height="match_parent"
+            android:layout_above="@id/downloadtemplate">
 
         </androidx.recyclerview.widget.RecyclerView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/downloadtemplate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/circular_button_background"
+            android:backgroundTint="@color/colorPrimary"
+            android:contentDescription="Download template Button"
+            android:cropToPadding="false"
+            android:padding="10dp"
+            app:srcCompat="@drawable/baseline_sim_card_download_24"
+            android:layout_alignParentRight="true" />
+
     </RelativeLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
