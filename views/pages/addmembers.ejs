@@ -91,17 +91,19 @@
                               <div class="modal-content">
                                 <div class="modal-header" id="dynamic_modal_title">Note</div>
                                 <div class="modal-body">
-                                  <ul>
+
+                                  <h5>Please do not change the column names!</h5>
+                                  <!-- <ul> -->
                                     
-                                      <ul>
-                                          <li>Please do not change the column names</li>
-                                          <li>mem_start (membership start) and mem_end (membership end) should be added in yyyy-mm-dd format</li>
+                                      <!-- <ul> -->
+                                          <!-- <li</li> -->
+                                          <!-- <li>mem_start (membership start) and mem_end (membership end) should be added in yyyy-mm-dd format</li>
                                           <li>Academic year should be mentioned in yy-yy format (eg: 22-23) in the acad column</li>
                                           <li>class_name column has to be filled with the year of the student (eg: TE, BE)</li>
                                           <li>In gender column enter either 'female' or 'male' (with no capital letters)</li>
-                                          <li>In role column, the role_id should be added (refer to the role id below)</li>
-                                      </ul>
-                                      <li>Role IDs:</li>
+                                          <li>In role column, the role_id should be added (refer to the role id below)</li> -->
+                                      <!-- </ul> -->
+                                      <!-- <li>Role IDs:</li>
                                       <ul>
                                           <li>3-Chairperson</li>
                                           <li>4-Vice Chairperson</li>
@@ -113,8 +115,8 @@
                                           <li>10-Secretary</li>
                                           <li>11-Documentation Head</li>
                                           <li>12-Test Login</li>
-                                      </ul>
-                                  </ul>
+                                      </ul> -->
+                                  <!-- </ul> -->
                               </div>
                               
                                   <div class="modal-footer">
@@ -304,41 +306,58 @@
 });
 
   </script>
-  <script>
-    document.getElementById('csv').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        
-        fetch('/uploadcsv', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success) {
-                alert(data.message); // Display an alert box with the success message
-                window.location.reload(); // Optionally reload the page or redirect
-            } else {
-                // Check if the server responded with detailed error messages and display them
-                if (data.errors && data.errors.length > 0) {
-                    let errorMessage = 'Failed to process CSV file. Please correct the following errors:\n';
-                    errorMessage += data.errors.join('\n');
-                    alert(errorMessage);
-                } else {
-                    // Fallback error message if no detailed errors are provided
-                    alert(data.message || 'Failed to process CSV file.');
-                }
-                document.getElementById('csvFile').value = '';
-            }
-        })
-        .catch(error => {
+<script>
+  document.getElementById('csv').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('/uploadcsv', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Attempt to parse the response body as JSON to extract error messages
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if(data.success) {
+            alert(data.message); // Success message
+            window.location.reload(); // Optionally reload or redirect
+        } else {
+            displayErrors(data); // Handle application-level errors
+        }
+    })
+    .catch(error => {
+        // Check if the error object contains detailed errors and display them
+        if (error.errors && error.errors.length > 0) {
+            let errorMessage = 'Failed to process CSV file. Please correct the following errors:\n';
+            errorMessage += error.errors.join('\n');
+            alert(errorMessage);
+        } else {
+            // Fallback to a generic error message
             console.error('Error:', error);
-            alert('An error occurred while uploading the file.');
-            // Optionally clear the file input in case of fetch error
-        document.getElementById('csvFile').value = '';
-        });
+            alert(error.message || 'An error occurred while uploading the file.');
+        }
+        document.getElementById('csvFile').value = ''; // Reset file input
     });
+});
+
+function displayErrors(data) {
+    let errorMessage = 'Failed to process CSV file.';
+    if (data.errors && data.errors.length > 0) {
+        errorMessage += ' Please correct the following errors:\n' + data.errors.join('\n');
+    } else {
+        errorMessage += ' ' + (data.message || 'Please try again.');
+    }
+    alert(errorMessage);
+    document.getElementById('csvFile').value = ''; // Reset file input
+}
+
 </script>
+
 
     
   <script>

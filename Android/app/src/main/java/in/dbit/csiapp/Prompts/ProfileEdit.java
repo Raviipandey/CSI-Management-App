@@ -70,10 +70,13 @@ public class ProfileEdit extends AppCompatActivity {
 
     private String getFileNameFromUri(Uri uri) {
         String result = null;
-        if (uri.getScheme().equals("content")) {
+        if ("content".equals(uri.getScheme())) {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    int columnIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (columnIndex != -1) { // Check if the column index is valid
+                        result = cursor.getString(columnIndex);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -81,13 +84,14 @@ public class ProfileEdit extends AppCompatActivity {
         }
         if (result == null) {
             result = uri.getPath();
-            int cut = result.lastIndexOf('/');
+            int cut = result != null ? result.lastIndexOf('/') : -1;
             if (cut != -1) {
                 result = result.substring(cut + 1);
             }
         }
         return result;
     }
+
 
 //    private void uploadImageToServer(String filePath, String fileName) {
 //
