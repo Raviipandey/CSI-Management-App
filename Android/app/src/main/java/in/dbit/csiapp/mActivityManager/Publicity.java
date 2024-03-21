@@ -28,6 +28,7 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -105,7 +106,9 @@ public class Publicity extends AppCompatActivity {
 
     private static final String TAG = "YourActivity";
 
-    private Button selectFileButton, deleteButton;
+    private Button selectFileButton;
+    private ImageButton deleteButton;
+    private ImageButton downloadButton;
     private String currentFileName = null;
 
     private Button downloadButtonForOthers;
@@ -128,7 +131,8 @@ public class Publicity extends AppCompatActivity {
         checkboxContainer = findViewById(R.id.pub_checkbox_container);
 //        Toast.makeText(Publicity.this,"role: "+urole1,Toast.LENGTH_SHORT).show();
 //        Log.i("volleyABC ", urole1);
-        Button downloadButton = findViewById(R.id.download_button);
+        deleteButton = findViewById(R.id.delete_button);
+        downloadButton = findViewById(R.id.download_button);
 
         eventName = (TextView) findViewById(R.id.name_pl);
         tvFileStatus = findViewById(R.id.tvFileStatus);
@@ -167,7 +171,7 @@ public class Publicity extends AppCompatActivity {
 
         }
 
-        Button pub_add_checkbox = findViewById(R.id.pub_add_checkbox_button);
+        ImageButton pub_add_checkbox = (ImageButton) findViewById(R.id.pub_add_checkbox_button);
 
         if (urole1.equals("PR Head")) {
             edit_pr.setVisibility(View.VISIBLE);
@@ -333,7 +337,7 @@ public class Publicity extends AppCompatActivity {
     private void handleFileExistence(String filename, String url) {
         tvFileStatus.setVisibility(View.GONE); // Hide the status message
         selectFileButton.setEnabled(false); // Disable the select file button
-        Button downloadButton = findViewById(R.id.download_button);
+        downloadButton = findViewById(R.id.download_button);
         downloadButton.setVisibility(View.VISIBLE); // Show the download button
 
         if ("PR Head".equalsIgnoreCase(urole1)) {
@@ -416,7 +420,7 @@ public class Publicity extends AppCompatActivity {
     private void handleFileNotFound(String error) {
         // File not found, update UI accordingly
         // Enable the select file button or take appropriate action
-        Button downloadButton = findViewById(R.id.download_button);
+        downloadButton = findViewById(R.id.download_button);
         selectFileButton.setEnabled(true);
         deleteButton.setVisibility(View.GONE);
         downloadButton.setVisibility(View.GONE);
@@ -603,7 +607,7 @@ public class Publicity extends AppCompatActivity {
                         @Override
                         public void run() {
                             selectFileButton.setEnabled(false); // Disable the select file button
-                            Button downloadButton = findViewById(R.id.download_button);
+                            downloadButton = findViewById(R.id.download_button);
                             downloadButton.setVisibility(View.VISIBLE); // Show the download button
                             downloadButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -729,6 +733,15 @@ public class Publicity extends AppCompatActivity {
 
         CheckBox checkBox = new CheckBox(this);
         checkBox.setText(name);
+        checkBox.setTextColor(getResources().getColor(R.color.colorPrimary)); // Set text color
+        checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20); // Set text size
+        checkBox.setPadding(checkBox.getPaddingLeft(), 10, checkBox.getPaddingRight(), 10); // Set padding
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(20, 10, 20, 10); // Set margins (start, top, end, bottom)
+        checkBox.setLayoutParams(params);
         checkboxContainer.addView(checkBox);
         checkBoxList.add(checkBox);
 
@@ -772,7 +785,8 @@ public class Publicity extends AppCompatActivity {
                         eventName.setText(jsonObject1.getString("proposals_event_name"));
                         eventTheme.setText(jsonObject1.getString("proposals_event_category"));
 
-                        speaker.setText(jsonObject1.getString("speaker"));
+//                        speaker.setText(jsonObject1.getString("speaker"));
+                        speaker.setText(getValueOrPlaceholder(jsonObject1, "speaker", "Not available"));
                         venue.setText(jsonObject1.getString("proposals_venue"));
                         fee_csi.setText(jsonObject1.getString("proposals_reg_fee_csi"));
                         fee_non_csi.setText(jsonObject1.getString("proposals_reg_fee_noncsi"));
@@ -790,10 +804,23 @@ public class Publicity extends AppCompatActivity {
                         }
                         else inclass_pub.setChecked(false);
 
-                        target_aud.setText(jsonObject1.getString("pr_member_count"));
-                        comments.setText(jsonObject1.getString("pr_comment"));
-                        money_c.setText(jsonObject1.getString("pr_rcd_amount"));
-                        money_s.setText(jsonObject1.getString("pr_spent"));
+//                        target_aud.setText(jsonObject1.getString("pr_member_count"));
+                        String targetAudience = jsonObject1.optString("pr_member_count", "");
+                        target_aud.setText(targetAudience.isEmpty() || "null".equals(targetAudience) ? "" : targetAudience);
+
+//                        comments.setText(jsonObject1.getString("pr_comment"));
+
+                        String commentsText = jsonObject1.optString("pr_comment", "");
+                        comments.setText(commentsText.isEmpty() || "null".equals(commentsText) ? "" : commentsText);
+
+                        String moneycText = jsonObject1.optString("pr_rcd_amount", "");
+                        money_c.setText(moneycText.isEmpty() || "null".equals(moneycText) ? "" : moneycText);
+
+//                        money_c.setText(jsonObject1.getString("pr_rcd_amount"));
+                        String moneysText = jsonObject1.optString("pr_spent", "");
+                        money_s.setText(moneysText.isEmpty() || "null".equals(moneysText) ? "" : moneysText);
+
+//                        money_s.setText(jsonObject1.getString("pr_spent"));
                         cr_budget.setText(jsonObject1.getString("proposals_creative_budget"));
                         pub_budget.setText(jsonObject1.getString("proposals_publicity_budget"));
                         guest_budget.setText(jsonObject1.getString("proposals_guest_budget"));
@@ -893,6 +920,10 @@ public class Publicity extends AppCompatActivity {
 //        return ret[0];
 
 
+    }
+
+    private String getValueOrPlaceholder(JSONObject jsonObject, String key, String placeholder) {
+        return jsonObject.isNull(key) ? placeholder : jsonObject.optString(key, placeholder);
     }
 
     public void volley_send(){

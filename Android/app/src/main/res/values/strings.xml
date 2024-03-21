@@ -1,7 +1,7 @@
 <resources>
-<!--    <string name="server_url">http://192.168.29.217:9000</string>-->
+    <string name="server_url">http://192.168.0.104:9000</string>
 <!--    <string name="gallery_url">http://165.232.181.152:9091</string>-->
-    <string name="server_url">https://csiapp.dbit.in</string>
+<!--    <string name="server_url">https://csiapp.dbit.in</string>-->
 <!--    <string name="gallery_url">http://192.168.0.104:9091</string>-->
     <string name="app_name">CSI-DBIT</string>
     <string name="title_activity_minutes_list">MinutesList</string>
@@ -16,6 +16,10 @@
     <string name="title_activity_history">History</string>
     <string name="title_activity_attendance">Attendance</string>
     <string name="title_activity_minute_manager">MinuteManager</string>
+    <string name="add_tasks">Add Tasks</string>
+    <string name="delete_pdf">Delete the pdf</string>
+    <string name="download_pdf">Download the pdf</string>
+
 
     <string name="login_preference">com.example.csi_login_preference</string>
 

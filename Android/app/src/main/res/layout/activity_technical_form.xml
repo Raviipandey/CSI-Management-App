@@ -396,12 +396,104 @@
                     android:textSize="17sp" />
             </LinearLayout>
 
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/tech_pl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_margin="0dp"
+                android:background="#EDEDED" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="10dp"
+                android:text="TECH DOC. UPLOAD"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_margin="0dp"
                 android:background="#EDEDED" />
-        </LinearLayout>
+
+            <TextView
+                android:id="@+id/techFileStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Note: Expense file not uploaded yet (Max file size: 10 mb)"
+                android:visibility="visible"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="10dp"
+                android:paddingBottom="10dp"
+                android:layout_gravity="left"/>
+
+            <Button
+                android:id="@+id/tech_select_file_button"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Select File"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:background="@drawable/ripple_effect"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/tech_select_file_button">
+
+                <ImageButton
+                    android:id="@+id/tech_delete_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_delete_24"
+                    android:tint="@color/colorPrimary"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="gone"
+
+                    android:contentDescription="@string/delete_pdf" />
+
+                <ImageButton
+                    android:id="@+id/tech_download_button"
+                    android:layout_width="wrap_content"
+                    android:tint="@color/colorPrimary"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/baseline_download_24"
+
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="invisible"
+                    android:contentDescription="@string/download_pdf"
+                    android:layout_marginLeft="15dp" />
+
+
+
+            </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp"
+            android:background="#EDEDED" />
 
         <LinearLayout
             android:id="@+id/linear_layout"
@@ -434,8 +526,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:enabled="false"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+
                 android:text="Question Setting"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
@@ -447,8 +538,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:enabled="false"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+
                 android:text="Internet Availability"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
@@ -460,8 +550,8 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:enabled="false"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+
+
                 android:text="Softwares Installed"
                 android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
@@ -471,10 +561,10 @@
             android:id="@+id/checkbox_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:paddingBottom="10dp"
+
             android:textColor="@color/colorPrimary"
             android:orientation="vertical">
         </LinearLayout>
@@ -493,19 +583,21 @@
             android:textSize="20sp"/>
 
 
-        <Button
+        <ImageButton
             android:id="@+id/add_checkbox_button"
-            android:visibility="gone"
-            android:text="Add Tasks"
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:src="@drawable/baseline_format_list_bulleted_add_24"
+            android:contentDescription="@string/add_tasks"
+            android:background="?android:selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
             android:layout_gravity="left"
             android:layout_marginVertical="20dp"
-
-            android:textColor="@color/black"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:visibility="gone"/>
+
 
 
         <LinearLayout
@@ -518,14 +610,14 @@
             android:visibility="gone"
             >
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20sp"
-                android:text="Comments"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="@color/colorAccent"/>
+<!--            <TextView-->
+<!--                android:layout_width="fill_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:paddingLeft="20sp"-->
+<!--                android:text="Comments"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textColor="@color/colorAccent"/>-->
 
             <EditText
                 android:id="@+id/comment_t"
@@ -544,7 +636,7 @@
                 android:scrollbars="vertical"
                 android:scrollbarSize="5dp"
                 android:paddingRight="15dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:gravity="start"
                 android:layout_marginLeft="20dp"
                 android:layout_marginStart="20dp"
@@ -557,7 +649,7 @@
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="251dp"
                 android:layout_height="wrap_content"
-                android:text="Click To Update The Tasks "
+                android:text="Update Tasks "
                 android:visibility="visible"
                 android:layout_gravity="center"
                 android:layout_marginVertical="20dp"
@@ -566,80 +658,9 @@
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/tech_pl"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_margin="0dp"
-                    android:background="#EDEDED" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginVertical="10dp"
-                    android:text="TECH DOC. UPLOAD"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/techFileStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Note: Expense file not uploaded yet (Max upload size: 10 mb)"
-                    android:visibility="visible"
-                    android:textColor="@color/colorPrimary"
-                    android:paddingLeft="10dp"
-                    android:paddingBottom="10dp"
-                    android:layout_gravity="left"/>
-
-                <Button
-                    android:id="@+id/tech_select_file_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="Select File" />
+        </LinearLayout>
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/tech_select_file_button">
-
-                    <Button
-                        android:id="@+id/tech_delete_button"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:background="@drawable/ripple_effect"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:text="Delete File"
-                        android:visibility="gone" />
-
-                    <Button
-                        android:id="@+id/tech_download_button"
-                        android:layout_width="100dp"
-                        android:layout_marginStart="15dp"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:background="@drawable/ripple_effect"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:text="Download"
-                        android:visibility="invisible" />
-
-                </LinearLayout>
-            </LinearLayout>
 
 
 
