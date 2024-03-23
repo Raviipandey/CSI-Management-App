@@ -3,6 +3,8 @@ package in.dbit.csiapp.mActivityManager;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -25,7 +27,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mFragments.datePickerFrag;
 import in.dbit.csiapp.mFragments.datePickerFrag_min;
 
@@ -35,14 +40,21 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Proposal extends AppCompatActivity {
+
+    private SharedPreferenceConfig preferenceConfig;
     String date = null;
     String edate = null;
     String three_track = null;
     EditText description;
     String selectedoption;
+
+    String uname;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +73,16 @@ public class Proposal extends AppCompatActivity {
         description.setMovementMethod(new ScrollingMovementMethod());
         getSupportActionBar().setTitle("Add Proposal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        Intent intent = getIntent();
+
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
+
+//        fcmtoken = intent.getStringExtra(MainActivity.EXTRA_FCMTOKEN);
+//        fcmtoken= preferenceConfig.fetchfcmtoken();
+
+//        fcmtoken = "fnl1bEjUS3idaXa8MniKIv:APA91bENrfM12zxGMGnWZRlCdlbZ9iqAbIvJ0zuV3eqtRVSiLckiE0Fs-p5qFrA1XaNg6KJ2JbmM4B45cXUNRxKiSG2WrZaA4Z-a3VBAyCZlj6QR8pZfPuEQ6aWq-RFI4-DyLpgYgTBB";
         Button submit = findViewById(R.id.submit_praposal);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,6 +170,81 @@ public class Proposal extends AppCompatActivity {
             }
         });
     }
+
+    // Method to fetch all FCM tokens from the server
+    private void fetchAllTokens() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        // Call the method to send notification for each FCM token
+                        sendNotification(fcmToken);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+
+
+
+    // Method to send notification after successful proposal submission
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "New Proposal Added");
+            notificationBody.put("body", "A new proposal has been added by" + uname);
+            notification.put("notification", notificationBody);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+
 
     DatePickerDialog.OnDateSetListener onDate = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -461,6 +558,8 @@ public class Proposal extends AppCompatActivity {
         }
 
 
+
+
     }
 
 
@@ -486,6 +585,7 @@ public class Proposal extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         sendData(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/createproposal",jsonobject,1);
+                        fetchAllTokens();
                         finish();
 
                     }

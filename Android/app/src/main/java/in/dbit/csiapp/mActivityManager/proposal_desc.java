@@ -20,14 +20,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class proposal_desc extends AppCompatActivity {
 
@@ -35,8 +39,10 @@ public class proposal_desc extends AppCompatActivity {
     EditText comment_e;
     TextView comment_t;
 
+    public String urole1;
+
     private SharedPreferenceConfig preferenceConfig;
-    String eid;
+    String eid , uname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +57,11 @@ public class proposal_desc extends AppCompatActivity {
 
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
-        String urole1=preferenceConfig.readRoleStatus();
+        urole1=preferenceConfig.readRoleStatus();
+
+        Intent intent = getIntent();
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
 //      Toast.makeText(proposal_desc.this,urole1,Toast.LENGTH_SHORT).show();
 
         eid = getIntent().getStringExtra(praposal_recycler.eid);
@@ -94,11 +104,13 @@ public class proposal_desc extends AppCompatActivity {
                                       if(urole1.equals("HOD")) {
                                           customDialog("The Proposal is Approved","3");
 
-//                                          //if sbc then 2 if hod 3
                                       }
                                       else if(urole1.equals("SBC")) customDialog("The Proposal will be Forwarded to HOD","2");
 //                                          //if sbc then 2 if hod 3
-                                      else if(urole1.equals("Chairperson")) customDialog("The Proposal will be Forwarded to SBC","1");
+                                      else if(urole1.equals("Chairperson")) {
+                                          customDialog("The Proposal will be Forwarded to SBC","1");
+
+                                      }
 
                                   }
                               });
@@ -123,6 +135,88 @@ public class proposal_desc extends AppCompatActivity {
         }
         );
     }
+
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "Proposal Accepted");
+            notificationBody.put("body", "The recent proposal has been accepted by chairperson");
+            notification.put("notification", notificationBody);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    // Method to fetch FCM tokens from the server
+    private void fetchFCMTokensFromServer() {
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/getalltoken";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // Handle the response and obtain FCM tokens
+                handleFCMTokensResponse(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error response
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    // Method to handle FCM tokens response
+    private void handleFCMTokensResponse(String response) {
+        // Parse the response and obtain FCM tokens
+        try {
+            JSONArray tokensArray = new JSONArray(response);
+            for (int i = 0; i < tokensArray.length(); i++) {
+                String token = tokensArray.getString(i);
+                sendNotification(token);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     void get_data(String url , String flag , String status) {
         JSONObject jsonObject = new JSONObject();
 
@@ -240,7 +334,7 @@ public class proposal_desc extends AppCompatActivity {
         get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/viewproposal","0","0");
     }
 
-    public void customDialog(String message , String st){
+    public void customDialog(String message, String st) {
         final androidx.appcompat.app.AlertDialog.Builder builderSingle = new androidx.appcompat.app.AlertDialog.Builder(proposal_desc.this);
         //builderSingle.setIcon(R.drawable.ic_notification);
         builderSingle.setTitle("NOTE");
@@ -260,18 +354,24 @@ public class proposal_desc extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/status","1",st );
-
-//                        finish();
+                        get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/status", "1", st);
+                        if (urole1.equals("Chairperson") && st.equals("1")) {
+                            // Send notification only if the user is Chairperson and proposal is accepted
+                            sendNotification();
+                        }
                         Intent manager = new Intent(proposal_desc.this, Manager.class);
                         startActivity(manager);
                         finish();
-
                     }
                 });
-
         builderSingle.show();
     }
+
+    private void sendNotification() {
+        // Fetch FCM tokens and send notification logic here
+        fetchFCMTokensFromServer();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         // TODO Auto-generated method sub

@@ -15,7 +15,7 @@ public class role_intent extends AppCompatActivity {
         setContentView(R.layout.activity_role_intent);
 
         TextView t =(TextView) findViewById(R.id.uid_final);
-        t.setText(getIntent().getStringExtra(MainActivity.EXTRA_UID));
+        t.setText(getIntent().getStringExtra(MainActivity.EXTRA_USERID));
 
         TextView t1 = (TextView) findViewById(R.id.uname_final);
         t1.setText(getIntent().getStringExtra(MainActivity.EXTRA_UNAME));

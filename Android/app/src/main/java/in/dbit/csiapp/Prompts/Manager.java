@@ -44,7 +44,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
     public static final String EXTRA_UROLE = "com.example.csimanagementsystem.EXTRA_UROLE";
 
 
-    String uid, uname, urole, uProfile;
+    String uid, uname, urole, uProfile , userid , fcmtoken;
 
     TextView UNAME, UID, UROLE;
     View mView;
@@ -64,18 +64,22 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         //get data sent by Mainactivity.java startsact
         Intent intent = getIntent();
-        uid = intent.getStringExtra(MainActivity.EXTRA_UID);
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
         uid=preferenceConfig.readLoginStatus();
         Log.i("tracking uid","manager when received "+uid);
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
         urole = intent.getStringExtra(MainActivity.EXTRA_UROLE);
         urole=preferenceConfig.readRoleStatus();
         uProfile = intent.getStringExtra(MainActivity.EXTRA_URL);
 
         uProfile=preferenceConfig.readUrlStatus();
-        Log.i("trackinggggg","manager when received "+uid+uname+urole+uProfile);
+
+        fcmtoken = intent.getStringExtra(MainActivity.EXTRA_FCMTOKEN);
+        fcmtoken= preferenceConfig.fetchfcmtoken();
+        Log.i("trackinggggg","manager when received "+uid+uname+urole+uProfile+fcmtoken);
         //get data sent by Mainactivity.java ends
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.server_url_button);
@@ -302,7 +306,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         } else if (id == R.id.log_out) {
             //....6/6/2019
-            preferenceConfig.writeLoginStatus(false,"","","","","");
+            preferenceConfig.writeLoginStatus(false,"","","","","","","");
             startActivity(new Intent(this, MainActivity.class));
             finish();
             //....6/6/2019

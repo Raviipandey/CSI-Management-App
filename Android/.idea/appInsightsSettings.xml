@@ -27,10 +27,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="in.dbit.csiapp" />
+                  <option name="mobileSdkAppId" value="1:1078420883728:android:56d4bcc5d274f1c52dfd95" />
+                  <option name="projectId" value="csiapp-fd2c5" />
+                  <option name="projectNumber" value="1078420883728" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

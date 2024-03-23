@@ -26,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,12 +36,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddMinute extends AppCompatActivity {
 
+    private SharedPreferenceConfig preferenceConfig;
+
     AutoCompleteTextView mCreateAgenda;
     Button mAddMinute, mAddTask;
-    String Agenda, Points, Creator, Absentee, server_url, date, time;
+    String Agenda, Points, Creator, Absentee, server_url, date, time, uname;
     EditText  mCreatePoints, mTask, mAbsentee;
     Spinner spinner;
     TableLayout tableLayout;
@@ -52,17 +57,22 @@ public class AddMinute extends AppCompatActivity {
         setContentView(R.layout.activity_add_minute);
         getSupportActionBar().setTitle("Add Minute");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         Intent intent = getIntent();
         Creator = intent.getStringExtra("id"); //getting User ID from MinuteManager
+
+
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-         date = dateFormat.format(calendar.getTime());
+        date = dateFormat.format(calendar.getTime());
         Log.i("date",date);
-         time = timeFormat.format(calendar.getTime());
+        time = timeFormat.format(calendar.getTime());
         Log.i("time",time );
 
 
@@ -229,12 +239,86 @@ public class AddMinute extends AppCompatActivity {
                 Absentee = mAbsentee.getText().toString();
 
                 //createMinuteTesting();
-                createNewMinute(); //sending new created minute to server
+                createNewMinute();
+                fetchAllTokens(); //sending new created minute to server
 
                 finish();
             }
 
         });
+    }
+
+    // Method to fetch all FCM tokens from the server
+    private void fetchAllTokens() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        // Call the method to send notification for each FCM token
+                        sendNotification(fcmToken);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+
+
+
+    // Method to send notification after successful proposal submission
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "New Minutes of meet added");
+            notificationBody.put("body",  uname + " has added the minutes of recent meeting.");
+            notification.put("notification", notificationBody);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     public void createNewMinute() {
@@ -305,10 +389,10 @@ public class AddMinute extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 //Log.e("volleyABC" ,"Got error in connecting server");
                 try{
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                Log.i("i234" ,Integer.toString(error.networkResponse.statusCode));
-                Toast.makeText(AddMinute.this,"Error:-"+statusCode,Toast.LENGTH_SHORT).show();
-                error.printStackTrace();}
+                    String statusCode = String.valueOf(error.networkResponse.statusCode);
+                    Log.i("i234" ,Integer.toString(error.networkResponse.statusCode));
+                    Toast.makeText(AddMinute.this,"Error:-"+statusCode,Toast.LENGTH_SHORT).show();
+                    error.printStackTrace();}
                 catch (Exception e)
                 {
                     Log.i("i234" ,"Error uploading data");

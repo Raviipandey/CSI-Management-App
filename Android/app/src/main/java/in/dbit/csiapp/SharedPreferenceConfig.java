@@ -10,7 +10,7 @@ public class SharedPreferenceConfig {
 
     private SharedPreferences sharedPreferences;
     private Context context;
-    EditText userid, password;
+    EditText userid, password ;
 
 
 
@@ -20,13 +20,15 @@ public class SharedPreferenceConfig {
 
     }
 
-    public void writeLoginStatus(boolean status, String uid, String pwd, String role, String UserName, String ProfileUrl){
+    public void writeLoginStatus(boolean status, String mobno, String pwd, String userid , String role, String UserName, String ProfileUrl, String Fcmtoken){
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("userid",uid);
+        editor.putString("userid",mobno);
         editor.putString("password",pwd);
+        editor.putString("userid2" , userid);
         editor.putString("role",role);//update
         editor.putString("userName",UserName);
         editor.putString("profileURL",ProfileUrl);
+        editor.putString("fcmtoken" , Fcmtoken);
         editor.apply();
         //editor.putBoolean(context.getResources().getString(R.string.login_status_preference), status);
        // editor.commit();
@@ -35,7 +37,7 @@ public class SharedPreferenceConfig {
     public String readLoginStatus(){
         //boolean status = false;
 
-        String name = sharedPreferences.getString("userid","");
+        String name = sharedPreferences.getString("userid2","");
         String password = sharedPreferences.getString("password","");
 
         if(name!="" && password!=""){
@@ -46,6 +48,14 @@ public class SharedPreferenceConfig {
         //status = sharedPreferences.getBoolean(context.getResources().getString(R.string.login_status_preference), false);
         //return status;
     }
+
+    public String fetchfcmtoken(){
+
+        String fcmtoken = sharedPreferences.getString("fcmtoken" , "");
+        return fcmtoken;
+    }
+
+
 
     public String readRoleStatus(){
         //boolean status = false;

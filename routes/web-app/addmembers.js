@@ -6,8 +6,11 @@ const { response } = require("express");
 const multer = require('multer');
 const csv = require('fast-csv');
 const fs = require('fs');
-
+const crypto = require('crypto');
+const admin = require('firebase-admin');
 const upload = multer({ dest: 'server_uploads/csv_upload' });
+var serviceAccount = require('../../firebase/ServiceAccount.json');
+
 
 const roleMapping = {
     'Chairperson': 3,
@@ -138,11 +141,19 @@ module.exports = {
     addmembers: (request, response) => {
         console.log("Received request", request.body);
         const { role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name, mem_strt, mem_end, acad } = request.body;
-    
+        
+        // Encrypting password using MD5
+        const encryptedPassword = crypto.createHash('md5').update(password).digest('hex');
+
+        const userRecord = admin.auth().createUser({
+            email: email,
+            password: encryptedPassword
+        });
+
         // Step 1: Insert data into core_details to get core_id
         connection.query(
             'INSERT INTO csiApp2022.core_details (core_role_id, core_en_fname, core_en_lname, core_rollno, core_mobileno, core_email, core_pwd, core_branch, core_class, core_acad_year, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name, acad, request.body.gender],
+            [role, first_name, last_name, roll_no, mob_no, email, encryptedPassword, branch, class_name, acad, request.body.gender],
             (error, result) => {
                 if (error) {
                     console.error('Error inserting data into the core_details table:', error.message);

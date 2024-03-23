@@ -22,6 +22,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -31,27 +32,35 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
 //import com.google.firebase.messaging.FirebaseMessaging;
 //import com.google.firebase.messaging.FirebaseMessagingService;
 
 import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
+import in.dbit.csiapp.mActivityManager.Forgetpassword;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class MainActivity extends AppCompatActivity implements Animation.AnimationListener {
 
     private static final int NOTIFICATION_PERMISSION_REQUEST = 100;
     private SharedPreferenceConfig preferenceConfig; //.....6/6/2019
 
-    public static final String EXTRA_UID = "com.example.csimanagementsystem.EXTRA_UID";
+    public static final String EXTRA_MOBNO = "com.example.csimanagementsystem.EXTRA_MOBNO";
     public static final String EXTRA_UNAME = "com.example.csimanagementsystem.EXTRA_UNAME";
     public static final String EXTRA_UROLE = "com.example.csimanagementsystem.EXTRA_UROLE";
     public static final String EXTRA_URL = "com.example.csimanagementsystem.EXTRA_URL";
+
+    public static final String EXTRA_USERID = "com.example.csimanagementsystem.EXTRA_USERID";
+
+    public static final String EXTRA_FCMTOKEN = "com.example.csimanagementsystem.EXTRA_FCMTOKEN";
 
     String server_url;
     //Main Server URL
@@ -59,10 +68,11 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     private static final String pref_name="";
 
 
-    String uid=" ",pstring=" ";
+    String uid=" ",pstring=" " , mobno = "" , token;
     ImageView logo;
     Animation splash,fadein,fadeout;
     View lay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -76,36 +86,43 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         if(preferenceConfig.readLoginStatus()!=""){
             Intent manager = new Intent(MainActivity.this, Manager.class);
-            manager.putExtra(EXTRA_UID, preferenceConfig.readLoginStatus());
+            manager.putExtra(EXTRA_MOBNO, preferenceConfig.readLoginStatus());
             manager.putExtra(EXTRA_UROLE, preferenceConfig.readRoleStatus());
             manager.putExtra(EXTRA_UNAME,preferenceConfig.readNameStatus());
+            manager.putExtra(EXTRA_USERID,preferenceConfig.readNameStatus());
             //Log.i("New Error", preferenceConfig.readUrlStatus());
             manager.putExtra(EXTRA_URL, preferenceConfig.readUrlStatus());
 //            Intent manager = new Intent(this, Manager.class);
             startActivity(manager);
             finish();
         }
+
+
         //.....6/6/2019
 
         Button Login =(Button) findViewById(R.id.Login_button);
-        final EditText usrid =(EditText) findViewById(R.id.userid);
+        final EditText mobileno =(EditText) findViewById(R.id.mobileno);
+
+
 
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("abcdef" ,"Reached Listner" + server_url);
 
-                uid =usrid.getText().toString();
-                Log.i("something","User ID is"+uid);
+                mobno =mobileno.getText().toString();
 
                 TextInputEditText pword =findViewById(R.id.password);
                 pstring =pword.getText().toString();
+
+                pstring = encryptPassword(pstring);
+
 
                 //validation part starts
                 //if(uid.length()==10 ) { // && pstring.length()>=7
 
 
-                insertSrv();  //this method contains json part of the login page
+                getfcmtoken();  //this method contains json part of the login page
                 // }
                 // else {
 
@@ -119,10 +136,19 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
         mpref=getSharedPreferences(pref_name,MODE_PRIVATE);
         String stored_usrid=mpref.getString("username","");
-        usrid.setText(stored_usrid);
+//        usrid.setText(stored_usrid);
 
-//        getfcmtoken();
+        TextView resetpass = findViewById(R.id.resetPasswordTextView);
+        resetpass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this , Forgetpassword.class));
+            }
+        });
+//
     }
+
+
 
     // Method to request notification permission
     private void requestNotificationPermission() {
@@ -184,22 +210,31 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         }
     }
 
-//    private void getfcmtoken() {
-//        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
-//            if(task.isSuccessful()){
-//                String token = task.getResult();
-//                Log.i("My fcm token", token);
-//            }
-//        });
-//    }
+    private void getfcmtoken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        // Token retrieval successful
+                        token = task.getResult();
+                        Log.i("My fcm token", token);
+                        // Now you can proceed to make your network request with the token
+                        insertSrv();
+                    } else {
+                        // Token retrieval failed
+                        Log.e("FCM Token Error", "Failed to retrieve FCM token: " + task.getException());
+                    }
+                });
+    }
 
     private void insertSrv()
     {
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("id", uid);
+            jsonObject.put("mobno", mobno);
             jsonObject.put("password", pstring);
+
+            jsonObject.put("fcmtoken" , token);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -219,25 +254,30 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                 Toast.makeText(MainActivity.this, "Logged IN", Toast.LENGTH_SHORT).show();
 
                 Intent manager = new Intent(MainActivity.this, Manager.class);
-                String UROLE="", USERNAME="", ProfileURL="";
+                String USERID="" , UROLE="", USERNAME="", ProfileURL="" , FCMTOKEN = "";
 
                 try {
                     JSONObject jsonObject1 = new JSONObject(response);
                     // Log.i("tracking uid","main Activity "+UID);
                     Log.i("Profile response" , String.valueOf(jsonObject1));
+                    USERID = jsonObject1.getString("userid");
                     USERNAME = jsonObject1.getString("name");
                     UROLE = jsonObject1.getString("role");
                     ProfileURL = jsonObject1.getString("dp");
+                    FCMTOKEN = jsonObject1.getString("fcmtoken");
 
                     //sharedPreference.... 6/6/2019
-                    preferenceConfig.writeLoginStatus(true,uid,pstring,UROLE,USERNAME,ProfileURL);
+
+                    Log.i("Sharedpreferences", USERID + USERNAME + UROLE + ProfileURL + FCMTOKEN);
+                    preferenceConfig.writeLoginStatus(true,mobno,pstring,USERID ,UROLE,USERNAME,ProfileURL,FCMTOKEN);
                     //sharedPreference.... 6/6/2019
 
 
                     SharedPreferences.Editor editor=mpref.edit();
-                    editor.putString("username",uid);
+                    editor.putString("username",mobno);
                     editor.putString("password",pstring);
                     editor.putString("urole",UROLE);
+                    editor.putString("userid" , USERID);
                     editor.apply();
                     finish();
 
@@ -248,10 +288,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                     e.printStackTrace();
                 }
                 //startActivity(manager);
-                manager.putExtra(EXTRA_UID, uid);
+                manager.putExtra(EXTRA_MOBNO, mobno);
+                manager.putExtra(EXTRA_USERID , USERID);
                 manager.putExtra(EXTRA_UNAME, USERNAME);
                 manager.putExtra(EXTRA_UROLE, UROLE);
                 manager.putExtra(EXTRA_URL, ProfileURL);
+                manager.putExtra(EXTRA_FCMTOKEN, FCMTOKEN);
                 //Send data to Manager.java ends
                 startActivity(manager);
                 //
@@ -292,6 +334,29 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
         RequestQueue requestQueue= Volley.newRequestQueue(this);
         requestQueue.add(stringRequest); // get response from server
+    }
+
+    private String encryptPassword(String password) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(password.getBytes());
+            byte[] messageDigest = digest.digest();
+
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hex = Integer.toHexString(0xFF & b);
+                while (hex.length() < 2) {
+                    hex = "0" + hex;
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     //Afif's Work
