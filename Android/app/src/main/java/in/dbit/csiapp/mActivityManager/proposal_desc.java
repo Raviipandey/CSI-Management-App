@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -225,6 +226,7 @@ public class proposal_desc extends AppCompatActivity {
             if(flag.equals("1")){
                 jsonObject.put("proposals_status",status);
                 jsonObject.put("proposals_comment",comment_e.getText().toString());
+                jsonObject.put("role", preferenceConfig.readRoleStatus());
 
             }
 
@@ -322,7 +324,29 @@ public class proposal_desc extends AppCompatActivity {
         p.setText(res.getString("proposals_publicity_budget"));
         g.setText(res.getString("proposals_guest_budget"));
         tot.setText(res.getString("proposals_total_budget"));
-        comment_t.setText(res.getString("proposals_comment"));
+//        comment_t.setText(res.getString("proposals_comment"));
+        // Handling the proposals_comment
+        if (!res.isNull("proposals_comment")) {
+            StringBuilder commentsFormatted = new StringBuilder();
+            String commentsString = res.getString("proposals_comment"); // Get the JSON string
+            try {
+                JSONObject commentsObj = new JSONObject(commentsString); // Parse the string into a JSONObject
+                Iterator<String> keys = commentsObj.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    String value = commentsObj.getString(key);
+                    commentsFormatted.append(key).append(": ").append(value).append("\n");
+                }
+                comment_t.setText(commentsFormatted.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                comment_t.setText("Error parsing comments.");
+            }
+        } else {
+            comment_t.setText("No comments available.");
+        }
+
         getSupportActionBar().setTitle(res.getString("proposals_event_name"));
 
     }

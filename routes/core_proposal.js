@@ -150,54 +150,90 @@ router.post('/viewagenda', (req, res) => {
 });
 
 //modify status
-router.post('/status', (req, res) => {
-    var cpm_id = req.body.cpm_id;
-    var status = req.body.proposals_status;
-    var comment = req.body.proposals_comment;
+// router.post('/status', (req, res) => {
+//     var cpm_id = req.body.cpm_id;
+//     var status = req.body.proposals_status;
+//     var comment = req.body.proposals_comment;
 
-    connection.query('UPDATE core_proposals_manager SET proposals_status=?, proposals_comment=? WHERE cpm_id=?', [status, comment, cpm_id], function(error) {
+//     connection.query('UPDATE core_proposals_manager SET proposals_status=?, proposals_comment=? WHERE cpm_id=?', [status, comment, cpm_id], function(error) {
+//         if (error) {
+//             console.log(error);
+//             console.log("Fail to update status");
+//             res.sendStatus(400);
+//         } else {
+//             //Mail to Creative-head/PR-head/Tech-head
+//             if (status == 2) {
+//                 connection.query("INSERT INTO core_creative_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
+//                     if (error) {
+//                         console.log("Fail To Insert Into Creative Table");
+//                         res.sendStatus(400);
+//                     } else {
+//                         console.log("Succesfully Inserted Into Creative Table");
+//                         connection.query("INSERT INTO core_pr_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
+//                             if (error) {
+//                                 console.log(error);
+//                                 console.log("Fail To Insert Into Publicity Table");
+//                                 res.sendStatus(400);
+//                             } else {
+//                                 console.log("Succesfully Inserted Into Publicity Table");
+//                                 connection.query("INSERT INTO core_technical_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
+//                                     if (error) {
+//                                         console.log("Fail To Insert Into Technical Table");
+//                                         res.sendStatus(400);
+//                                     } else {
+//                                         console.log("Succesfully Inserted Into Technical Table");
+//                                         res.sendStatus(200);
+//                                     }
+
+//                                 });
+//                             }
+//                         });
+//                     }
+//                 });
+
+//             } else {
+//                 console.log("Succesfully updated  status");
+//                 res.sendStatus(200);
+//             }
+//         }
+//     });
+// });
+
+router.post('/status', (req, res) => {
+    const cpm_id = req.body.cpm_id;
+    const status = req.body.proposals_status;
+    const newRole = req.body.role; // Retrieve the role from the request
+    const newComment = req.body.proposals_comment;
+
+    // First, fetch the existing comments
+    connection.query('SELECT proposals_comment FROM core_proposals_manager WHERE cpm_id=?', [cpm_id], function(error, results) {
         if (error) {
             console.log(error);
-            console.log("Fail to update status");
-            res.sendStatus(400);
+            return res.sendStatus(400);
         } else {
-            //Mail to Creative-head/PR-head/Tech-head
-            if (status == 2) {
-                connection.query("INSERT INTO core_creative_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
-                    if (error) {
-                        console.log("Fail To Insert Into Creative Table");
-                        res.sendStatus(400);
-                    } else {
-                        console.log("Succesfully Inserted Into Creative Table");
-                        connection.query("INSERT INTO core_pr_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
-                            if (error) {
-                                console.log(error);
-                                console.log("Fail To Insert Into Publicity Table");
-                                res.sendStatus(400);
-                            } else {
-                                console.log("Succesfully Inserted Into Publicity Table");
-                                connection.query("INSERT INTO core_technical_manager(cpm_id) VALUES(?)", [cpm_id], function(error) {
-                                    if (error) {
-                                        console.log("Fail To Insert Into Technical Table");
-                                        res.sendStatus(400);
-                                    } else {
-                                        console.log("Succesfully Inserted Into Technical Table");
-                                        res.sendStatus(200);
-                                    }
+            let comments = {};
+            if (results.length > 0 && results[0].proposals_comment) {
+                // Parse existing comments if there are any
+                comments = JSON.parse(results[0].proposals_comment);
+            }
+            // Add or update the comment for the current role
+            comments[newRole] = newComment;
 
-                                });
-                            }
-                        });
+            // Now update the database with the new comments JSON
+            connection.query('UPDATE core_proposals_manager SET proposals_status=?, proposals_comment=? WHERE cpm_id=?', 
+                [status, JSON.stringify(comments), cpm_id], function(updateError) {
+                    if (updateError) {
+                        console.log(updateError);
+                        return res.sendStatus(400);
+                    } else {
+                        console.log("Successfully updated status and comments");
+                        res.sendStatus(200);
                     }
                 });
-
-            } else {
-                console.log("Succesfully updated  status");
-                res.sendStatus(200);
-            }
         }
     });
 });
+
 
 
 //View proposal details

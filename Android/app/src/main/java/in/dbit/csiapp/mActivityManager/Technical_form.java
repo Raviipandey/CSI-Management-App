@@ -24,6 +24,7 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -96,7 +97,10 @@ public class Technical_form extends AppCompatActivity {
     private ArrayList<String> checkboxNames = new ArrayList<>();
     private List<CheckBox> checkBoxList = new ArrayList<>();
     private List<CheckBox> checkedboxes = new ArrayList<>();
-    private Button techselectFileButton, techdeleteButton;
+    private Button techselectFileButton;
+
+    private ImageButton techdeleteButton;
+    private ImageButton downloadButton;
     private static final int REQUEST_CODE = 1;
 
 
@@ -149,7 +153,7 @@ public class Technical_form extends AppCompatActivity {
 
 
         Button edit = findViewById(R.id.updateTech);
-        Button add_checkbox_button = findViewById(R.id.add_checkbox_button);
+        ImageButton add_checkbox_button = (ImageButton) findViewById(R.id.add_checkbox_button);
 
 
         if(urole1.equals("Tech Head" )){
@@ -204,7 +208,7 @@ public class Technical_form extends AppCompatActivity {
 //        super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_technical_form);
 
-        Button addCheckboxButton = findViewById(R.id.add_checkbox_button);
+        ImageButton addCheckboxButton = (ImageButton) findViewById(R.id.add_checkbox_button);
         addCheckboxButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -415,7 +419,7 @@ public class Technical_form extends AppCompatActivity {
     private void handleFileExistence(String filename, String url) {
         techFileStatus.setVisibility(View.GONE); // Hide the status message
         techselectFileButton.setEnabled(false); // Disable the select file button
-        Button downloadButton = findViewById(R.id.tech_download_button);
+        downloadButton = findViewById(R.id.tech_download_button);
         downloadButton.setVisibility(View.VISIBLE); // Show the download button
 
         if ("Tech Head".equalsIgnoreCase(urole1)) {
@@ -500,7 +504,7 @@ public class Technical_form extends AppCompatActivity {
     private void handleFileNotFound(String error) {
         // File not found, update UI accordingly
         // Enable the select file button or take appropriate action
-        Button downloadButton = findViewById(R.id.tech_download_button);
+        downloadButton = findViewById(R.id.tech_download_button);
         techselectFileButton.setEnabled(true);
         techdeleteButton.setVisibility(View.GONE);
         downloadButton.setVisibility(View.GONE);
@@ -681,9 +685,9 @@ public class Technical_form extends AppCompatActivity {
                         @Override
                         public void run() {
                             techselectFileButton.setEnabled(false); // Disable the select file button
-                            Button techdownloadButton = findViewById(R.id.tech_download_button);
-                            techdownloadButton.setVisibility(View.VISIBLE); // Show the download button
-                            techdownloadButton.setOnClickListener(new View.OnClickListener() {
+                            downloadButton = findViewById(R.id.tech_download_button);
+                            downloadButton.setVisibility(View.VISIBLE); // Show the download button
+                            downloadButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     // Build the download request
@@ -798,6 +802,15 @@ public class Technical_form extends AppCompatActivity {
 
         CheckBox checkBox = new CheckBox(this);
         checkBox.setText(name);
+        checkBox.setTextColor(getResources().getColor(R.color.colorPrimary)); // Set text color
+        checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20); // Set text size
+        checkBox.setPadding(checkBox.getPaddingLeft(), 10, checkBox.getPaddingRight(), 10); // Set padding
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(20, 10, 20, 10); // Set margins (start, top, end, bottom)
+        checkBox.setLayoutParams(params);
         checkboxContainer.addView(checkBox);
         checkBoxList.add(checkBox);
 
