@@ -68,7 +68,7 @@ router.post('/request',(req,res)=>{
 
 //Display all the requests
 router.post('/requestlist',(req,res)=>{
-	connection.query('SELECT cd.core_en_fname, ad.* FROM attendance_details ad JOIN core_details cd ON ad.core_id = cd.core_id WHERE ad.status = "WAITING";',function(error,result){
+	connection.query('SELECT cd.core_en_fname, cd.fcm_token, ad.* FROM attendance_details ad JOIN core_details cd ON ad.core_id = cd.core_id WHERE ad.status = "WAITING";',function(error,result){
 		if(error){
 			//console.log"(Error");
 			res.sendStatus(400);

@@ -2,6 +2,7 @@ package in.dbit.csiapp.mFragments;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,12 +27,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import in.dbit.csiapp.R;
 
+import in.dbit.csiapp.Prompts.MainActivity;
+import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Attendance extends Fragment {
@@ -46,6 +53,10 @@ public class Attendance extends Fragment {
     String miss="";
     String slots="";
     String UID="";
+
+    String uname;
+
+    private SharedPreferenceConfig preferenceConfig;
 
     public static Attendance newInstance() {
         return new Attendance();
@@ -63,11 +74,17 @@ public class Attendance extends Fragment {
 
         Button datePicker= rootView.findViewById(R.id.dateBtn);
 
+        preferenceConfig = new SharedPreferenceConfig(getActivity().getApplicationContext());
+        Intent intent = getActivity().getIntent();
+
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
+
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 datePickerFrag dpf = new datePickerFrag().newInstance();
-               dpf.setCallBack(onDate);
+                dpf.setCallBack(onDate);
                 dpf.show(getFragmentManager().beginTransaction(), "DatePickerFragment");
             }
         });
@@ -181,6 +198,84 @@ public class Attendance extends Fragment {
         return rootView;
     }
 
+    private void fetchAllTokens() {
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getActivity().getResources().getString(R.string.server_url)+"/proposal/getcvctoken", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        // Call the method to send notification for each FCM token
+                        sendNotification(fcmToken);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+
+
+
+    // Method to send notification after successful proposal submission
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "New request for attendance");
+
+            notificationBody.put("body", uname + " has missed some lectures");
+            notification.put("notification", notificationBody);
+
+            // Add intent to open TechnicalForm activity when notification is clicked
+            JSONObject data = new JSONObject();
+            data.put("click_action", ".Technical_form"); // Adjust with your TechnicalForm activity class name
+            notification.put("data", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        requestQueue.add(stringRequest);
+    }
+
     public String toString() {
         return "Attendance";
     }
@@ -191,7 +286,7 @@ public class Attendance extends Fragment {
                               int dayOfMonth) {
 
 
-           date= String.valueOf(year) + "-" + String.valueOf(monthOfYear+1)
+            date= String.valueOf(year) + "-" + String.valueOf(monthOfYear+1)
                     + "-" + String.valueOf(dayOfMonth);
 
             TextView outputDate = rootView.findViewById(R.id.date);
@@ -312,6 +407,7 @@ public class Attendance extends Fragment {
                         if(setJason()==1)
                         {
                             sendrequest();
+                            fetchAllTokens();
                         }
 
                         Log.i("info123", String.valueOf(jsonObject));

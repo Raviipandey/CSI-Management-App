@@ -1,5 +1,6 @@
 package in.dbit.csiapp.mFragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
@@ -24,8 +25,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
 
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mReqAdapter.RequestListAdapter;
 import in.dbit.csiapp.mReqAdapter.RequestListItem;
 
@@ -37,6 +40,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class AttendancePR extends Fragment {
@@ -47,6 +52,10 @@ public class AttendancePR extends Fragment {
     private ArrayList<RequestListItem> mRequestList;
     private RequestQueue mRequestQueue;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    private String uname , fcmtoken , name;
+
+    private SharedPreferenceConfig preferenceConfig;
 
     StringBuffer sb = null;
 
@@ -69,6 +78,12 @@ public class AttendancePR extends Fragment {
 
         mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
+        preferenceConfig = new SharedPreferenceConfig(getActivity().getApplicationContext());
+        Intent intent = getActivity().getIntent();
+
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
+
         Log.i("AttPR","Started");
         parseJSON();  //Get list of requests
 
@@ -77,6 +92,7 @@ public class AttendancePR extends Fragment {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 parsejson2();  //Method to Confirm Requests
                 parsejson3();  //Method to Reject Requests
 
@@ -87,6 +103,37 @@ public class AttendancePR extends Fragment {
 
         return rootView;
     }
+
+//    private void fetchAllTokens() {
+//        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, getActivity().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                try {
+//                    JSONArray tokensArray = new JSONArray(response);
+//                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+//                    for (int i = 0; i < tokensArray.length(); i++) {
+//                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+//                        // Call the method to send notification for each FCM token
+//                        sendNotification(fcmToken);
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace();
+//            }
+//        });
+//        requestQueue.add(stringRequest);
+//    }
+
+
+
+    // Method to send notification after successful proposal submission
+
 
     public String toString() {
         return "Attendance PR";
@@ -154,7 +201,7 @@ public class AttendancePR extends Fragment {
                             String requestId = request.getString("ad_id");
                             Log.i("AttPR", "got response" + requestId);
                             //String requestId = request.getString("id");
-                            String name = request.getString("core_en_fname");
+                            name = request.getString("core_en_fname");
                             Log.i("AttPR", "got response" + name);
                             String date = request.getString("core_date");
                             String date1 = date.substring(8, 10) + "/" + date.substring(5, 7) + "/" + date.substring(0, 4);
@@ -171,6 +218,9 @@ public class AttendancePR extends Fragment {
                             Log.i("AttPR", "got response" + missed);
                             String reason = request.getString("core_reason");
                             Log.i("AttPR", "got response" + reason);
+
+                            fcmtoken = request.getString("fcm_token");
+                            Log.i("Attendance fcm" , fcmtoken);
 
                             //We can't display the lecture slots in the s1 s2 s3... format to PR Head
                             //So we are using timeslot variable to send time slots in proper manner
@@ -226,6 +276,106 @@ public class AttendancePR extends Fragment {
 
     }
 
+    private void sendAcceptedNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "Attendance accepted");
+
+            notificationBody.put("body", "Your attendance request has been accepted");
+            notification.put("notification", notificationBody);
+
+            // Add intent to open TechnicalForm activity when notification is clicked
+            JSONObject data = new JSONObject();
+            data.put("click_action", ".Technical_form"); // Adjust with your TechnicalForm activity class name
+            notification.put("data", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        requestQueue.add(stringRequest);
+    }
+
+    private void sendRejectedNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "Attendance rejected");
+
+            notificationBody.put("body", "Your attendance request has been rejected");
+            notification.put("notification", notificationBody);
+
+            // Add intent to open TechnicalForm activity when notification is clicked
+            JSONObject data = new JSONObject();
+            data.put("click_action", ".Technical_form"); // Adjust with your TechnicalForm activity class name
+            notification.put("data", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        requestQueue.add(stringRequest);
+    }
+
+
+
     public void parsejson2() {
         String server_url = rootView.getResources().getString(R.string.server_url) + "/attendance/finallist";   //Main Server URL
 
@@ -236,6 +386,7 @@ public class AttendancePR extends Fragment {
         for (RequestListItem rli : mRequestListAdapter.mConfirmRequestList) {
             sb.append(rli.getRequestID());
             finalConReq.add(rli.getRequestID());
+            Log.i("request list" , String.valueOf(rli));
         }
 
         Gson gson = new Gson();
@@ -250,6 +401,10 @@ public class AttendancePR extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("accepted", jsonArray);
+            if (jsonArray.length() > 0) {
+                sendAcceptedNotification(fcmtoken);
+            }
+
         } catch (JSONException e)
         {
             e.printStackTrace();
@@ -324,6 +479,7 @@ public class AttendancePR extends Fragment {
         for (RequestListItem rli : mRequestListAdapter.mRejectRequestList) {
             sb.append(rli.getRequestID());
             finalRejReq.add(rli.getRequestID());
+
         }
         Gson gson = new Gson();
         rejReq = gson.toJson(finalRejReq);
@@ -337,6 +493,10 @@ public class AttendancePR extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("rejected", jsonArray);
+            if (jsonArray.length() > 0) {
+                sendRejectedNotification(fcmtoken);
+            }
+
         } catch (JSONException e)
         {
             e.printStackTrace();

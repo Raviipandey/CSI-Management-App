@@ -28,10 +28,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,9 +46,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import okhttp3.Call;
@@ -64,7 +74,7 @@ public class Reportmanager extends AppCompatActivity {
     private SharedPreferenceConfig preferenceConfig;
 
 
-    String eName , urole;
+    String eName , urole , uname;
     String eid;
 
     FloatingActionButton uploadreport;
@@ -92,6 +102,9 @@ public class Reportmanager extends AppCompatActivity {
         uploadreport = findViewById(R.id.Uploadreport);
         download = findViewById(R.id.Downloadreport);
         deletereport = findViewById(R.id.deletereport);
+
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
 
         uploadreport.hide();
         download.hide();
@@ -139,6 +152,84 @@ public class Reportmanager extends AppCompatActivity {
         // Make HTTP request to check if the report exists
 
 
+    }
+
+    private void fetchAllTokens() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new com.android.volley.Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        // Call the method to send notification for each FCM token
+                        sendNotification(fcmToken);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+
+
+
+    // Method to send notification after successful proposal submission
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "New Event Report Uploaded");
+
+            notificationBody.put("body", uname + " just uploaded report for " + eName + ". Click to view.");
+            notification.put("notification", notificationBody);
+
+            // Add intent to open TechnicalForm activity when notification is clicked
+            JSONObject data = new JSONObject();
+            data.put("click_action", ".Technical_form"); // Adjust with your TechnicalForm activity class name
+            notification.put("data", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return notification.toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     private class DownloadPdfTask extends AsyncTask<String, Void, File> {
@@ -245,6 +336,7 @@ public class Reportmanager extends AppCompatActivity {
             InputStream inputStream = getContentResolver().openInputStream(fileUri);
 
 
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
             // Create OkHttp3 client and builder
             OkHttpClient client = new OkHttpClient();
             MultipartBody.Builder builder = new MultipartBody.Builder();
@@ -278,9 +370,17 @@ public class Reportmanager extends AppCompatActivity {
 
                 @Override
                 public void onResponse(Call call, okhttp3.Response response) throws IOException {
+
                     if (!response.isSuccessful()) {
                         throw new IOException("Unexpected code " + response);
                     }
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(eid, true);
+                    editor.apply();
+
+                    fetchAllTokens();
+
 
                     runOnUiThread(new Runnable() {
                         @Override

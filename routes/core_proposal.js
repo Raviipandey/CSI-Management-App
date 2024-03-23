@@ -98,7 +98,35 @@ router.post('/createproposal', (req, res) => {
     });
 });
 
+router.get('/getalltoken', (req, res) => {
+    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens");
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            // Extract fcm_token values from the result array
+            const fcmTokens = result.map(row => row.fcm_token).filter(token => token); // Filter out null or empty tokens
 
+            // Send the fcmTokens array as JSON
+            res.status(200).json(fcmTokens);
+        }
+    });
+});
+
+router.get('/getcvctoken', (req, res) => {
+    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id = 3 and 4', function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens");
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            // Extract fcm_token values from the result array
+            const fcmTokens = result.map(row => row.fcm_token).filter(token => token); // Filter out null or empty tokens
+
+            // Send the fcmTokens array as JSON
+            res.status(200).json(fcmTokens);
+        }
+    });
+});
 // cpm_id, proposals_event_name, proposals_event_date, proposals_event_category, proposals_venue, 
 // proposals_three_track, proposals_desc, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, 
 // proposals_prize, proposals_meeting_id, proposals_status, proposals_comment, agenda, speaker

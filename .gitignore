@@ -5,3 +5,5 @@ tmp_uploads
 node_modules
 csiapp.jks
 encoded_keystore.b64
+firebase/
+Android/app/google-services.json

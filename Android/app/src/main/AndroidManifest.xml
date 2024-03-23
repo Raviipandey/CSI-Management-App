@@ -18,6 +18,7 @@
 
 
     <application
+        android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"
         android:icon="@drawable/csidbitlogo"
         android:label="@string/app_name"
@@ -26,6 +27,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity android:name="in.dbit.csiapp.mActivityManager.Forgetpassword"
+            android:theme="@style/AppTheme2"/>
+
+
         <activity android:name="in.dbit.csiapp.mActivityManager.ReportDisplay"
             android:theme="@style/AppTheme2"/>
         <activity android:name="in.dbit.csiapp.mActivityManager.CreativePosterFull" />
@@ -102,6 +107,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
 
         <!--        <service android:name=".Notificationservice" android:exported="false">-->

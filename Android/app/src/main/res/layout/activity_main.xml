@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context="in.dbit.csiapp.Prompts.MainActivity"
     android:id="@+id/start">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -85,7 +85,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/userid"
+                android:id="@+id/mobileno"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="#F0F0F0"
@@ -132,8 +132,18 @@
                 android:drawableStart="@drawable/ic_vpn_key_black_24dp"
                 android:paddingStart="10dp" />
 
+            <TextView
+                android:id="@+id/resetPasswordTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset password"
+                android:textColor="@color/Black"
+                app:layout_constraintTop_toBottomOf="@+id/password"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp" />
         </com.google.android.material.textfield.TextInputLayout>
-        
+
         <Button
             android:id="@+id/Login_button"
             android:layout_width="251dp"
@@ -153,7 +163,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pwlayout"
             app:layout_constraintVertical_bias="0.317" />
-        
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
