@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -174,9 +175,41 @@ public class Reportmanager extends AppCompatActivity {
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Reportmanager.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Reportmanager.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Reportmanager.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Reportmanager.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         requestQueue.add(stringRequest);
     }
 

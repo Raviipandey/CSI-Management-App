@@ -5,6 +5,7 @@ var router=express.Router();
 var dotenv = require('dotenv');
 dotenv.config();
 app.use(express.json()); // This line is essential for parsing JSON bodies
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 // MySQL Connection
 var mysql=require('mysql');
@@ -25,7 +26,7 @@ connection.connect(function(err){
 });
 
 //Attendance Request
-router.post('/request',(req,res)=>{
+router.post('/request',validateSessionToken,(req,res)=>{
     var ad_id=req.body.ad_id;
 	var id=req.body.id; //core_id
 	var date=req.body.date;
@@ -67,7 +68,7 @@ router.post('/request',(req,res)=>{
 });
 
 //Display all the requests
-router.post('/requestlist',(req,res)=>{
+router.post('/requestlist',validateSessionToken,(req,res)=>{
 	connection.query('SELECT cd.core_en_fname, cd.fcm_token, ad.* FROM attendance_details ad JOIN core_details cd ON ad.core_id = cd.core_id WHERE ad.status = "WAITING";',function(error,result){
 		if(error){
 			//console.log"(Error");
@@ -83,7 +84,7 @@ router.post('/requestlist',(req,res)=>{
 
 //Accept json array,move the record from request to final_list
 // Route to update the status of attendance requests
-router.post('/finallist', (req, res) => {
+router.post('/finallist',validateSessionToken, (req, res) => {
 	console.log(req.body); // Check the incoming data
 	// Extract the 'accepted' array from the request body
 	const acceptedIds = req.body.accepted;
@@ -166,7 +167,7 @@ router.post('/finallist', (req, res) => {
 // });
 
 // Attendance Reject
-router.post('/reject', (req, res) => {
+router.post('/reject',validateSessionToken, (req, res) => {
     const ids = req.body.rejected;
     console.log('Received IDs:', ids);
 
@@ -279,7 +280,7 @@ router.post('/reject', (req, res) => {
 // });
 
 //SBC Attendance
-router.post('/view',(req,res)=>{
+router.post('/view',validateSessionToken,(req,res)=>{
 	var id=req.body.id; 
 	var year=req.body.year;
 	var name=req.body.name;

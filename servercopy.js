@@ -19,6 +19,7 @@ const fifteenMinutes = 1000 * 60 * 15; // Milliseconds in a minute * 15
 const router = express.Router();
 var flash = require("connect-flash");
 const multer = require('multer');
+app.use(express.json()); 
 
 app.use(flash());
 
@@ -174,6 +175,16 @@ app.get('/members/:year', addmembers.fetchCoreMembers);
 app.get('/privacy.html', (req, res) => {
     res.render('pages/privacy');
   });
+
+//middleware
+const validateSessionToken = require('./middleware/ValidateTokens');
+app.use(validateSessionToken);
+
+
+
+  
+
+
 
 
 

@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -193,10 +194,41 @@ public class proposal_desc extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // Handle error response
-                error.printStackTrace();
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(proposal_desc.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(proposal_desc.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(proposal_desc.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(proposal_desc.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
         // Add the request to the RequestQueue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -259,15 +291,32 @@ public class proposal_desc extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try{
-                    //String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(proposal_desc.this,error.networkResponse.statusCode,Toast.LENGTH_SHORT).show();//it will not occur as authenticating at start
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("volleyABC" ,"exception");
-                    Toast.makeText(proposal_desc.this,"Check Network",Toast.LENGTH_SHORT).show();} //occur if connection not get estabilished
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(proposal_desc.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(proposal_desc.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(proposal_desc.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(proposal_desc.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
 
         }){
@@ -279,6 +328,14 @@ public class proposal_desc extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

@@ -48,8 +48,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mAdapter.MediaPagerAdapter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -65,8 +67,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -87,6 +92,7 @@ public class Creative_form extends AppCompatActivity {
     private File mSelectedFile;
 //    private String filePath;
     private LinearLayout mPreviewLayout;
+    private SharedPreferenceConfig preferenceConfig;
     ImageView imagePreview;
     private Button floatingButton;
     private View newLayout;
@@ -131,6 +137,7 @@ public class Creative_form extends AppCompatActivity {
         setContentView(R.layout.activity_creative_form);
         mPreviewLayout = findViewById(R.id.preview_layout);
 
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
 
 
@@ -286,10 +293,42 @@ public class Creative_form extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle error
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
                 }
-        );
+        ){@Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
 // Add the request to the Volley request queue
         Volley.newRequestQueue(this).add(jsonObjectRequest);
@@ -430,16 +469,32 @@ public class Creative_form extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Creative_form.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Creative_form.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -451,6 +506,15 @@ public class Creative_form extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -553,16 +617,32 @@ public class Creative_form extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Creative_form.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Creative_form.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -574,6 +654,15 @@ public class Creative_form extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -790,11 +879,42 @@ public class Creative_form extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle error
-                        Log.e("Fetch Media URLs", "Error: " + error.getMessage());
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
                 }
-        );
+        ){@Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
         // Add the request to the Volley request queue
         Volley.newRequestQueue(this).add(jsonObjectRequest);

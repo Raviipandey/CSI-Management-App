@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,12 +32,15 @@ import in.dbit.csiapp.Gallery.Interfaces.IRecyclerViewClickListener;
 import in.dbit.csiapp.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapter.ImageViewHolder> {
 
     private Context context;
     private boolean isDeleteButtonVisible = false;
+
     private ArrayList<String> urlList;
     private IRecyclerViewClickListener clickListener;
     private SparseBooleanArray selectedItems = new SparseBooleanArray();
@@ -172,10 +176,21 @@ public class GalleryImageAdapter extends RecyclerView.Adapter<GalleryImageAdapte
                 // Handle error
                 Log.e("DeleteError", "Error deleting image: " + error.toString());
             }
-        });
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
+
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(stringRequest);
+
     }
 
     public void deleteSelectedImages() {

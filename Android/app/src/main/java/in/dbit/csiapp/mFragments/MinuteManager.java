@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.Nullable;
+
+import com.android.volley.AuthFailureError;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -30,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Prompts.AddMinute;
 import in.dbit.csiapp.Prompts.DetailActivity;
@@ -43,7 +46,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClickedListener {
     private String urole1,eid , BoxStatus;
@@ -216,17 +222,41 @@ public class MinuteManager extends Fragment implements ExampleAdapter.OnItemClic
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e("volleyABC" ,"Got error in connecting server");
+                String errorMessage = "An error occurred"; // Default message
                 try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(loginIntent);
+                    getActivity().finish();
                 }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         mRequestQueue.add(stringRequest);
     }
 

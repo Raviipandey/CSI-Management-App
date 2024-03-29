@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const request = require('request');
 const { server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 // Increase payload limit to 50MB
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -51,7 +52,7 @@ const upload = multer({
     storage: storage 
 });
 
-router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
+router.post("/upload",validateSessionToken, upload.single("pdfFile"), function (req, res, next) {
     const file = req.file;
     if (!file) {
         return res.status(400).send("Please upload a file");
@@ -90,7 +91,7 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
     });
 });
 
-router.get("/download", function (req, res) {
+router.get("/download",validateSessionToken, function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
@@ -110,7 +111,7 @@ router.get("/download", function (req, res) {
     });
 });
 
-router.get("/fetchtech", function (req, res) {
+router.get("/fetchtech",validateSessionToken, function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
@@ -126,7 +127,7 @@ router.get("/fetchtech", function (req, res) {
     });
 });
 
-router.post("/delete", function (req, res) {
+router.post("/delete",validateSessionToken, function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM technical_files WHERE eid = ?";
@@ -150,7 +151,7 @@ router.post("/delete", function (req, res) {
 
 
 //Viewing Events
-router.post('/viewEvents', (req, res) =>{
+router.post('/viewEvents',validateSessionToken, (req, res) =>{
     var eid = req.body.eid;
     var checkboxStatus = req.body.checkboxStatus;
 
@@ -177,7 +178,7 @@ router.post('/viewEvents', (req, res) =>{
 });
 //Adding checkboxes
 
-router.post('/addcheckbox',(req,res)=>{
+router.post('/addcheckbox',validateSessionToken,(req,res)=>{
     var eid = req.body.eid;
     var qs_set = req.body.qs_set;    
     var internet = req.body.internet;    
@@ -232,7 +233,7 @@ router.post('/addcheckbox',(req,res)=>{
 
 
 //Edit Technical
-router.post('/editEvents' , (req,res)=>{
+router.post('/editEvents' ,validateSessionToken, (req,res)=>{
 	var eid = req.body.eid;
 	var qs_set = req.body.qs_set;	
 	var internet = req.body.internet;	
@@ -255,7 +256,7 @@ router.post('/editEvents' , (req,res)=>{
 
 //Fetching added checkboxes
 
-router.get('/checkboxes', function(req, res) {
+router.get('/checkboxes',validateSessionToken, function(req, res) {
     const status = 1;
     const sql = 'SELECT task FROM `technical_tasks` WHERE status = 1';
     connection.query(sql, [status], function(error, results, fields) {

@@ -1,6 +1,7 @@
 package in.dbit.csiapp.mFragments;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -37,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -177,10 +180,13 @@ public class Attendance extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 EditText reason = rootView.findViewById(R.id.reason);
                 rsn = reason.getText().toString();
                 EditText missed = rootView.findViewById(R.id.sub_miss);
                 miss = missed.getText().toString();
+
 
                 if(date==null)  {
                     Toast.makeText(getActivity(),"Enter Date",Toast.LENGTH_SHORT).show(); }
@@ -219,8 +225,25 @@ public class Attendance extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Session token is invalid or expired, log the user out
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class); // Assuming LoginActivity is your login activity
+                    startActivity(loginIntent);
+                    getActivity().finish(); // Correctly calling finish() on the activity instance
+                    Toast.makeText(getActivity(), "Session expired, please log in again", Toast.LENGTH_LONG).show();
+                } else {
+                    // Handle other errors
+                    Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         requestQueue.add(stringRequest);
     }
 
@@ -352,15 +375,32 @@ public class Attendance extends Fragment {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-                    Log.i("info123" ,Integer.toString(error.networkResponse.statusCode));
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(getActivity(),"Check Network",Toast.LENGTH_SHORT).show();}
-
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(loginIntent);
+                    getActivity().finish();
+                }
             }
         }){
 
@@ -372,6 +412,14 @@ public class Attendance extends Fragment {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

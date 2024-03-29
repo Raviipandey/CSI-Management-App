@@ -7,6 +7,7 @@ const fs = require('fs');
 const request = require('request');
 var bodyParser=require('body-parser');
 const { server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -49,7 +50,7 @@ const upload = multer({
 });
 
 /////----------Route to list events for report -------------//
-router.get('/list',(req,res)=>{
+router.get('/list',validateSessionToken,(req,res)=>{
 
 	connection.query('SELECT * FROM core_proposals_manager',function(err,result){
 		if(err){
@@ -65,7 +66,7 @@ router.get('/list',(req,res)=>{
 });
 
 /////----------Route to upload reports -------------//
-router.post("/upload", upload.single("report"), function (req, res, next) {
+router.post("/upload",validateSessionToken, upload.single("report"), function (req, res, next) {
     const file = req.file;
     if (!file) {
         return res.status(400).send("Please upload a file");
@@ -99,7 +100,7 @@ router.post("/upload", upload.single("report"), function (req, res, next) {
 });
 
 /////----------Route to fetch uploaded reports-------------//
-router.get("/fetchreport", function (req, res) {
+router.get("/fetchreport",validateSessionToken, function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
@@ -114,7 +115,7 @@ router.get("/fetchreport", function (req, res) {
 });
 
 /////----------Route to download reports-------------//
-router.get("/download", function (req, res) {
+router.get("/download",validateSessionToken, function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
@@ -135,7 +136,7 @@ router.get("/download", function (req, res) {
 });
 
 /////----------Route to delete reports-------------//
-router.post("/delete", function (req, res) {
+router.post("/delete" ,validateSessionToken,function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM reports WHERE eid = ?";

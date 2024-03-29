@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.json()); // for parsing application/json
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 
 // MySQL Connection
@@ -26,7 +27,7 @@ connection.connect(function(err) {
 });
 
 //To Create Minute
-router.post('/create',(req,res)=>{
+router.post('/create',validateSessionToken,(req,res)=>{
 	var id=req.body.id;
 	var agenda = req.body.agenda;
 	console.log(agenda);
@@ -69,7 +70,7 @@ router.post('/create',(req,res)=>{
 });
 
 //To List All minutes
-router.post('/list', (req, res) =>{
+router.post('/list',validateSessionToken, (req, res) =>{
 	var id = req.body.id;
 
 	//fetching from minute table
@@ -85,7 +86,7 @@ router.post('/list', (req, res) =>{
 	});
 });
 
-router.post('/viewminute',(req,res)=>{
+router.post('/viewminute',validateSessionToken,(req,res)=>{
 	var date = req.body.date;
 	var time = req.body.time;
 
@@ -102,7 +103,7 @@ router.post('/viewminute',(req,res)=>{
 	});
 });	
 
-router.get('/members', (req, res) => {
+router.get('/members',validateSessionToken, (req, res) => {
     // var date = req.body.date;
 
     connection.query('SELECT core_en_fname FROM core_details where(core_en_fname!="Nilesh" && core_en_fname!="Prasad")', function(error, results) {

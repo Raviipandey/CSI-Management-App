@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,11 +55,13 @@ public class Proposal extends AppCompatActivity {
     String selectedoption;
 
     String uname;
+    String sessiontoken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proposal);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
 
         Spinner threetrackspinner;
@@ -73,8 +76,16 @@ public class Proposal extends AppCompatActivity {
         description.setMovementMethod(new ScrollingMovementMethod());
         getSupportActionBar().setTitle("Add Proposal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         Intent intent = getIntent();
+        sessiontoken = intent.getStringExtra(MainActivity.EXTRA_SESSIONTOKEN);
+        if (sessiontoken == null || sessiontoken.isEmpty()) {
+            sessiontoken = preferenceConfig.readSessionToken();
+        }
+
+
+
+
+
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
@@ -192,9 +203,44 @@ public class Proposal extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Proposal.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Proposal.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
+        };
         requestQueue.add(stringRequest);
     }
 
@@ -227,6 +273,7 @@ public class Proposal extends AppCompatActivity {
                 }
             }
 
+
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
@@ -238,6 +285,7 @@ public class Proposal extends AppCompatActivity {
                 headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
                 return headers;
             }
+
         };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -356,15 +404,32 @@ public class Proposal extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Proposal.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-                    Log.i("info123" ,Integer.toString(error.networkResponse.statusCode));
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Proposal.this,"Check Network",Toast.LENGTH_SHORT).show();}
-
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Proposal.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
 
@@ -376,6 +441,14 @@ public class Proposal extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

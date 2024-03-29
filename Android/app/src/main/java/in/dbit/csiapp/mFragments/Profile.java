@@ -22,8 +22,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.Prompts.ProfileEdit;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
+
 import com.joooonho.SelectableRoundedImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -32,6 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Profile extends Fragment {
 
@@ -42,6 +49,7 @@ public class Profile extends Fragment {
     View rootView;
     ImageView imageButton;
     private String profileImageUrl;
+    private SharedPreferenceConfig preferenceConfig;
 
     public static Profile newInstance() {
         return new Profile();
@@ -70,12 +78,14 @@ public class Profile extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
         rootView = inflater.inflate(R.layout.activity_profile,container,false);
+
 //        Log.i("id print hogi", UID);
         UID = this.getArguments().getString("id");
         server_url = rootView.getResources().getString(R.string.server_url) + "/profile/?id="+UID;
         Log.i("naya",server_url);
         getActivity().setTitle("My Profile");
         Bundle bundle = getArguments();
+        preferenceConfig = new SharedPreferenceConfig(getActivity());
 
 
         UProfile = this.getArguments().getString("core_profilepic_url");
@@ -83,11 +93,14 @@ public class Profile extends Fragment {
         imageButton = rootView.findViewById(R.id.profile_photo);
         loadImageUrl(UProfile);
 
+
         Button edit_button = rootView.findViewById(R.id.edit_button);
 
         //decalring varriables
         TextView id = rootView.findViewById(R.id.id);
         TextView role = rootView.findViewById(R.id.role);
+
+
         //id will get from called intent
         // id.setText(getIntent().getStringExtra("id from respective intent"));
         id.setText(UID);
@@ -177,15 +190,32 @@ public class Profile extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try{
-                    //String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(),"Invalid Username or Password",Toast.LENGTH_SHORT).show();//it will not occur as authenticating at start
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("volleyABC" ,"exception");
-                    Toast.makeText(getActivity(),"Check Network",Toast.LENGTH_SHORT).show();} //occur if connection not get estabilished
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(loginIntent);
+                    getActivity().finish();
+                }
             }
 
         }){
@@ -198,6 +228,15 @@ public class Profile extends Fragment {
                     return null;
                 }
             }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
 
             @Override
             public String getBodyContentType() {

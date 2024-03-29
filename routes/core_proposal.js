@@ -3,7 +3,7 @@ var router = express.Router();
 var randomstring = require('randomstring');
 var dotenv = require('dotenv');
 dotenv.config();
-
+const validateSessionToken  = require('../middleware/ValidateTokens');
 // MySQL Connection
 var mysql = require('mysql');
 var connection = mysql.createConnection({
@@ -62,7 +62,7 @@ var transporter = nodemailer.createTransport({
 
 
 //Creating propsal
-router.post('/createproposal', (req, res) => {
+router.post('/createproposal',validateSessionToken, (req, res) => {
     var cpm_id = req.body.cpm_id;
     var proposals_event_name = req.body.proposals_event_name;
     var proposals_event_category = req.body.proposals_event_category;
@@ -98,8 +98,52 @@ router.post('/createproposal', (req, res) => {
     });
 });
 
-router.get('/getalltoken', (req, res) => {
-    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
+router.get('/getalltoken',validateSessionToken, (req, res) => {
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens");
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            // Extract core_id and fcm_token values from the result array and create an array of objects
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
+
+            // Send the tokensWithIds array as JSON
+            res.status(200).json(tokensWithIds);
+        }
+    });
+});
+
+
+router.get('/getadmintoken',validateSessionToken,(req, res) => {
+    var id = req.query.id; // Access id from query parameters
+    console.log("Received id: ", id);
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id = ?', [id], function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens:", error);
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            // Extract core_id and fcm_token values from the result array and create an array of objects
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
+
+            // Send the tokensWithIds array as JSON
+            res.status(200).json(tokensWithIds);
+        }
+    });
+});
+
+//This route is used for attendance
+router.get('/getcvctoken',validateSessionToken,(req, res) => {
+    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (3 , 4)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");
             res.status(400).json({ error: 'Error fetching core fcm tokens' });
@@ -113,25 +157,31 @@ router.get('/getalltoken', (req, res) => {
     });
 });
 
-router.get('/getcvctoken', (req, res) => {
-    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id = 3 and 4', function(error, result) {
+//Tech head and event head token
+router.get('/getthehtoken',validateSessionToken, (req, res) => {
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (5 ,6)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");
             res.status(400).json({ error: 'Error fetching core fcm tokens' });
         } else {
-            // Extract fcm_token values from the result array
-            const fcmTokens = result.map(row => row.fcm_token).filter(token => token); // Filter out null or empty tokens
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token);
 
             // Send the fcmTokens array as JSON
-            res.status(200).json(fcmTokens);
+            res.status(200).json(tokensWithIds);
         }
     });
 });
+
 // cpm_id, proposals_event_name, proposals_event_date, proposals_event_category, proposals_venue, 
 // proposals_three_track, proposals_desc, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, 
 // proposals_prize, proposals_meeting_id, proposals_status, proposals_comment, agenda, speaker
 //search for agenda
-router.post('/viewagenda', (req, res) => {
+router.post('/viewagenda',validateSessionToken, (req, res) => {
     var date = req.body.date;
     console.log(date);
     connection.query('SELECT minute_objective FROM core_minute_manager where minute_date = ?', [date], function(error, results) {
@@ -199,7 +249,7 @@ router.post('/viewagenda', (req, res) => {
 //     });
 // });
 
-router.post('/status', (req, res) => {
+router.post('/status',validateSessionToken,(req, res) => {
     const cpm_id = req.body.cpm_id;
     const status = req.body.proposals_status;
     const newRole = req.body.role; // Retrieve the role from the request
@@ -237,7 +287,7 @@ router.post('/status', (req, res) => {
 
 
 //View proposal details
-router.post('/viewproposal', (req, res) => {
+router.post('/viewproposal',validateSessionToken, (req, res) => {
     var cpm_id = req.body.cpm_id;
     connection.query('SELECT proposals_event_name, proposals_event_category,proposals_three_track, proposals_desc, proposals_event_date,proposals_creative_budget,proposals_publicity_budget,proposals_guest_budget,proposals_total_budget,proposals_comment from core_proposals_manager where cpm_id=?;', [cpm_id], function(error, results) {
         console.log(results)
@@ -252,7 +302,7 @@ router.post('/viewproposal', (req, res) => {
 });
 
 //Listing All proposal
-router.get('/viewlistproposal', (req, res) => {
+router.get('/viewlistproposal',validateSessionToken, (req, res) => {
 
     connection.query('SELECT cpm_id, proposals_event_name, proposals_event_category ,proposals_status , proposals_event_date from core_proposals_manager order by cpm_id DESC ;', function(error, results) {
         // console.log(results)
@@ -267,7 +317,7 @@ router.get('/viewlistproposal', (req, res) => {
 });
 
 //Edit proposal
-router.post('/editproposal', (req, res) => {
+router.post('/editproposal',validateSessionToken, (req, res) => {
     
     var eid = req.body.eid;
     var name = req.body.name;
@@ -290,4 +340,5 @@ router.post('/editproposal', (req, res) => {
         }
     });
 });
+
 module.exports = router;

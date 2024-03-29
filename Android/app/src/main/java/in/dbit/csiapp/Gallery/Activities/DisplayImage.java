@@ -1,6 +1,7 @@
 package in.dbit.csiapp.Gallery.Activities;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -32,6 +33,7 @@ import com.android.volley.toolbox.Volley;
 
 import in.dbit.csiapp.Gallery.DisplayImageAdapter.GalleryImageAdapter;
 import in.dbit.csiapp.Gallery.Interfaces.IRecyclerViewClickListener;
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.Gallery.ImageFilePath;
 
@@ -44,7 +46,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -55,6 +60,7 @@ import okhttp3.RequestBody;
 public class DisplayImage extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+
     private static final int REQUEST_IMAGE_PICKER = 2;
     private static final String FILE_PROVIDER_AUTHORITY = "in.dbit.csiapp.fileprovider";
 
@@ -226,16 +232,32 @@ public class DisplayImage extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(DisplayImage.this, "Invalid", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(DisplayImage.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(DisplayImage.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(DisplayImage.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(DisplayImage.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(DisplayImage.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -247,6 +269,15 @@ public class DisplayImage extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -343,16 +374,32 @@ public class DisplayImage extends AppCompatActivity {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    String errorMessage = "An error occurred"; // Default message
+                    try {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = new JSONObject(responseBody);
+                            errorMessage = data.optString("error", errorMessage); // Extract custom message
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                    try{
-                        Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                        Toast.makeText(DisplayImage.this, "Invalid", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                    if ("Session expired".equals(errorMessage)) {
+                        Toast.makeText(DisplayImage.this, "Session expired", Toast.LENGTH_LONG).show();
+                    } else if ("Another device has logged in".equals(errorMessage)) {
+                        Toast.makeText(DisplayImage.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(DisplayImage.this, errorMessage, Toast.LENGTH_LONG).show();
+                    }
 
-
-                        error.printStackTrace();}
-                    catch (Exception e)
-                    {
-                        Toast.makeText(DisplayImage.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        // Handle logout if session is expired or taken over
+                        preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                        Intent loginIntent = new Intent(DisplayImage.this, MainActivity.class);
+                        startActivity(loginIntent);
+                        finish();
+                    }
                 }
             }){
                 //sending JSONOBJECT String to server starts
@@ -364,6 +411,15 @@ public class DisplayImage extends AppCompatActivity {
                         e.printStackTrace();
                         return null;
                     }
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    String sessionToken = preferenceConfig.readSessionToken();
+                    Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                    headers.put("Authorization", "Bearer " + sessionToken);
+                    return headers;
                 }
 
                 @Override
