@@ -461,33 +461,36 @@ public class AttendancePR extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String errorMessage = "An error occurred"; // Default message
-                try {
-                    if (error.networkResponse != null && error.networkResponse.data != null) {
-                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                        JSONObject data = new JSONObject(responseBody);
-                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                if(getActivity() != null) {
+                    String errorMessage = "An error occurred"; // Default message
+                    try {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = new JSONObject(responseBody);
+                            errorMessage = data.optString("error", errorMessage); // Extract custom message
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                if ("Session expired".equals(errorMessage)) {
-                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
-                } else if ("Another device has logged in".equals(errorMessage)) {
-                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
-                }
+                    if ("Session expired".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                    } else if ("Another device has logged in".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
 
-                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                    // Handle logout if session is expired or taken over
-                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
-                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
-                    startActivity(loginIntent);
-                    getActivity().finish();
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        // Handle logout if session is expired or taken over
+                        preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                        Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(loginIntent);
+                        getActivity().finish();
+                    }
                 }
             }
+
         }){
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -577,33 +580,36 @@ public class AttendancePR extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String errorMessage = "An error occurred"; // Default message
-                try {
-                    if (error.networkResponse != null && error.networkResponse.data != null) {
-                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                        JSONObject data = new JSONObject(responseBody);
-                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                if(getActivity() != null) {
+                    String errorMessage = "An error occurred"; // Default message
+                    try {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = new JSONObject(responseBody);
+                            errorMessage = data.optString("error", errorMessage); // Extract custom message
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                if ("Session expired".equals(errorMessage)) {
-                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
-                } else if ("Another device has logged in".equals(errorMessage)) {
-                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
-                }
+                    if ("Session expired".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                    } else if ("Another device has logged in".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
 
-                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                    // Handle logout if session is expired or taken over
-                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
-                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
-                    startActivity(loginIntent);
-                    getActivity().finish();
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        // Handle logout if session is expired or taken over
+                        preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                        Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(loginIntent);
+                        getActivity().finish();
+                    }
                 }
             }
+
         }){
             @Override
             public byte[] getBody() throws AuthFailureError {
