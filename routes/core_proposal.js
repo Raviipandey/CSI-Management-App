@@ -143,8 +143,7 @@ router.get('/getadmintoken',validateSessionToken,(req, res) => {
 });
 
 //This route is used for attendance
-router.get('/getcvctoken',validateSessionToken,(req, res) => {
-    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (3 , 4)', function(error, result) {
+
 
 router.get('/getalltoken', (req, res) => {
     connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
@@ -168,9 +167,7 @@ router.get('/getalltoken', (req, res) => {
 });
 
 
-//Tech head and event head token
-router.get('/getthehtoken',validateSessionToken, (req, res) => {
-    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (5 ,6)', function(error, result) {
+
 
 
 router.get('/getadmintoken', (req, res) => {
@@ -197,7 +194,7 @@ router.get('/getadmintoken', (req, res) => {
 
 
 // This route is used for attendance
-router.get('/getcvctoken', (req, res) => {
+router.get('/getcvctoken', validateSessionToken, (req, res) => {
     connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (3 , 4)', function(error, result) {
 
         if (error) {
@@ -220,7 +217,7 @@ router.get('/getcvctoken', (req, res) => {
 });
 
 //Tech head and event head token
-router.get('/getthehtoken', (req, res) => {
+router.get('/getthehtoken',validateSessionToken, (req, res) => {
     connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (5 ,6)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");

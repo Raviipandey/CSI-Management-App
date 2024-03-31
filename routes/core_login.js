@@ -15,7 +15,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-const crypto = require('crypto');
+
 
 function generateSessionToken() {
     return crypto.randomBytes(48).toString('hex'); // Generates a secure, random 48-byte hex string

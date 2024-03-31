@@ -56,7 +56,7 @@ public class Proposal extends AppCompatActivity {
     String selectedoption;
 
 
-    String uname;
+
     String sessiontoken;
 
     String uname , uid;

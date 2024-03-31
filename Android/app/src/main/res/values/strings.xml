@@ -1,5 +1,5 @@
 <resources>
-    <string name="server_url">http://192.168.1.103:9000</string>
+    <string name="server_url">http://192.168.177.203:9000</string>
     <string name="app_name">CSI-DBIT</string>
     <string name="title_activity_minutes_list">MinutesList</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
