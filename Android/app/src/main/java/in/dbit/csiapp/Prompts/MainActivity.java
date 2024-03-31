@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         animation();
         //.....6/6/2019
 
+
+
+  
+
         if(preferenceConfig.readLoginStatus()!=""){
             Intent manager = new Intent(MainActivity.this, Manager.class);
             manager.putExtra(EXTRA_MOBNO, preferenceConfig.readLoginStatus());
@@ -442,4 +446,8 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     }
 
 
+
 }
+
+}
+

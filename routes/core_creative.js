@@ -62,7 +62,6 @@ router.post('/submit',validateSessionToken,(req,res)=>{
 	});
 });
 
-
 //Poster,video uploading
 var multer=require('multer');
 

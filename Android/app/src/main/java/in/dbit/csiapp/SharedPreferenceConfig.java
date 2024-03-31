@@ -86,9 +86,9 @@ public class SharedPreferenceConfig {
         return sharedPreferences.getString("profileURL","");
     }
 
+
     // Method to fetch the session token
     public String readSessionToken() {
         return sharedPreferences.getString("newSessionToken", "No token found");
     }
-
 }

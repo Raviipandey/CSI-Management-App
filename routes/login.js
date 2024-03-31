@@ -42,7 +42,6 @@ router.post('/',(req,res)=>{
              				});
           			}
 	        		else{
-            				//Users password do not match
 					console.log("Password Do ");
           				res.sendStatus(400);
           			}

@@ -89,7 +89,7 @@ public class Publicity extends AppCompatActivity {
     public static final String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
-    String urole1, eventDate ,uname;
+    String urole1, eventDate ,uname, uid;
     LinearLayout pr_lay;
     Button edit_pr, submit_pr;
 //    String eid;
@@ -132,6 +132,9 @@ public class Publicity extends AppCompatActivity {
         Intent intent = getIntent();
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
         submit_pr = findViewById(R.id.submit_pl);
         edit_pr = findViewById(R.id.edit_pr_req);
         pr_lay = findViewById(R.id.pr_pl);
@@ -276,12 +279,21 @@ public class Publicity extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                        // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New expense sheet uploaded", uname + " just uploaded expense sheet for " + eventName.getText().toString(), Integer.parseInt(uid), idsArray , "5");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -328,6 +340,32 @@ public class Publicity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+    }
+
 
 
     // Method to send notification after successful proposal submission
@@ -339,6 +377,7 @@ public class Publicity extends AppCompatActivity {
             JSONObject notificationBody = new JSONObject();
             notificationBody.put("title", "New expense sheet uploaded");
             notificationBody.put("body", uname + " just uploaded expense sheet for " + eventName.getText().toString() + ". Click to view.");
+            notification.put("priority", "high");
             notification.put("notification", notificationBody);
 
             // Add intent to open MainActivity when notification is clicked
@@ -348,7 +387,6 @@ public class Publicity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
                 response -> Log.d("FCM", "Notification sent successfully"),
                 error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
@@ -566,6 +604,7 @@ public class Publicity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, try to download file again

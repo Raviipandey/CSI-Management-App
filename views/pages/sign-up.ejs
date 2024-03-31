@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+<div class="form-gap" style="padding-top: 70px;"></div>
+<div class="container">
+  <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+          <div class="panel panel-default">
+              <div class="panel-body">
+                  <div class="text-center">
+                      <h3><i class="fa fa-lock fa-4x"></i></h3>
+                      <h2 class="text-center">Reset Password</h2>
+                      <p>You can reset your password here.</p>
+                      <div class="panel-body">
+                        <div id="success-message" style="display: none;" class="alert alert-success text-center">
+                          Password reset successful!
+                        </div>
+                        <form id="reset-password-form" role="form" autocomplete="off" class="form" method="post" action="/login/newpassword">
+                          <div class="form-group">
+                              <div class="input-group">
+                                  <span class="input-group-addon"><i class="glyphicon glyphicon-lock color-blue"></i></span>
+                                  <input id="newPassword" name="newPassword" placeholder="New Password" class="form-control" type="password" required>
+                              </div>
+                          </div>
+                          <input type="hidden" name="token" id="token"> <!-- Hidden input for the token -->
+                          <div class="form-group">
+                              <input name="reset-submit" class="btn btn-lg btn-primary btn-block" value="Reset Password" type="submit">
+                          </div>
+                      </form>
+                          <div id="countdownTimer" class="text-center"></div> <!-- Countdown timer placeholder -->
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<script>
+  // Check if the success message should be displayed
+  const urlParams = new URLSearchParams(window.location.search);
+  const success = urlParams.get('success');
+
+  if (success === 'true') {
+      // Show the success message
+      document.getElementById('success-message').style.display = 'block';
+  }
+
+  // Extract the token from the URL
+  const url = window.location.href;
+  const token = url.substring(url.lastIndexOf('/') + 1);
+
+  // Set the token value in the hidden input field
+  document.getElementById('token').value = token;
+</script>

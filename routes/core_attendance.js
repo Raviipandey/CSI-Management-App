@@ -5,7 +5,14 @@ var router=express.Router();
 var dotenv = require('dotenv');
 dotenv.config();
 app.use(express.json()); // This line is essential for parsing JSON bodies
+
 const validateSessionToken  = require('../middleware/ValidateTokens');
+
+var admin = require('firebase-admin');
+const { server_url} = require('../serverconfig');
+// var serviceAccount = require('../firebase/ServiceAccount.json');
+
+
 
 // MySQL Connection
 var mysql=require('mysql');
@@ -67,6 +74,26 @@ router.post('/request',validateSessionToken,(req,res)=>{
 	});
 });
 
+router.post('/fetchtokenbyid', (req, res) => {
+    var ad_ids = req.body.ad_ids; // Assuming ad_ids is an array of request IDs sent by the client
+
+    // Construct the SQL query dynamically to handle multiple ad_ids
+    var query = 'SELECT cd.fcm_token FROM csiApp2022.attendance_details ad JOIN csiApp2022.core_details cd ON ad.core_id = cd.core_id WHERE ad.ad_id IN (?)';
+
+    connection.query(query, [ad_ids], function (error, result) {
+        if (error) {
+            res.status(500).json({ error: error.message });
+        } else {
+            // Extract FCM tokens from the query result
+            var fcmTokens = result.map(entry => entry.fcm_token);
+			console.log(fcmTokens);
+            res.status(200).json({ fcmTokens: fcmTokens });
+        }
+    });
+});
+
+
+
 //Display all the requests
 router.post('/requestlist',validateSessionToken,(req,res)=>{
 	connection.query('SELECT cd.core_en_fname, cd.fcm_token, ad.* FROM attendance_details ad JOIN core_details cd ON ad.core_id = cd.core_id WHERE ad.status = "WAITING";',function(error,result){
@@ -84,6 +111,7 @@ router.post('/requestlist',validateSessionToken,(req,res)=>{
 
 //Accept json array,move the record from request to final_list
 // Route to update the status of attendance requests
+
 router.post('/finallist',validateSessionToken, (req, res) => {
 	console.log(req.body); // Check the incoming data
 	// Extract the 'accepted' array from the request body
@@ -117,6 +145,115 @@ router.post('/finallist',validateSessionToken, (req, res) => {
 	  });
 	});
   });
+
+router.post('/finallist', (req, res) => {
+    // Extract the accepted IDs from the request body
+    const acceptedIds = req.body.accepted;
+    console.log("Response here", acceptedIds);
+
+    // Check if acceptedIds is not an array or is empty
+    if (!Array.isArray(acceptedIds) || acceptedIds.length === 0) {
+        return res.status(400).send({ message: 'No accepted IDs provided.' });
+    }
+
+    // Update the status of accepted IDs in the database
+    const updatePromises = acceptedIds.map(id =>
+        new Promise((resolve, reject) => {
+            connection.query('UPDATE attendance_details SET status = "ACCEPTED" WHERE ad_id = ?', [id], (error, result) => {
+                if (error) {
+                    console.error(`Error updating ad_id ${id}:`, error);
+                    return reject(error);
+                }
+                console.log(`Successfully updated ad_id ${id}`);
+                resolve(result);
+            });
+        })
+    );
+
+    // Execute all update queries and handle results
+    Promise.allSettled(updatePromises)
+        .then(updateResults => {
+            const updateErrors = updateResults.filter(r => r.status === 'rejected');
+            if (updateErrors.length > 0) {
+                // Handle partial or complete update failure
+                console.error('Errors occurred while updating attendance status:', updateErrors);
+                return res.status(500).send('Error updating attendance status.');
+            }
+
+            // Fetch FCM tokens only if there are accepted IDs
+            connection.query('SELECT cd.fcm_token , cd.core_id FROM csiApp2022.attendance_details ad JOIN csiApp2022.core_details cd ON ad.core_id = cd.core_id WHERE ad.ad_id IN (?)', [acceptedIds], (error, results) => {
+                if (error) {
+                    console.error('Failed to fetch FCM tokens:', error);
+                    return res.status(500).send('Error fetching FCM tokens.');
+                }
+
+                // Extract FCM tokens from the results
+                const fcmTokens = results.map(result => result.fcm_token);
+                const coreIds = results.map(result => result.core_id);
+
+                // Send notifications to each FCM token
+                fcmTokens.forEach(token => {
+                    const message = {
+                        notification: {
+                            title: 'Attendance accepted',
+                            body: 'Your attendance request has been accepted',
+                        },
+                        token: token,
+        					android: {
+            				notification: {
+                				click_action: 'AttendancePR_ACTIVITY' // Set the intent action to open AttendancePR activity
+            				}
+        				}
+                    };
+
+                    admin.messaging().send(message)
+                        .then(response => {
+                            console.log('Successfully sent acceptance message:', response);
+                        })
+                        .catch(error => {
+                            console.error('Error sending acceptance message:', error);
+                        });
+                });
+
+                const notificationData = {
+                    nd_title: 'Attendance accepted',
+                    nd_body: 'Your attendance request has been accepted',
+                    nd_sender_id: '3', // Update with actual sender ID
+                    nd_receiver_ids: coreIds, // Pass coreIds as receiver_ids
+                    nc_id: '3' // Update with actual notification category ID
+                };
+
+                fetch(`${server_url}/notification/createnotification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(notificationData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle response from create notification endpoint if needed
+                    console.log('Notification created successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error creating notification:', error);
+                });
+
+
+                // Send success response with FCM tokens
+                res.status(200).send({ message: 'All attendance statuses updated successfully.', fcmTokens: fcmTokens });
+            });
+        })
+        .catch(error => {
+            console.error('Error updating attendance status:', error);
+            res.status(500).send('Error updating attendance status.');
+        });
+});
+
+
+
+
+
 
 
 
@@ -172,8 +309,8 @@ router.post('/reject',validateSessionToken, (req, res) => {
     console.log('Received IDs:', ids);
 
     // Ensure ids is an array
-    if (!Array.isArray(ids)) {
-        return res.status(400).send('Invalid data format');
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).send('No IDs provided or invalid data format');
     }
 
     const promises = ids.map(id =>
@@ -198,9 +335,68 @@ router.post('/reject',validateSessionToken, (req, res) => {
         } else {
             // All queries succeeded
             res.sendStatus(200);
+
+            // Fetch FCM tokens for rejected IDs only if there are rejected IDs
+            connection.query('SELECT cd.fcm_token , cd.core_id FROM csiApp2022.attendance_details ad JOIN csiApp2022.core_details cd ON ad.core_id = cd.core_id WHERE ad.ad_id IN (?)', [ids], (error, results) => {
+                if (error) {
+                    console.error('Failed to fetch FCM tokens:', error);
+                    return;
+                }
+                // Extract FCM tokens from the results
+                const fcmTokens = results.map(result => result.fcm_token);
+                const coreIds = results.map(result => result.core_id);
+                
+                // Send notification to each FCM token
+                fcmTokens.forEach(token => {
+                    // Construct the message payload
+                    const message = {
+                        notification: {
+                            title: 'Attendance rejected',
+                            body: 'Your request for attendance has been rejected',
+                        },
+                        token: token,
+                    };
+
+                    // Send the message
+                    admin.messaging().send(message)
+                        .then((response) => {
+                            console.log('Successfully sent rejection message:', response);
+                        })
+                        .catch((error) => {
+                            console.error('Error sending rejection message:', error);
+                        });
+                });
+
+                // Prepare notification data for both methods
+                const notificationData = {
+                    nd_title: 'Attendance rejected',
+                    nd_body: 'Your request for attendance has been rejected',
+                    nd_sender_id: '3', // Update with actual sender ID
+                    nd_receiver_ids: coreIds, // Pass coreIds as receiver_ids
+                    nc_id: '3' // Update with actual notification category ID
+                };
+
+                // Method 2: Make POST request to create notification
+                fetch(`${server_url}/notification/createnotification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(notificationData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle response from create notification endpoint if needed
+                    console.log('Notification created successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error creating notification:', error);
+                });
+            });
         }
     });
 });
+
 
 
 
