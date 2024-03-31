@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -93,6 +94,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         animation();
         //.....6/6/2019
 
+        Intent intent = getIntent();
+        if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri uri = intent.getData();
+            if (uri != null && uri.getPath().equals("/login/newpassword")) {
+
+                Toast.makeText(MainActivity.this , "Login with your new password" ,Toast.LENGTH_LONG).show();
+                // This activity was started from the deep link
+                // Perform actions accordingly
+                // For example, navigate to specific fragment or perform required tasks
+            }
+        }
 
 
   

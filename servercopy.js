@@ -55,6 +55,7 @@ app.use(express.static(__dirname + "/views"));
 
 // Correctly configure the path to your static files
 app.use('/server_uploads', express.static(path.join(__dirname, 'server_uploads')));
+app.use('/.well-known', express.static(path.join(__dirname, '.well-known')));
 app.use('/report', express.static(path.join(__dirname, 'report')));
 app.use('/creative', express.static('./creative'));
 

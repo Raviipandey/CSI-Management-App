@@ -7,7 +7,7 @@ android {
         applicationId 'in.dbit.csiapp'
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 7
+        versionCode 9
         versionName "2.0.0"
         multiDexEnabled true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
