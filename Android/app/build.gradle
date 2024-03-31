@@ -7,8 +7,8 @@ android {
         applicationId 'in.dbit.csiapp'
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 9
-        versionName "1.0.8"
+        versionCode 7
+        versionName "2.0.0"
         multiDexEnabled true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         signingConfigs {
@@ -27,6 +27,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
