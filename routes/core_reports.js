@@ -66,7 +66,7 @@ router.get('/list',validateSessionToken,(req,res)=>{
 });
 
 /////----------Route to upload reports -------------//
-router.post("/upload",validateSessionToken, upload.single("report"), function (req, res, next) {
+router.post("/upload", upload.single("report"), function (req, res, next) {
     const file = req.file;
     if (!file) {
         return res.status(400).send("Please upload a file");
@@ -100,7 +100,7 @@ router.post("/upload",validateSessionToken, upload.single("report"), function (r
 });
 
 /////----------Route to fetch uploaded reports-------------//
-router.get("/fetchreport",validateSessionToken, function (req, res) {
+router.get("/fetchreport", function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
@@ -115,7 +115,7 @@ router.get("/fetchreport",validateSessionToken, function (req, res) {
 });
 
 /////----------Route to download reports-------------//
-router.get("/download",validateSessionToken, function (req, res) {
+router.get("/download", function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
@@ -136,7 +136,7 @@ router.get("/download",validateSessionToken, function (req, res) {
 });
 
 /////----------Route to delete reports-------------//
-router.post("/delete" ,validateSessionToken,function (req, res) {
+router.post("/delete" ,function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM reports WHERE eid = ?";

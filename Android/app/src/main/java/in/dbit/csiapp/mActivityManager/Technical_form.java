@@ -1,6 +1,7 @@
 package in.dbit.csiapp.mActivityManager;
 
 import android.Manifest;
+import android.app.DownloadManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -502,75 +503,28 @@ public class Technical_form extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Build the download request
-                OkHttpClient client = new OkHttpClient();
-                okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
-                        .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid)
-                        .build();
+                // Create a DownloadManager instance
+                DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
-                // Execute the download request asynchronously
-                client.newCall(downloadRequest).enqueue(new Callback() {
-                    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
+                // Create a DownloadManager.Request object
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid));
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setTitle(eid + "_"+ name.getText().toString() + "_technical");
+                request.setDescription("Downloading file...");
 
-                        if (!response.isSuccessful()) {
-                            throw new IOException("Unexpected code " + response);
-                        }
+                // Set the destination directory
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                } else {
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                }
 
-                        String contentDisposition = response.header("Content-Disposition");
-                        String fileName = extractFileName(contentDisposition);
-
-                        // Create a file with the downloaded content
-                        byte[] bytes = response.body().bytes();
-
-                        // Get the content resolver
-                        ContentResolver resolver = getContentResolver();
-
-                        // Set up the ContentValues to insert into the MediaStore
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-
-                        // For Android Q and above, use the Downloads directory
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                        }
-
-                        // Insert the file into the MediaStore
-                        Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
-
-                        if (uri != null) {
-                            try (OutputStream outputStream = resolver.openOutputStream(uri)) {
-                                outputStream.write(bytes);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(Technical_form.this, "Error saving file", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-
-
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                // Enqueue the download request
+                downloadManager.enqueue(request);
             }
         });
     }
+
 
     private void handleFileNotFound(String error) {
         // File not found, update UI accordingly
