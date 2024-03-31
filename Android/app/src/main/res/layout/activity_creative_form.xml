@@ -566,7 +566,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/upload_text"
@@ -730,31 +731,101 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/fileuploadlayout"
                 android:layout_width="320dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/browse_file_button"
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/browse_file_button"
+                        android:layout_width="135dp"
+                        android:layout_height="40dp"
+                        android:text="Browse File"
+                        android:textColor="@color/White"
+                        android:background="@drawable/button_background"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"/>
+
+                    <Spinner
+                        android:id="@+id/layout_type_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:entries="@array/layout_types"
+                        android:visibility="gone"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"/>
+
+                    <Spinner
+                        android:id="@+id/video_type_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:entries="@array/video_types"
+                        android:visibility="gone"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"/>
+
+                </LinearLayout>
+
+                <!-- Upload Button Section -->
+
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/defaultmsg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Browse File" />
+                    android:layout_below="@id/viewPager"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    android:text="Files will appear here"
+                    android:textSize="16sp"
+                    android:textColor="@color/design_default_color_primary"
+                    android:layout_gravity="center_horizontal"/>
 
-                <Spinner
-                    android:id="@+id/layout_type_spinner"
+                <com.viewpagerindicator.CirclePageIndicator
+                    android:id="@+id/indicator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:entries="@array/layout_types"
-                    android:visibility="gone"/>
+                    android:layout_gravity="center"
+                    android:padding="10dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp"
+                    app:fillColor="@color/colorPrimary"
+                    app:pageColor="@color/white"
+                    app:strokeColor="#FF000000"
+                    app:strokeWidth="1dp"
+                    app:radius="5dp"
+                    app:centered="true"
+                    app:snap="false" />
 
-                <Spinner
-                    android:id="@+id/video_type_spinner"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/upload_button"
+                    android:layout_width="225dp"
                     android:layout_height="wrap_content"
-                    android:entries="@array/video_types"
-                    android:visibility="gone" />
+                    android:layout_marginTop="16dp"
+                    android:text="Upload"
+                    android:textColor="@color/white"
+                   android:background="@drawable/ripple_effect"
+                    android:textSize="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_horizontal"
+                    />
 
             </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/preview_layout"
@@ -762,16 +833,11 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:padding="16dp"></LinearLayout>
+                android:padding="16dp"
+                android:visibility="gone" />
 
 
 
-            <Button
-                android:id="@+id/upload_button"
-                android:layout_width="199dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Upload" />
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -798,27 +864,7 @@
             android:layout_margin="0dp"
             android:background="#EDEDED" />
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_weight="1"/>
 
-        <com.viewpagerindicator.CirclePageIndicator
-            android:id="@+id/indicator"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="10dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp"
-            app:fillColor="@color/colorPrimary"
-            app:pageColor="@color/white"
-            app:strokeColor="#FF000000"
-            app:strokeWidth="1dp"
-            app:radius="5dp"
-            app:centered="true"
-            app:snap="false" />
 
 
         <View
@@ -842,7 +888,8 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:text="Submit"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:visibility="gone"/>
 
 
         </LinearLayout>

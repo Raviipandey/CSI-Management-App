@@ -23,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
@@ -45,7 +46,7 @@ public class AddMinute extends AppCompatActivity {
 
     AutoCompleteTextView mCreateAgenda;
     Button mAddMinute, mAddTask;
-    String Agenda, Points, Creator, Absentee, server_url, date, time, uname;
+    String Agenda, Points, Creator, Absentee, server_url, date, time, uname , uid;
     EditText  mCreatePoints, mTask, mAbsentee;
     Spinner spinner;
     TableLayout tableLayout;
@@ -64,6 +65,9 @@ public class AddMinute extends AppCompatActivity {
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -249,6 +253,7 @@ public class AddMinute extends AppCompatActivity {
     }
 
     // Method to fetch all FCM tokens from the server
+    // Method to fetch all FCM tokens and core_ids from the server
     private void fetchAllTokens() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
@@ -256,12 +261,21 @@ public class AddMinute extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                         // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New Minutes of meet added", uname + " has added the minutes of recent meeting.", Integer.parseInt(uid), idsArray , "1");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -273,6 +287,32 @@ public class AddMinute extends AppCompatActivity {
             }
         });
         requestQueue.add(stringRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
 

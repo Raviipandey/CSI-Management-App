@@ -25,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -53,7 +54,11 @@ public class Proposal extends AppCompatActivity {
     EditText description;
     String selectedoption;
 
-    String uname;
+    String uname , uid;
+
+    String notification_title , notification_body;
+
+    JSONArray idsArray = new JSONArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +83,13 @@ public class Proposal extends AppCompatActivity {
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+        Log.i("Fetching name" , uname);
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
+
+        notification_title = "New Proposal Added";
+        notification_body = "A new proposal has been added by " + uname;
 
 //        fcmtoken = intent.getStringExtra(MainActivity.EXTRA_FCMTOKEN);
 //        fcmtoken= preferenceConfig.fetchfcmtoken();
@@ -171,6 +183,8 @@ public class Proposal extends AppCompatActivity {
         });
     }
 
+
+
     // Method to fetch all FCM tokens from the server
     private void fetchAllTokens() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -180,11 +194,34 @@ public class Proposal extends AppCompatActivity {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
                     Log.i("FCM SERVER" , String.valueOf(tokensArray));
+
+                    // Create a JSON array to store IDs
+
+
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse fcm_token
+
+                        // Add core_id to the JSON array
+                        if(!uid.equals(coreId)){
+                            idsArray.put(coreId);
+                        }
+
+
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+
+                    createNotification(notification_title , notification_body , Integer.parseInt(uid), idsArray , "2");
+
+                    // Store the JSON array of IDs or use it as needed
+                    Log.i("IDS_ARRAY", idsArray.toString());
+
+
+
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -198,6 +235,37 @@ public class Proposal extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
+    // Method to create notification by calling the backend endpoint
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+
+
+
 
 
     // Method to send notification after successful proposal submission
@@ -207,9 +275,11 @@ public class Proposal extends AppCompatActivity {
         try {
             notification.put("to", fcmtoken); // Using the FCM token obtained earlier
             JSONObject notificationBody = new JSONObject();
-            notificationBody.put("title", "New Proposal Added");
-            notificationBody.put("body", "A new proposal has been added by" + uname);
+            notificationBody.put("title", notification_title);
+            notificationBody.put("body", notification_body);
             notification.put("notification", notificationBody);
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

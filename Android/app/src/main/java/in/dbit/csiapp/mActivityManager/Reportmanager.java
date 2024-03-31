@@ -31,6 +31,8 @@ import androidx.core.app.ActivityCompat;
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -74,7 +76,7 @@ public class Reportmanager extends AppCompatActivity {
     private SharedPreferenceConfig preferenceConfig;
 
 
-    String eName , urole , uname;
+    String eName , urole , uname , uid;
     String eid;
 
     FloatingActionButton uploadreport;
@@ -105,6 +107,9 @@ public class Reportmanager extends AppCompatActivity {
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
 
         uploadreport.hide();
         download.hide();
@@ -161,12 +166,21 @@ public class Reportmanager extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                        // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New Event Report Uploaded", uname + " just uploaded report for " + eName, Integer.parseInt(uid), idsArray , "7");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -178,6 +192,85 @@ public class Reportmanager extends AppCompatActivity {
             }
         });
         requestQueue.add(stringRequest);
+    }
+
+    private void fetchAdminTokens(final String id , String status) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/getadmintoken?id=" + id;
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(com.android.volley.Request.Method.GET, url, null,
+                new com.android.volley.Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            JSONArray coreIdsArray = new JSONArray(); // JSONArray to store core_ids
+                            JSONArray fcmTokensArray = new JSONArray(); // JSONArray to store FCM tokens
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject tokenObject = response.getJSONObject(i);
+                                String fcmToken = tokenObject.getString("fcm_token"); // Get the fcm_token
+                                String coreId = tokenObject.getString("core_id"); // Get the core_id
+
+                                // Create JSONObject for core_id and FCM token
+//                                JSONObject coreIdObject = new JSONObject();
+//                                coreIdObject.put("core_id", coreId);
+//                                coreIdsArray.put(coreIdObject);
+                                // Initialize idsArray separately for each method call
+                                JSONArray idsArrayadminn = new JSONArray();
+                                idsArrayadminn.put(coreId);
+
+                                JSONObject fcmTokenObject = new JSONObject();
+                                fcmTokenObject.put("fcm_token", fcmToken);
+                                fcmTokensArray.put(fcmTokenObject);
+
+                                // Call the method to send notification for each FCM token
+                                if (id.equals("1")) {
+                                    sendNotification(fcmToken);
+                                    createNotification("New Event Report Uploaded", uname + " just uploaded report for " + eName, Integer.parseInt(uid), idsArrayadminn , "7");
+
+                                } else if (id.equals("2")) {
+                                    sendNotification(fcmToken);
+                                    createNotification("New Event Report Uploaded", uname + " just uploaded report for " + eName, Integer.parseInt(uid), idsArrayadminn , "7");
+                                }
+                            }
+                            // Do something with coreIdsArray and fcmTokensArray if needed
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        requestQueue.add(jsonArrayRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
 
@@ -380,6 +473,7 @@ public class Reportmanager extends AppCompatActivity {
                     editor.apply();
 
                     fetchAllTokens();
+                    fetchAdminTokens("1" , "1");
 
 
                     runOnUiThread(new Runnable() {

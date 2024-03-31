@@ -17,6 +17,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -43,7 +45,15 @@ public class proposal_desc extends AppCompatActivity {
     public String urole1;
 
     private SharedPreferenceConfig preferenceConfig;
-    String eid , uname;
+    String eid , uname , uid;
+    JSONArray idsArraycore = new JSONArray();
+    JSONArray idsArrayadminn = new JSONArray();
+
+    JSONArray idsArraycvc = new JSONArray();
+
+    String ap_title , ap_body_to_core , ap_body_to_sbc ,ap_body_to_hod ,np_title , np_body , ap_sbc_to_core , ap_sbc_to_hod , ap_hod_to_all ;
+    String rp_title , rp_body_to_core , rp_sbc_to_core , rp_hod_to_all;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,21 +66,39 @@ public class proposal_desc extends AppCompatActivity {
          comment_e = findViewById(R.id.comment_e);
          comment_t = findViewById(R.id.comment_t);
 
-
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         urole1=preferenceConfig.readRoleStatus();
 
         Intent intent = getIntent();
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
 //      Toast.makeText(proposal_desc.this,urole1,Toast.LENGTH_SHORT).show();
 
         eid = getIntent().getStringExtra(praposal_recycler.eid);
         String st = getIntent().getStringExtra(praposal_recycler.st);
 
+        np_title = "New proposal";
+        ap_title = "Proposal accepted";
+        ap_body_to_core = "The recent proposal has been accepted by " + urole1 + " and forwarded to SBC";
+        ap_body_to_sbc = uname + " has approved new proposal. Click to view";
+        ap_sbc_to_core = "The recent proposal has been accepted by SBC and forwarded to HOD";
+        ap_sbc_to_hod = "A proposal has been approved by SBC. Click to view";
+        ap_hod_to_all = "The recent proposal has been accepted by HOD";
+
+
+        rp_title = "Proposal rejected";
+        rp_body_to_core = "The recent proposal has been rejected by " + urole1;
+        rp_sbc_to_core = "The recent proposal has been rejected by SBC";   // Here core means chair and vice chair for SBC
+        rp_hod_to_all = "The recent proposal has been rejected by HOD";  // Here all means chair ,vice chair and SBC for HOD
+
+
         Log.i("volleyABC" ,"123");
 //        Toast.makeText(proposal_desc.this,eid , Toast.LENGTH_SHORT).show();
         get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/viewproposal","0","0");
+
 
 
         if(urole1.equals("HOD") && st.equals("2")){
@@ -137,14 +165,14 @@ public class proposal_desc extends AppCompatActivity {
         );
     }
 
-    private void sendNotification(String fcmtoken) {
+    private void sendNotification(String fcmtoken, String title, String body) {
         // Construct the notification payload
         JSONObject notification = new JSONObject();
         try {
             notification.put("to", fcmtoken); // Using the FCM token obtained earlier
             JSONObject notificationBody = new JSONObject();
-            notificationBody.put("title", "Proposal Accepted");
-            notificationBody.put("body", "The recent proposal has been accepted by chairperson");
+            notificationBody.put("title", title);
+            notificationBody.put("body", body);
             notification.put("notification", notificationBody);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -187,7 +215,7 @@ public class proposal_desc extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                // Handle the response and obtain FCM tokens
+                // Handle the response and obtain FCM tokens and core IDs
                 handleFCMTokensResponse(response);
             }
         }, new Response.ErrorListener() {
@@ -205,17 +233,245 @@ public class proposal_desc extends AppCompatActivity {
 
     // Method to handle FCM tokens response
     private void handleFCMTokensResponse(String response) {
-        // Parse the response and obtain FCM tokens
         try {
             JSONArray tokensArray = new JSONArray(response);
             for (int i = 0; i < tokensArray.length(); i++) {
-                String token = tokensArray.getString(i);
-                sendNotification(token);
+                JSONObject tokenObject = tokensArray.getJSONObject(i);
+                String token = tokenObject.getString("fcm_token");
+                String coreId = tokenObject.getString("core_id");
+                idsArraycore.put(coreId);
+
+                sendNotification(token, ap_title, ap_hod_to_all);
+
             }
+
+            createNotification(ap_title, ap_hod_to_all, Integer.parseInt(uid), idsArraycore , "2");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+
+//    ----------------------------------------------------------------------------------------------
+
+    private void fetchTechEventToken(String status) {
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/getthehtoken";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String token = tokenObject.getString("fcm_token");
+                        String coreId = tokenObject.getString("core_id");
+                        idsArraycore.put(coreId);
+
+                        if(urole1.equals("Chairperson")){
+                            if(status.equals("1")){
+                                sendNotification(token, ap_title, ap_body_to_core);
+                            }
+                            else {
+                                sendNotification(token, rp_title, rp_body_to_core);
+                            }
+                        }
+                        if(urole1.equals("SBC")){
+                            if(status.equals("1")){
+                                sendNotification(token, ap_title, ap_sbc_to_core);
+                            }
+                            else{
+                                sendNotification(token, rp_title, rp_sbc_to_core);
+                            }
+
+                        }
+
+
+                    }
+                    if(urole1.equals("Chairperson") || urole1.equals("Vice Chairperson")){
+                        if(status.equals("1")){
+                            createNotification(ap_title, ap_body_to_core, Integer.parseInt(uid), idsArraycore , "2");
+                        } else if (status.equals("-1")) {
+                            createNotification(rp_title, rp_body_to_core, Integer.parseInt(uid), idsArraycore , "2");
+                        }
+                    } else if(urole1.equals("SBC")){
+                        if(status.equals("1")){
+                            createNotification(ap_title, ap_sbc_to_core, Integer.parseInt(uid), idsArraycore , "2");
+                        } else if (status.equals("-1")) {
+                            createNotification(rp_title, rp_sbc_to_core, Integer.parseInt(uid), idsArraycore , "2");
+                        }
+                    } else if (urole1.equals("HOD")) {
+                        if(status.equals("-1")){
+                            createNotification(rp_title, rp_hod_to_all, Integer.parseInt(uid), idsArraycore , "2");
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error response
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void fetchcvcToken(String status) {
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/getcvctoken";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String token = tokenObject.getString("fcm_token");
+                        String coreId = tokenObject.getString("core_id");
+                        idsArraycvc.put(coreId);
+
+                        if(status.equals("1")){
+                            sendNotification(token,ap_title , ap_sbc_to_core);
+                        } else if (status.equals("-1")) {
+                            sendNotification(token,rp_title , rp_sbc_to_core);
+                        }
+
+                    }
+
+
+                    if(status.equals("1")){
+                        createNotification(ap_title, ap_sbc_to_core, Integer.parseInt(uid), idsArraycvc , "2");
+                    } else if (status.equals("-1")) {
+                        if(urole1.equals("SBC")){
+                            createNotification(rp_title, rp_sbc_to_core, Integer.parseInt(uid), idsArraycvc , "2");
+                        } else if (urole1.equals("HOD")) {
+                            createNotification(rp_title, rp_hod_to_all, Integer.parseInt(uid), idsArraycvc , "2");
+                        }
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error response
+                error.printStackTrace();
+            }
+        });
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    // Method to handle FCM tokens response
+
+//-----------------------------------------------------------------------------------------------------
+
+    private void fetchAdminTokens(final String id , String status) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        String url = getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/getadmintoken?id=" + id;
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            JSONArray coreIdsArray = new JSONArray(); // JSONArray to store core_ids
+                            JSONArray fcmTokensArray = new JSONArray(); // JSONArray to store FCM tokens
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject tokenObject = response.getJSONObject(i);
+                                String fcmToken = tokenObject.getString("fcm_token"); // Get the fcm_token
+                                String coreId = tokenObject.getString("core_id"); // Get the core_id
+
+                                // Create JSONObject for core_id and FCM token
+//                                JSONObject coreIdObject = new JSONObject();
+//                                coreIdObject.put("core_id", coreId);
+//                                coreIdsArray.put(coreIdObject);
+                                // Initialize idsArray separately for each method call
+
+                                idsArrayadminn.put(coreId);
+
+                                JSONObject fcmTokenObject = new JSONObject();
+                                fcmTokenObject.put("fcm_token", fcmToken);
+                                fcmTokensArray.put(fcmTokenObject);
+
+                                // Call the method to send notification for each FCM token
+                                if (id.equals("1")) {
+                                    if(urole1.equals("Chairperson")){
+                                        sendNotification(fcmToken, np_title, ap_body_to_sbc);
+                                        createNotification(np_title, ap_body_to_sbc , Integer.parseInt(uid), idsArrayadminn , "2");
+                                    } else if (urole1.equals("HOD")) {
+                                        if(status.equals("1")){
+                                            sendNotification(fcmToken, ap_title, ap_hod_to_all);
+                                            createNotification(ap_title, ap_hod_to_all, Integer.parseInt(uid), idsArrayadminn , "2");
+                                        } else if (status.equals("-1")) {
+                                            sendNotification(fcmToken, rp_title, rp_hod_to_all);
+                                            createNotification(rp_title, rp_hod_to_all, Integer.parseInt(uid), idsArrayadminn , "2");
+                                        }
+
+                                    }
+
+                                } else if (id.equals("2")) {
+                                    sendNotification(fcmToken, np_title, ap_sbc_to_hod);
+                                    createNotification(np_title, ap_sbc_to_hod , Integer.parseInt(uid), idsArrayadminn , "2");
+                                }
+                            }
+                            // Do something with coreIdsArray and fcmTokensArray if needed
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        requestQueue.add(jsonArrayRequest);
+    }
+
+
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+
 
 
     void get_data(String url , String flag , String status) {
@@ -379,9 +635,27 @@ public class proposal_desc extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         get_data(getApplicationContext().getResources().getString(R.string.server_url) + "/proposal/status", "1", st);
+
+
                         if (urole1.equals("Chairperson") && st.equals("1")) {
-                            // Send notification only if the user is Chairperson and proposal is accepted
-                            sendNotification();
+                            fetchTechEventToken("1");
+                            fetchAdminTokens("1" , "1");
+                        } else if (urole1.equals("Chairperson") && st.equals("-1")) {
+                            fetchTechEventToken("-1");
+                        } else if(urole1.equals("SBC") && st.equals("2")){
+                            fetchTechEventToken("1");
+                            fetchcvcToken("1");
+                            fetchAdminTokens("2" , "1");
+                        } else if (urole1.equals("SBC") && st.equals("-2")) {
+                            fetchTechEventToken("-1");
+                            fetchcvcToken("-1");
+                        } else if(urole1.equals("HOD") && st.equals("3")){
+                           fetchFCMTokensFromServer();
+                           fetchAdminTokens("1" , "1");
+                        } else if(urole1.equals("HOD") && st.equals("-3")){
+                            fetchcvcToken("-1");
+                            fetchTechEventToken("-1");
+                            fetchAdminTokens("1" , "-1");
                         }
                         Intent manager = new Intent(proposal_desc.this, Manager.class);
                         startActivity(manager);

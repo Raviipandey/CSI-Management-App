@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         setContentView(R.layout.activity_main);
         animation();
         //.....6/6/2019
+
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         if(preferenceConfig.readLoginStatus()!=""){
             Intent manager = new Intent(MainActivity.this, Manager.class);

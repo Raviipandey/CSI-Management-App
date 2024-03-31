@@ -74,4 +74,5 @@ public class SharedPreferenceConfig {
 
         return sharedPreferences.getString("profileURL","");
     }
+
 }
