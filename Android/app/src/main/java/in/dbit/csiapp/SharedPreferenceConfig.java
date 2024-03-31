@@ -20,7 +20,7 @@ public class SharedPreferenceConfig {
 
     }
 
-    public void writeLoginStatus(boolean status, String mobno, String pwd, String userid , String role, String UserName, String ProfileUrl, String Fcmtoken){
+    public void writeLoginStatus(boolean status, String mobno, String pwd, String userid , String role, String UserName, String ProfileUrl, String Fcmtoken, String sessionToken){
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userid",mobno);
         editor.putString("password",pwd);
@@ -29,10 +29,20 @@ public class SharedPreferenceConfig {
         editor.putString("userName",UserName);
         editor.putString("profileURL",ProfileUrl);
         editor.putString("fcmtoken" , Fcmtoken);
+        editor.putString("newSessionToken",sessionToken);
         editor.apply();
         //editor.putBoolean(context.getResources().getString(R.string.login_status_preference), status);
        // editor.commit();
     }
+    public void logoutUser() {
+        // Clear shared preferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear(); // Or explicitly remove keys
+        editor.apply();
+
+        // Optionally, add a method to notify the backend about the logout
+    }
+
 
     public String readLoginStatus(){
         //boolean status = false;
@@ -57,6 +67,7 @@ public class SharedPreferenceConfig {
 
 
 
+
     public String readRoleStatus(){
         //boolean status = false;
 
@@ -75,4 +86,9 @@ public class SharedPreferenceConfig {
         return sharedPreferences.getString("profileURL","");
     }
 
+
+    // Method to fetch the session token
+    public String readSessionToken() {
+        return sharedPreferences.getString("newSessionToken", "No token found");
+    }
 }

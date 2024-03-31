@@ -6,11 +6,12 @@ const fs = require('fs');
 const path = require('path')
 const app = express();
 const {connection , server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 
 
 //Listing All events
-router.get('/listcreative',(req,res)=>{
+router.get('/listcreative',validateSessionToken,(req,res)=>{
 	connection.query('SELECT cpm_id,proposals_event_name,proposals_event_category,proposals_event_date FROM core_proposals_manager where proposals_status=3 order by cpm_id DESC',function(err,result){
 		if(err){
 			console.log(err);
@@ -26,7 +27,7 @@ router.get('/listcreative',(req,res)=>{
 });
 
 //Viewing pre-filled event detail
-router.post('/viewpropdetail',(req,res)=>{
+router.post('/viewpropdetail',validateSessionToken,(req,res)=>{
 	var cpm_id=req.body.cpm_id;
 	console.log(cpm_id);
 	var qry = 'SELECT * FROM(SELECT core_creative_manager.cpm_id,proposals_event_name,proposals_event_category,proposals_event_date,speaker, proposals_venue , proposals_reg_fee_csi ,proposals_reg_fee_noncsi ,proposals_prize , proposals_desc , proposals_creative_budget, proposals_publicity_budget, proposals_guest_budget , creative_url FROM core_proposals_manager,core_creative_manager WHERE core_proposals_manager.cpm_id=core_creative_manager.cpm_id) AS creative WHERE cpm_id=?'
@@ -44,7 +45,7 @@ router.post('/viewpropdetail',(req,res)=>{
 });
 
 //Submit Creative
-router.post('/submit',(req,res)=>{
+router.post('/submit',validateSessionToken,(req,res)=>{
 	var eid = req.body.eid;
 	var poster = req.body.poster;
 	var video = req.body.video;
@@ -131,7 +132,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload',validateSessionToken, upload.single('file'), (req, res) => {
 	const eid = req.body.eid;
 	const fileheader = req.body.fileheader;
 	const file = req.file;
@@ -167,7 +168,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
   });
 
 // Define a route to fetch uploaded files using a POST request
-router.post('/fetch', (req, res) => {
+router.post('/fetch',validateSessionToken, (req, res) => {
     var eid = req.body.eid;
   
     // Query the database to fetch uploaded files associated with the event ID
@@ -189,7 +190,7 @@ router.post('/fetch', (req, res) => {
     });
 });
   
-  router.get('/fetch/:filename', (req, res) => {
+  router.get('/fetch/:filename',validateSessionToken, (req, res) => {
 	const filename = req.params.filename;
 	const file = path.join(__dirname, 'creative', filename);
   

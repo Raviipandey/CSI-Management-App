@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -20,20 +21,27 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.Gallery.EventNameAdapter.EventItem;
 import in.dbit.csiapp.Gallery.EventNameAdapter.EventNameAdapter;
 import in.dbit.csiapp.Gallery.ExampleDialogue;
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DisplayYear extends AppCompatActivity implements EventNameAdapter.OnItemClickListener, ExampleDialogue.ExampleDialogListener {
 
     public static final String EXTRA_EVENT = "FullPath";
 
     private RecyclerView mRecyclerView;
+
+    private SharedPreferenceConfig preferenceConfig;
     private RecyclerView.LayoutManager layoutManager;
     private EventNameAdapter mEventNameAdapter;
     private ArrayList<EventItem> mEventList;
@@ -49,6 +57,7 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
         PARENT_DIR = intent.getStringExtra(EXTRA_EVENT);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
         mRecyclerView = findViewById(R.id.recycler_view);
         layoutManager = new GridLayoutManager(this, 2);
@@ -114,16 +123,32 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(DisplayYear.this, "Invalid", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(DisplayYear.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(DisplayYear.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(DisplayYear.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(DisplayYear.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(DisplayYear.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -135,6 +160,14 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -224,16 +257,32 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(DisplayYear.this, "Something went wrong", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(DisplayYear.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(DisplayYear.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(DisplayYear.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(DisplayYear.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(DisplayYear.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -245,6 +294,15 @@ public class DisplayYear extends AppCompatActivity implements EventNameAdapter.O
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

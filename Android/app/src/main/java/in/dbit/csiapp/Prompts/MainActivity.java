@@ -45,10 +45,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements Animation.AnimationListener {
+
+
+
 
     private static final int NOTIFICATION_PERMISSION_REQUEST = 100;
     private SharedPreferenceConfig preferenceConfig; //.....6/6/2019
@@ -61,8 +67,10 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     public static final String EXTRA_USERID = "com.example.csimanagementsystem.EXTRA_USERID";
 
     public static final String EXTRA_FCMTOKEN = "com.example.csimanagementsystem.EXTRA_FCMTOKEN";
+    public static final String EXTRA_SESSIONTOKEN = "com.example.csimanagementsystem.EXTRA_SESSIONTOKEN";
 
     String server_url;
+    String sessiontoken;
     //Main Server URL
     private SharedPreferences mpref; //asdfg
     private static final String pref_name="";
@@ -81,10 +89,14 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         server_url = getApplicationContext().getResources().getString(R.string.server_url) + "/login";
 //        Toast.makeText(this, "this is server_rl from string " + server_url , Toast.LENGTH_SHORT).show();
         setContentView(R.layout.activity_main);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         animation();
         //.....6/6/2019
 
-        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
+
+  
+
         if(preferenceConfig.readLoginStatus()!=""){
             Intent manager = new Intent(MainActivity.this, Manager.class);
             manager.putExtra(EXTRA_MOBNO, preferenceConfig.readLoginStatus());
@@ -93,10 +105,16 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             manager.putExtra(EXTRA_USERID,preferenceConfig.readNameStatus());
             //Log.i("New Error", preferenceConfig.readUrlStatus());
             manager.putExtra(EXTRA_URL, preferenceConfig.readUrlStatus());
+
 //            Intent manager = new Intent(this, Manager.class);
             startActivity(manager);
             finish();
         }
+
+
+        sessiontoken= preferenceConfig.readSessionToken();
+
+
 
 
         //.....6/6/2019
@@ -229,6 +247,10 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
     private void insertSrv()
     {
+        // Before using the session token
+        String currentSessionToken = preferenceConfig.readSessionToken();
+        Log.i("CurrentSessionToken", "Session Token before use: " + currentSessionToken);
+
         //creating jsonobject starts
         final JSONObject jsonObject = new JSONObject();
         try {
@@ -236,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             jsonObject.put("password", pstring);
 
             jsonObject.put("fcmtoken" , token);
+
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -244,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
         //checking data inserted into json object
         final String requestBody = jsonObject.toString();
-        Log.i("volleyABC", requestBody);
+        Log.i("volleyABC main ", requestBody);
 
         //getting response from server starts
         StringRequest stringRequest = new StringRequest(Request.Method.POST,server_url,new Response.Listener<String>(){
@@ -255,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                 Toast.makeText(MainActivity.this, "Logged IN", Toast.LENGTH_SHORT).show();
 
                 Intent manager = new Intent(MainActivity.this, Manager.class);
-                String USERID="" , UROLE="", USERNAME="", ProfileURL="" , FCMTOKEN = "";
+                String USERID="" , UROLE="", USERNAME="", ProfileURL="" , FCMTOKEN = "", SESSIONTOKEN = "";
 
                 try {
                     JSONObject jsonObject1 = new JSONObject(response);
@@ -266,12 +289,16 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                     UROLE = jsonObject1.getString("role");
                     ProfileURL = jsonObject1.getString("dp");
                     FCMTOKEN = jsonObject1.getString("fcmtoken");
+                    SESSIONTOKEN = jsonObject1.getString("newSessionToken");
+
 
                     //sharedPreference.... 6/6/2019
 
-                    Log.i("Sharedpreferences", USERID + USERNAME + UROLE + ProfileURL + FCMTOKEN);
-                    preferenceConfig.writeLoginStatus(true,mobno,pstring,USERID ,UROLE,USERNAME,ProfileURL,FCMTOKEN);
+                    Log.i("Sharedpreferences", USERID + USERNAME + UROLE + ProfileURL + FCMTOKEN + SESSIONTOKEN);
+                    preferenceConfig.writeLoginStatus(true,mobno,pstring,USERID ,UROLE,USERNAME,ProfileURL,FCMTOKEN, SESSIONTOKEN);
                     //sharedPreference.... 6/6/2019
+                    String storedToken = preferenceConfig.readSessionToken();
+                    Log.i("StoredSessionToken", "Session Token right after storage: " + storedToken);
 
 
                     SharedPreferences.Editor editor=mpref.edit();
@@ -279,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                     editor.putString("password",pstring);
                     editor.putString("urole",UROLE);
                     editor.putString("userid" , USERID);
+                    editor.putString("newSessionToken", SESSIONTOKEN);
                     editor.apply();
                     finish();
 
@@ -295,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                 manager.putExtra(EXTRA_UROLE, UROLE);
                 manager.putExtra(EXTRA_URL, ProfileURL);
                 manager.putExtra(EXTRA_FCMTOKEN, FCMTOKEN);
+                manager.putExtra(EXTRA_SESSIONTOKEN, SESSIONTOKEN);
                 //Send data to Manager.java ends
                 startActivity(manager);
                 //
@@ -303,16 +332,32 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(MainActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(MainActivity.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(MainActivity.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(MainActivity.this,"Check Network " + server_url,Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -325,6 +370,15 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
                     return null;
                 }
             }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
 
             @Override
             public String getBodyContentType() {
@@ -390,4 +444,10 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
+
+
+
 }
+
+}
+

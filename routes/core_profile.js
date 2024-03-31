@@ -11,6 +11,7 @@ var app=express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const {connection , server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
@@ -62,7 +63,7 @@ const profilePicUpload = multer({
 });
 
 
-router.get('/',(req,res)=>{
+router.get('/',validateSessionToken,(req,res)=>{
 	var id = req.query.id;
   // console.log(id);
 	//fetching deatails from profile table
@@ -103,7 +104,7 @@ router.get('/',(req,res)=>{
 	});
 });
 
-router.post('/new',(req,res) => {
+router.post('/new',validateSessionToken,(req,res) => {
   var password = generator.generate({
     length: 10,
     numbers: true
@@ -142,7 +143,7 @@ router.post('/new',(req,res) => {
   });
 });
 
-router.post('/view', (req,res) => {
+router.post('/view',validateSessionToken, (req,res) => {
   connection.query('Select id,name,email,phone,year,branch,rollno,batch,membership_left from profile where role=\'member\'',[],function(error,results,fields){
     if(error){
       console.log(error);
@@ -154,7 +155,7 @@ router.post('/view', (req,res) => {
   });
 });
 
-router.post('/edit',(req,res)=>{
+router.post('/edit',validateSessionToken, (req,res)=>{
   console.log(req.body);
 	var id = req.query.id;
 	var name = req.query.name;

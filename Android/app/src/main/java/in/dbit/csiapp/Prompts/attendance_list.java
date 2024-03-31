@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 //import in.dbit.csiapp.mAdapter.ExampleItem;
 
 import org.json.JSONArray;
@@ -27,6 +28,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import static in.dbit.csiapp.mFragments.AttendanceSBC.EXTRA_CLASS;
 
@@ -35,6 +39,7 @@ public class attendance_list extends AppCompatActivity {
     String sam;
     String server_url;
     TableLayout tableLayout;
+    private SharedPreferenceConfig preferenceConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class attendance_list extends AppCompatActivity {
 
         Intent intent = getIntent();
         sam = intent.getStringExtra(EXTRA_CLASS);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
         //Toast.makeText(this, "Your selected " + sam, Toast.LENGTH_SHORT).show();
 
@@ -150,15 +156,31 @@ public class attendance_list extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                String errorMessage = "An error occurred"; // Default message
                 try {
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(attendance_list.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
-
-
-                    error.printStackTrace();
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
                 } catch (Exception e) {
-                    Toast.makeText(attendance_list.this, "Check Network", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(attendance_list.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(attendance_list.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(attendance_list.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(attendance_list.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
                 }
             }
         }) {
@@ -171,6 +193,13 @@ public class attendance_list extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

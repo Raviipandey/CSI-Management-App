@@ -15,6 +15,12 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+const crypto = require('crypto');
+
+function generateSessionToken() {
+    return crypto.randomBytes(48).toString('hex'); // Generates a secure, random 48-byte hex string
+}
+
 // MySQL Connection
 var mysql = require('mysql');
 const connection = mysql.createConnection({
@@ -39,16 +45,23 @@ connection.connect(function (err) {
 router.post('/', (req, res) => {
     var mobno = req.body.mobno;
     var password = req.body.password;
+    
     var fcmtoken = req.body.fcmtoken;
     console.log(mobno, password, fcmtoken);
+
+    const newSessionToken = generateSessionToken(); 
     
     // Query to update the fcm_token in core_details table
-    connection.query('UPDATE core_details SET fcm_token = ? WHERE core_mobileno = ?', [fcmtoken, mobno], (err, result) => {
+    connection.query('UPDATE core_details SET session_token = ?, fcm_token = ? WHERE core_mobileno = ?', [newSessionToken, fcmtoken, mobno], (err, result) => {
         if (err) {
-            console.log("Error updating fcm_token in core_details table:", err);
-            res.sendStatus(500);
-            return;
+            console.log("Error updating fcm_token and udid in core_details table:", err);
+            return res.status(500).json({ error: 'Database error during token update' });
         }
+        
+        
+
+        
+
         
         // Query to fetch user details from core_details table
         connection.query('SELECT * FROM core_details WHERE core_mobileno = ?', [mobno], (error, result) => {
@@ -81,7 +94,8 @@ router.post('/', (req, res) => {
                                     "name": user.core_en_fname,
                                     "dp": user.core_profilepic_url,
                                     "fcmtoken": user.fcm_token,
-                                    "userid": user.core_id
+                                    "userid": user.core_id, 
+                                    "newSessionToken":user.session_token
                                 });
                             } else {
                                 console.log("Password does not match");
@@ -102,7 +116,9 @@ router.post('/', (req, res) => {
         });
     });
 });
+
 var userFirstName = "";
+
 router.post('/resetpassword', (req, res) => {
     const email = req.body.email;
     console.log(email);

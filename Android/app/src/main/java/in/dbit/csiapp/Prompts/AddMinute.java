@@ -29,11 +29,13 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
 import in.dbit.csiapp.SharedPreferenceConfig;
 
+import org.checkerframework.checker.units.qual.A;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -132,11 +134,45 @@ public class AddMinute extends AppCompatActivity {
                     }
                 },
                 new Response.ErrorListener() {
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle the error
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(AddMinute.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(AddMinute.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(AddMinute.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(AddMinute.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
-                });
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }};
 
         mQueue.add(request);
 
@@ -285,7 +321,13 @@ public class AddMinute extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         requestQueue.add(stringRequest);
     }
 
@@ -342,7 +384,9 @@ public class AddMinute extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+
             }
+
 
             @Override
             public String getBodyContentType() {
@@ -427,17 +471,32 @@ public class AddMinute extends AppCompatActivity {
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e("volleyABC" ,"Got error in connecting server");
-                try{
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("i234" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(AddMinute.this,"Error:-"+statusCode,Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("i234" ,"Error uploading data");
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(AddMinute.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(AddMinute.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(AddMinute.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(AddMinute.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }) {
 
@@ -450,7 +509,14 @@ public class AddMinute extends AppCompatActivity {
                     return null;
                 }
             }
-
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
