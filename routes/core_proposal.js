@@ -99,34 +99,89 @@ router.post('/createproposal', (req, res) => {
 });
 
 router.get('/getalltoken', (req, res) => {
-    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");
             res.status(400).json({ error: 'Error fetching core fcm tokens' });
         } else {
-            // Extract fcm_token values from the result array
-            const fcmTokens = result.map(row => row.fcm_token).filter(token => token); // Filter out null or empty tokens
+            // Extract core_id and fcm_token values from the result array and create an array of objects
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
 
-            // Send the fcmTokens array as JSON
-            res.status(200).json(fcmTokens);
+            // Send the tokensWithIds array as JSON
+            res.status(200).json(tokensWithIds);
         }
     });
 });
 
+
+router.get('/getadmintoken', (req, res) => {
+    var id = req.query.id; // Access id from query parameters
+    console.log("Received id: ", id);
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id = ?', [id], function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens:", error);
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            // Extract core_id and fcm_token values from the result array and create an array of objects
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
+
+            // Send the tokensWithIds array as JSON
+            res.status(200).json(tokensWithIds);
+        }
+    });
+});
+
+
+// This route is used for attendance
 router.get('/getcvctoken', (req, res) => {
-    connection.query('SELECT fcm_token FROM csiApp2022.core_details WHERE core_role_id = 3 and 4', function(error, result) {
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (3 , 4)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");
             res.status(400).json({ error: 'Error fetching core fcm tokens' });
         } else {
-            // Extract fcm_token values from the result array
-            const fcmTokens = result.map(row => row.fcm_token).filter(token => token); // Filter out null or empty tokens
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token);
 
-            // Send the fcmTokens array as JSON
-            res.status(200).json(fcmTokens);
+            // Send the tokensWithIds array as JSON
+            res.status(200).json(tokensWithIds);
         }
     });
 });
+
+//Tech head and event head token
+router.get('/getthehtoken', (req, res) => {
+    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (5 ,6)', function(error, result) {
+        if (error) {
+            console.log("Error fetching core fcm tokens");
+            res.status(400).json({ error: 'Error fetching core fcm tokens' });
+        } else {
+            const tokensWithIds = result.map(row => {
+                return {
+                    core_id: row.core_id,
+                    fcm_token: row.fcm_token
+                };
+            }).filter(obj => obj.fcm_token);
+
+            // Send the fcmTokens array as JSON
+            res.status(200).json(tokensWithIds);
+        }
+    });
+});
+
 // cpm_id, proposals_event_name, proposals_event_date, proposals_event_category, proposals_venue, 
 // proposals_three_track, proposals_desc, proposals_total_budget, proposals_reg_fee_csi, proposals_reg_fee_noncsi, 
 // proposals_prize, proposals_meeting_id, proposals_status, proposals_comment, agenda, speaker
@@ -226,6 +281,34 @@ router.post('/status', (req, res) => {
                         console.log(updateError);
                         return res.sendStatus(400);
                     } else {
+                        if (status === '3') {
+                            connection.query('INSERT INTO core_creative_manager (cpm_id) VALUES (?)', [cpm_id], function(err, res) {
+                                if (err) {
+                                    console.log(err);
+                                    return res.sendStatus(400);
+                                }
+                                // Insert into core_pr_manager
+                                connection.query('INSERT INTO core_pr_manager (cpm_id) VALUES (?)', [cpm_id], function(err, result1) {
+                                    if (err) {
+                                        console.log(err);
+                                        return res.sendStatus(400);
+                                    }
+                                    // Insert into core_technical_manager
+                                    connection.query('INSERT INTO core_technical_manager (cpm_id) VALUES (?)', [cpm_id], function(err, result2) {
+                                        if (err) {
+                                            console.log(err);
+                                            return res.sendStatus(400);
+                                        }
+                                        console.log("All inserts successful");
+                                            return res.sendStatus(200);
+                                    });
+                                });
+                            });
+                        } else {
+                            // Do something else if status is not equal to '3'
+                        }
+                        
+                        
                         console.log("Successfully updated status and comments");
                         res.sendStatus(200);
                     }
@@ -290,4 +373,5 @@ router.post('/editproposal', (req, res) => {
         }
     });
 });
+
 module.exports = router;

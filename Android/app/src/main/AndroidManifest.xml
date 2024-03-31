@@ -28,6 +28,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity android:name="in.dbit.csiapp.mActivityManager.Forgetpassword"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppTheme2"/>
 
 
@@ -68,6 +69,10 @@
         <activity
             android:name="in.dbit.csiapp.mActivityManager.Report"
             android:theme="@style/AppTheme2" />
+
+        <activity
+            android:name=".mActivityManager.NotificationManager"
+            android:theme="@style/AppTheme2" />
         <activity android:name="in.dbit.csiapp.mActivityManager.Gallery" />
         <activity
             android:name="in.dbit.csiapp.mActivityManager.Technical"
@@ -88,6 +93,8 @@
             android:name="in.dbit.csiapp.Prompts.Manager"
             android:label="@string/title_activity_manager"
             android:theme="@style/AppTheme.NoActionBar" />
+
+
         <activity android:name="in.dbit.csiapp.Prompts.role_intent" />
         <activity
             android:name="in.dbit.csiapp.Prompts.AddMinute"

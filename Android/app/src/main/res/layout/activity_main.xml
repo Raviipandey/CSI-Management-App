@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/start"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.dbit.csiapp.Prompts.MainActivity"
-    android:id="@+id/start">
+    tools:context="in.dbit.csiapp.Prompts.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
@@ -20,55 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="invisible">
-
-<!--        <EditText-->
-<!--            android:id="@+id/userid"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:background="@drawable/btextfield"-->
-<!--            android:ems="10"-->
-<!--            android:hint="Username"-->
-<!--            android:inputType="number"-->
-<!--            android:paddingLeft="10dp"-->
-<!--            android:drawablePadding="10dp"-->
-<!--            android:drawableLeft="@drawable/ic_person_black_24dp"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.553"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:layout_constraintVertical_bias="0.461" -->
-<!--            android:visibility="gone"/>-->
-
-<!--        <ImageView-->
-<!--            android:id="@+id/imageView2"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:src="@drawable/ic_person_black_24dp"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/userid"-->
-<!--            app:layout_constraintEnd_toEndOf="@+id/userid"-->
-<!--            app:layout_constraintHorizontal_bias="0.054"-->
-<!--            app:layout_constraintStart_toStartOf="@+id/userid"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/userid"-->
-<!--            app:layout_constraintVertical_bias="0.545"-->
-<!--            android:visibility="gone"/>-->
-
-<!--        <ImageView-->
-<!--            android:id="@+id/imageView3"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:src="@drawable/ic_vpn_key_black_24dp"-->
-<!--            app:layout_constraintBottom_toBottomOf="@+id/pwlayout"-->
-<!--            app:layout_constraintEnd_toEndOf="@+id/pwlayout"-->
-<!--            app:layout_constraintHorizontal_bias="0.054"-->
-<!--            app:layout_constraintStart_toStartOf="@+id/pwlayout"-->
-<!--            app:layout_constraintTop_toTopOf="@+id/pwlayout"-->
-<!--            app:layout_constraintVertical_bias="0.575" -->
-<!--            android:visibility="gone"/>-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/userlayout"
@@ -108,14 +59,14 @@
             android:inputType="textPersonName"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.544"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userlayout"
             app:layout_constraintVertical_bias="0.095"
             app:passwordToggleEnabled="true">
-            
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
@@ -127,45 +78,58 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:inputType="textPassword"
-                tools:layout_editor_absoluteX="93dp"
-                tools:layout_editor_absoluteY="393dp"
                 android:drawableStart="@drawable/ic_vpn_key_black_24dp"
                 android:paddingStart="10dp" />
 
-            <TextView
-                android:id="@+id/resetPasswordTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reset password"
-                android:textColor="@color/Black"
-                app:layout_constraintTop_toBottomOf="@+id/password"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="8dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/Login_button"
             android:layout_width="251dp"
             android:layout_height="49dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/ripple_effect"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="LOGIN"
-            android:textColor="#ffffff"
-            android:textSize="19sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="LOGIN"
+        android:textColor="#ffffff"
+        android:textSize="19sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pwlayout"
+        app:layout_constraintVertical_bias="0.317" />
+
+
+        <LinearLayout
+            android:id="@+id/resetPasswordLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/Login_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pwlayout"
-            app:layout_constraintVertical_bias="0.317" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/resetPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forgot your login details?"
+                android:textColor="@color/Black"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/resetPasswordTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Get help logging in."
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <ImageView
         android:id="@+id/csilogo"

@@ -71,8 +71,9 @@ var creative=require('./routes/core_creative.js');
 var publicity=require('./routes/core_publicity.js');
 var technical=require("./routes/core_technical.js");
 var reports=require("./routes/core_reports.js");
-const featured_img = require("./routes/featured_img.js")
+const featured_img = require("./routes/featured_img.js");
 const galleryRouter = require('./gallery.js');
+const notification = require('./routes/core_notification.js');
 
 
 app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images_dynamic')));
@@ -94,6 +95,7 @@ app.use('/technical',technical);
 app.use('/reports',reports); //new report route
 app.use('/images', featured_img);
 app.use('/gallery', galleryRouter);
+app.use('/notification' , notification)
 
 
 //web app view
