@@ -119,21 +119,34 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // Handle response
                 if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + response);
-                }
-                // Display success message in the UI
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(ResetPasswordActivity.this, "Password updated successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(ResetPasswordActivity.this, MainActivity.class));
+                    if (response.code() == 404) {
+                        // Display error message for 404 response
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ResetPasswordActivity.this, "Password reset token invalid or expired", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        throw new IOException("Unexpected code " + response);
                     }
-                });
+                } else {
+                    // Display success message in the UI
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ResetPasswordActivity.this, "Password updated successfully", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(ResetPasswordActivity.this, MainActivity.class));
+                        }
+                    });
+                }
             }
+
         });
     }
 
