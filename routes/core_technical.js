@@ -52,7 +52,7 @@ const upload = multer({
     storage: storage 
 });
 
-router.post("/upload",validateSessionToken, upload.single("pdfFile"), function (req, res, next) {
+router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
     const file = req.file;
     if (!file) {
         return res.status(400).send("Please upload a file");
@@ -91,7 +91,7 @@ router.post("/upload",validateSessionToken, upload.single("pdfFile"), function (
     });
 });
 
-router.get("/download",validateSessionToken, function (req, res) {
+router.get("/download", function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
@@ -111,7 +111,7 @@ router.get("/download",validateSessionToken, function (req, res) {
     });
 });
 
-router.get("/fetchtech",validateSessionToken, function (req, res) {
+router.get("/fetchtech", function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
@@ -127,7 +127,7 @@ router.get("/fetchtech",validateSessionToken, function (req, res) {
     });
 });
 
-router.post("/delete",validateSessionToken, function (req, res) {
+router.post("/delete", function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM technical_files WHERE eid = ?";

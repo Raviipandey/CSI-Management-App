@@ -87,23 +87,9 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
     });
 });
 
-router.get("/fetchpr",validateSessionToken, function (req, res) {
-    const eid = req.query.eid;
-    console.log(eid);
-    // Retrieve the file metadata from the database
-    const query = "SELECT filename, url FROM publicity_files WHERE eid = ?";
-    connection.query(query, [eid], function (error, results, fields) {
-        if (error) return res.status(500).json({ error: "Error retrieving file details from database" });
-        if (!results.length) return res.status(404).json({ error: "File not found" });
 
-        const { filename, url } = results[0];
 
-        // Send the file details as JSON response
-        res.json({ filename, url });
-    });
-});
-
-router.get("/download",validateSessionToken, function (req, res) {
+router.get("/download", function (req, res) {
     const eid = req.query.eid;
 
     // Retrieve the file metadata from the database
@@ -123,7 +109,7 @@ router.get("/download",validateSessionToken, function (req, res) {
     });
 });
 
-router.get("/fetchpr",validateSessionToken, function (req, res) {
+router.get("/fetchpr", function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
@@ -140,7 +126,7 @@ router.get("/fetchpr",validateSessionToken, function (req, res) {
 });
 
 
-router.post("/delete",validateSessionToken, function (req, res) {
+router.post("/delete", function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM publicity_files WHERE eid = ?";
