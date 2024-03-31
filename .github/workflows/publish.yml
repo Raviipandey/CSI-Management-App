@@ -25,7 +25,10 @@ jobs:
         run: chmod +x Android/gradlew
 
       - name: Decode Keystore
-        run: echo "${{ secrets.KEYSTORE }}" | base64 -d > Android/app/my-release-key.keystore
+        run: |
+          mkdir -p Android/app/ # Ensure the directory exists
+          echo "${{ secrets.KEYSTORE }}" | base64 -d > Android/app/my-release-key.keystore
+          ls -l Android/app/ # List the directory contents to verify the file is there
       
       - name: Build Release APK
         run: |
