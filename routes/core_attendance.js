@@ -112,41 +112,8 @@ router.post('/requestlist',validateSessionToken,(req,res)=>{
 //Accept json array,move the record from request to final_list
 // Route to update the status of attendance requests
 
-router.post('/finallist',validateSessionToken, (req, res) => {
-	console.log(req.body); // Check the incoming data
-	// Extract the 'accepted' array from the request body
-	const acceptedIds = req.body.accepted;
-  
-	if (!acceptedIds || acceptedIds.length === 0) {
-	  return res.status(400).send({ message: 'No accepted IDs provided.' });
-	}
-  
-	// Keep track of completed queries
-	let completedQueries = 0;
-	const totalQueries = acceptedIds.length;
-	let encounteredError = false;
-  
-	// Update each accepted ID in the database
-	acceptedIds.forEach(ad_id => {
-	  connection.query('UPDATE attendance_details SET status = "ACCEPTED" WHERE ad_id = ?', [ad_id], (error, results) => {
-		completedQueries++;
-		if (error) {
-		  encounteredError = true;
-		  console.error('Failed to update ad_id:', ad_id, error);
-		  // Send an error response only once
-		  if (!res.headersSent) {
-			res.status(500).send({ message: 'Error updating attendance status.' });
-		  }
-		}
-		// If all queries have been processed and no error response has been sent, send a success response
-		if (completedQueries === totalQueries && !encounteredError && !res.headersSent) {
-		  res.status(200).send({ message: 'All attendance statuses updated successfully.' });
-		}
-	  });
-	});
-  });
 
-router.post('/finallist', (req, res) => {
+router.post('/finallist', validateSessionToken, (req, res) => {
     // Extract the accepted IDs from the request body
     const acceptedIds = req.body.accepted;
     console.log("Response here", acceptedIds);

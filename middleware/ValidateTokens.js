@@ -21,7 +21,7 @@ function validateSessionToken(req, res, next) {
     console.log('Validating session token...');
 
     // Exclude validation for the root route ("/")
-    if (req.originalUrl === '/' || req.originalUrl === '/logout' || req.originalUrl === '/.well-known/assetlinks.json' || req.originalUrl === '/login/newpassword') {
+    if (req.originalUrl === '/.well-known/assetlinks.json' || req.originalUrl === '/login/newpassword') {
       console.log('Skipping token validation for root route');
       next(); // Continue to the next middleware or route handler
       return;

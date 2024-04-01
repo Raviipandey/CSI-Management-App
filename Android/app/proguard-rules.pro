@@ -20,4 +20,30 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.shockwave.**
+# Preserve all classes in your package containing ResetPasswordActivity
+-keep class in.dbit.csiapp.mActivityManager.** { *; }
+
+# Preserve all public methods in ResetPasswordActivity
+-keepclassmembers class in.dbit.csiapp.mActivityManager.ResetPasswordActivity {
+    public *;
+}
+
+# Keep any custom views, including those referenced in XML layouts
+-keep public class * extends android.view.View {
+    public <init>(android.content.Context);
+    public <init>(android.content.Context, android.util.AttributeSet);
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+    public void set*(...);
+}
+
+# Preserve annotations, if you use any
+-keepattributes *Annotation*
+
+# If you are using Gson library, preserve its classes
+-keep class com.google.gson.** { *; }
+
+# If you are using OkHttp library, preserve its classes
+-keep class okhttp3.** { *; }
+
+# If you are using Retrofit library, preserve its classes
+-keep class retrofit2.** { *; }
