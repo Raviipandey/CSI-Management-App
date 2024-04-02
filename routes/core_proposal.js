@@ -99,48 +99,10 @@ router.post('/createproposal',validateSessionToken, (req, res) => {
 });
 
 
-router.get('/getalltoken',validateSessionToken, (req, res) => {
-    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id NOT IN (1, 2)', function(error, result) {
-        if (error) {
-            console.log("Error fetching core fcm tokens");
-            res.status(400).json({ error: 'Error fetching core fcm tokens' });
-        } else {
-            // Extract core_id and fcm_token values from the result array and create an array of objects
-            const tokensWithIds = result.map(row => {
-                return {
-                    core_id: row.core_id,
-                    fcm_token: row.fcm_token
-                };
-            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
-
-            // Send the tokensWithIds array as JSON
-            res.status(200).json(tokensWithIds);
-        }
-    });
-});
 
 
-router.get('/getadmintoken',validateSessionToken,(req, res) => {
-    var id = req.query.id; // Access id from query parameters
-    console.log("Received id: ", id);
-    connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id = ?', [id], function(error, result) {
-        if (error) {
-            console.log("Error fetching core fcm tokens:", error);
-            res.status(400).json({ error: 'Error fetching core fcm tokens' });
-        } else {
-            // Extract core_id and fcm_token values from the result array and create an array of objects
-            const tokensWithIds = result.map(row => {
-                return {
-                    core_id: row.core_id,
-                    fcm_token: row.fcm_token
-                };
-            }).filter(obj => obj.fcm_token); // Filter out null or empty tokens
 
-            // Send the tokensWithIds array as JSON
-            res.status(200).json(tokensWithIds);
-        }
-    });
-});
+
 
 //This route is used for attendance
 
@@ -194,7 +156,7 @@ router.get('/getadmintoken', (req, res) => {
 
 
 // This route is used for attendance
-router.get('/getcvctoken', validateSessionToken, (req, res) => {
+router.get('/getcvctoken', (req, res) => {
     connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (3 , 4)', function(error, result) {
 
         if (error) {
@@ -217,7 +179,7 @@ router.get('/getcvctoken', validateSessionToken, (req, res) => {
 });
 
 //Tech head and event head token
-router.get('/getthehtoken',validateSessionToken, (req, res) => {
+router.get('/getthehtoken', (req, res) => {
     connection.query('SELECT core_id, fcm_token FROM csiApp2022.core_details WHERE core_role_id IN (5 ,6)', function(error, result) {
         if (error) {
             console.log("Error fetching core fcm tokens");
@@ -352,10 +314,13 @@ router.post('/status',validateSessionToken,(req, res) => {
                                     connection.query('INSERT INTO core_technical_manager (cpm_id) VALUES (?)', [cpm_id], function(err, result2) {
                                         if (err) {
                                             console.log(err);
-                                            return res.sendStatus(400);
+                                            return result2.sendStatus(400);
                                         }
-                                        console.log("All inserts successful");
-                                            return res.sendStatus(200);
+                                        else{
+                                            console.log("All inserts successful");
+                                            
+                                        }
+                                        
                                     });
                                 });
                             });

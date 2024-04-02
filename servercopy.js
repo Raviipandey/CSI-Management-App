@@ -55,6 +55,7 @@ app.use(express.static(__dirname + "/views"));
 
 // Correctly configure the path to your static files
 app.use('/server_uploads', express.static(path.join(__dirname, 'server_uploads')));
+app.use('/.well-known', express.static(path.join(__dirname, '.well-known')));
 app.use('/report', express.static(path.join(__dirname, 'report')));
 app.use('/creative', express.static('./creative'));
 
@@ -179,14 +180,6 @@ app.get('/privacy.html', (req, res) => {
   });
 
 //middleware
-const validateSessionToken = require('./middleware/ValidateTokens');
-app.use(validateSessionToken);
-
-
-
-  
-
-
 
 
 
@@ -201,6 +194,7 @@ app.get("/",(req,res)=>{
             });
         }
 });
+
 
 // And in your server setup, handle the route to render the error page
 app.get('/error', (req, res) => {
@@ -218,6 +212,9 @@ app.get("/logout", (req, res, next)=>{
 // app.get("/",(req,res)=>{
 // return res.send("Welcome to CSI-DBIT");
 // });
+
+const validateSessionToken = require('./middleware/ValidateTokens');
+app.use(validateSessionToken);
 
 //Port Listening
 app.listen(9000,(req,res)=>{

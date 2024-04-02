@@ -154,7 +154,7 @@ router.post('/resetpassword', (req, res) => {
                 }
 
                 // Send the magic link to the user via email
-                const magicLink = `${server_url}/login/resetpassword/${resetPasswordToken.token}`;
+                const magicLink = `https://csiapp.dbit.in/app/${resetPasswordToken.token}`;
                 sendMagicLinkEmail(email, magicLink, userFirstName);
 
                 res.status(200).send("Magic link sent successfully!");
@@ -564,7 +564,7 @@ router.post('/newpassword', (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
       } else {
         if (result.affectedRows > 0) {
-          res.status(200).json({ message: "Password updated successfully" });
+          res.status(200).json({ message: "Password updated" });
         } else {
           res.status(404).json({ message: "Invalid or expired token" });
         }

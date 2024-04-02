@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.dbit.csiapp",
+      "sha256_cert_fingerprints":
+        ["84:C4:0C:31:58:59:36:9D:97:34:C7:9A:4C:01:7E:64:EA:87:1F:B3:BD:4D:01:D4:4D:FB:E2:DE:8A:21:4A:C2"]
+    }
+  }
+]

@@ -19,6 +19,14 @@ connection.connect(err => {
 // Middleware to validate session tokens
 function validateSessionToken(req, res, next) {
     console.log('Validating session token...');
+
+    // Exclude validation for the root route ("/")
+    if (req.originalUrl === '/.well-known/assetlinks.json' || req.originalUrl === '/login/newpassword') {
+      console.log('Skipping token validation for root route');
+      next(); // Continue to the next middleware or route handler
+      return;
+  }
+
     const authHeader = req.headers.authorization;
 
     // Check if the Authorization header is missing or doesn't start with 'Bearer '
