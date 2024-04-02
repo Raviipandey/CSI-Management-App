@@ -252,12 +252,17 @@ public class ProfileEdit extends AppCompatActivity {
 
         //declaring variables
         Button save_button = findViewById(R.id.save_button);
+        final TextView role = findViewById(R.id.role);
         final TextView id = findViewById(R.id.id_E);
         final TextView name = findViewById(R.id.profile_name_E);
         final EditText email = findViewById(R.id.email_E);
         final EditText phn = findViewById(R.id.phn_E);
         final RadioGroup yr = findViewById(R.id.year_E);
+
         final RadioGroup branch = findViewById(R.id.branch_E);
+        for (int i = 0; i < branch.getChildCount(); i++) {
+            branch.getChildAt(i).setEnabled(false);
+        }
         final EditText rol = findViewById(R.id.rollNo_E);
         //final RadioGroup batch = findViewById(R.id.batch_E);
         SelectableRoundedImageView imageView = findViewById(R.id.profile_photo_E);
@@ -266,6 +271,7 @@ public class ProfileEdit extends AppCompatActivity {
         //getting data from profile
 
         UProfile = getIntent().getStringExtra("core_profilepic_url");
+        role.setText(getIntent().getStringExtra("role_name"));
 
         id.setText(getIntent().getStringExtra("core_id"));
         name.setText(getIntent().getStringExtra("core_en_fname"));

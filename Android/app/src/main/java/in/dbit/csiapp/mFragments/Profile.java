@@ -1,5 +1,6 @@
 package in.dbit.csiapp.mFragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -165,6 +166,13 @@ public class Profile extends Fragment {
     }
 
     void get_data() {
+
+        // Ensure the fragment is attached to an activity before proceeding
+        Context context = getContext();
+        if (context == null) {
+            // Fragment is not attached to an activity, so we can't proceed safely
+            return;
+        }
         JSONObject jsonObject = new JSONObject();
         TextView  id= rootView.findViewById(R.id.id);
         String id_s =  id.getText().toString();

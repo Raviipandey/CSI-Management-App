@@ -536,44 +536,49 @@ public class Proposal extends AppCompatActivity {
 
     public void afterSubmit()
     {
+
+        int pcbsInt = 0; // Default values for budgets
+        int ppbsInt = 0;
+        int pguestsInt = 0;
         String preview ="",preSub="";
 
         EditText pname= findViewById(R.id.praposal_name);
-        String pnames = pname.getText().toString();
+        String pnames = pname.getText().toString().trim();
 
         EditText ptheme= findViewById(R.id.ptheme);
-        String pthemes = ptheme.getText().toString();
+        String pthemes = ptheme.getText().toString().trim();
 
         EditText pdesc= findViewById(R.id.pdescription);
-        String pdescs = pdesc.getText().toString();
+        String pdescs = pdesc.getText().toString().trim();
 
         EditText pcb= findViewById(R.id.creativebudget);
-        String pcbs = pcb.getText().toString();
+        String pcbs = pcb.getText().toString().trim();
 
 
         EditText ppb= findViewById(R.id.publicitybdget);
-        String ppbs = ppb.getText().toString();
+        String ppbs = ppb.getText().toString().trim();
 
         EditText pguest= findViewById(R.id.guestp);
-        String pguests = pguest.getText().toString();
+        String pguests = pguest.getText().toString().trim();
 
-        int total = Integer.valueOf(pcbs) + Integer.valueOf(ppbs) + Integer.valueOf(pguests);
+
+//        int total = Integer.valueOf(pcbs) + Integer.valueOf(ppbs) + Integer.valueOf(pguests);
 
 //        21sep
         EditText speaker_e= findViewById(R.id.speaker_p);
-        String speaker_s = speaker_e.getText().toString();
+        String speaker_s = speaker_e.getText().toString().trim();
 
         EditText venue_e= findViewById(R.id.venue_p);
-        String  venue_s= venue_e.getText().toString();
+        String  venue_s= venue_e.getText().toString().trim();
 
         EditText csi_f = findViewById(R.id.fee_csi);
-        String csi_s = csi_f.getText().toString();
+        String csi_s = csi_f.getText().toString().trim();
 
         EditText ncsi_f= findViewById(R.id.fee_non_csi);
-        String  ncsi_s= ncsi_f.getText().toString();
+        String  ncsi_s= ncsi_f.getText().toString().trim();
 
         EditText prize_e= findViewById(R.id.prize_p);
-        String  prize_s= prize_e.getText().toString();
+        String  prize_s= prize_e.getText().toString().trim();
 //        21sep
 
         EditText poth1= findViewById(R.id.other1B);
@@ -598,26 +603,122 @@ public class Proposal extends AppCompatActivity {
             agendas=agenda.getSelectedItem().toString();
         Log.i("info123","Passed here");
 
-        if(pnames.length() <1){Toast.makeText(Proposal.this,"Enter Name ",Toast.LENGTH_SHORT).show();}
-        else if(pthemes.length() <1){Toast.makeText(Proposal.this,"Enter Theme",Toast.LENGTH_SHORT).show();}
-        else if(edate.length() <1){Toast.makeText(Proposal.this,"Enter Event date",Toast.LENGTH_SHORT).show();}
-        else if(speaker_s.length() <1){Toast.makeText(Proposal.this,"Enter Speaker's Detail",Toast.LENGTH_SHORT).show();}
-        else if(venue_s.length() <1){Toast.makeText(Proposal.this,"Enter Venue",Toast.LENGTH_SHORT).show();}
-        else if(csi_s.length() <1){Toast.makeText(Proposal.this,"Enter CSI Members Fee",Toast.LENGTH_SHORT).show();}
-        else if(ncsi_s.length() <1){Toast.makeText(Proposal.this,"Enter Non-CSI Members Fee",Toast.LENGTH_SHORT).show();}
-        else if(prize_s.length() <1){Toast.makeText(Proposal.this,"Enter Prize Money",Toast.LENGTH_SHORT).show();}
-        else if(pdescs.length() <1){Toast.makeText(Proposal.this,"Enter Description",Toast.LENGTH_SHORT).show();}
-        else if(pcbs.length() <1){Toast.makeText(Proposal.this,"Enter Creative Budget",Toast.LENGTH_SHORT).show();}
-        else if(ppbs.length() <1){Toast.makeText(Proposal.this,"Enter Publicity Budget ",Toast.LENGTH_SHORT).show();}
-        else if(pguests.length() <1){Toast.makeText(Proposal.this,"Enter guests ",Toast.LENGTH_SHORT).show();}
+//        if(pnames.length() <1){Toast.makeText(Proposal.this,"Enter Name ",Toast.LENGTH_SHORT).show(); return;}
+        if (pnames.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the proposal name", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+        if (pthemes.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the theme", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
 
-        else if ((poths1.length() >0 && pothFs1.length() ==0) || (poths1.length() ==0 && pothFs1.length() >0)){Toast.makeText(Proposal.this,"Enter 1st other field",Toast.LENGTH_SHORT).show();}
+        if (three_track == null || three_track.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select a track", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
 
-        else if ((poths2.length() >0 && pothFs2.length() ==0)|| (poths2.length() ==0 && pothFs2.length() >0)){Toast.makeText(Proposal.this,"Enter 2nd other field",Toast.LENGTH_SHORT).show();}
 
-        else if ((poths3.length() >0 && pothFs3.length() ==0)||(poths3.length() ==0 && pothFs3.length() >0)){Toast.makeText(Proposal.this,"Enter 3rd other field",Toast.LENGTH_SHORT).show();}
 
-        else if(agendas==null || agendas=="SELECT"){Toast.makeText(Proposal.this,"Enter agenda",Toast.LENGTH_SHORT).show();}
+        if (edate == null || edate.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select the event date", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+
+        if (speaker_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the speaker name", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if (venue_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the venue", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if (csi_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the CSI Members Fee ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if ( ncsi_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the Non CSI Members Fee ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+        if (prize_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the Prize Money ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if ( pdescs.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please Enter Description", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        // Validate and parse pcbs
+        if (!pcbs.isEmpty()) {
+            try {
+                pcbsInt = Integer.parseInt(pcbs);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Creative Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Creative Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // Validate and parse ppbs
+        if (!ppbs.isEmpty()) {
+            try {
+                ppbsInt = Integer.parseInt(ppbs);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Publicity Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Publicity Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // Validate and parse pguests
+        if (!pguests.isEmpty()) {
+            try {
+                pguestsInt = Integer.parseInt(pguests);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Guests Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Guests Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // If all validations pass, calculate the total
+        int total = pcbsInt + ppbsInt + pguestsInt;
+
+//        else if(pthemes.length() <1){Toast.makeText(Proposal.this,"Enter Theme",Toast.LENGTH_SHORT).show(); return;}
+//        else if(edate.length() <1){Toast.makeText(Proposal.this,"Enter Event date",Toast.LENGTH_SHORT).show();return;}
+//        else if(speaker_s.length() <1){Toast.makeText(Proposal.this,"Enter Speaker's Detail",Toast.LENGTH_SHORT).show();return;}
+//        else if(venue_s.length() <1){Toast.makeText(Proposal.this,"Enter Venue",Toast.LENGTH_SHORT).show();return;}
+//        else if(csi_s.length() <1){Toast.makeText(Proposal.this,"Enter CSI Members Fee",Toast.LENGTH_SHORT).show();return;}
+//        else if(ncsi_s.length() <1){Toast.makeText(Proposal.this,"Enter Non-CSI Members Fee",Toast.LENGTH_SHORT).show();return;}
+//        else if(prize_s.length() <1){Toast.makeText(Proposal.this,"Enter Prize Money",Toast.LENGTH_SHORT).show();return;}
+//        else if(pdescs.length() <1){Toast.makeText(Proposal.this,"Enter Description",Toast.LENGTH_SHORT).show();return;}
+
+
+        if ((poths1.length() >0 && pothFs1.length() ==0) || (poths1.length() ==0 && pothFs1.length() >0)){Toast.makeText(Proposal.this,"Enter 1st other field",Toast.LENGTH_SHORT).show();return;}
+
+         if ((poths2.length() >0 && pothFs2.length() ==0)|| (poths2.length() ==0 && pothFs2.length() >0)){Toast.makeText(Proposal.this,"Enter 2nd other field",Toast.LENGTH_SHORT).show();return;}
+
+         if ((poths3.length() >0 && pothFs3.length() ==0)||(poths3.length() ==0 && pothFs3.length() >0)){Toast.makeText(Proposal.this,"Enter 3rd other field",Toast.LENGTH_SHORT).show();return;}
+
+        if (date == null || date.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select the date of meeting", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+         if(agendas==null || agendas=="SELECT"){Toast.makeText(Proposal.this,"Enter agenda",Toast.LENGTH_SHORT).show();return;}
         else{
 
             JSONObject jsub = new JSONObject();

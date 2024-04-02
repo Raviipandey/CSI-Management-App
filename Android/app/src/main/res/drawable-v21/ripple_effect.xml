@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#5363A3">
     <item>
-        <selector>
-            <item
-                android:drawable="@drawable/rects"/>
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <!-- Disabled state -->
+            <item android:state_enabled="false" android:drawable="@drawable/button_disabled" />
+            <!-- Default state -->
+            <item android:drawable="@drawable/rects" />
         </selector>
     </item>
 </ripple>
+

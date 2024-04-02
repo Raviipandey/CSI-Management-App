@@ -69,11 +69,31 @@
 
             </LinearLayout>
 
-            <Spinner
-                android:id="@+id/threetrackspinner"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:background="@drawable/spinner_border"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15dp"
+                    android:text="THREE TRACK"
+                    android:textColor="@color/colorPrimary"/>
+
+                <Spinner
+                    android:id="@+id/threetrackspinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/spinner_border"/>
+
+
+
+
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_height="wrap_content"
