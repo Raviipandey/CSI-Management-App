@@ -61,6 +61,18 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/role"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/profile_name_E"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="20dp"
+                android:text="Role Name"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
+
+            <TextView
                 android:id="@+id/id_E"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,7 +82,8 @@
                 android:layout_marginBottom="20dp"
                 android:text="Student_id"
                 android:textColor="@color/colorPrimary"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="gone"/>
         </RelativeLayout>
 
         <LinearLayout
@@ -104,6 +117,7 @@
                     android:textColor="@color/colorAccent"
                     android:background="@drawable/btextfield"
                     android:layout_margin="10dp"
+                    android:enabled="false"
                     /></LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -130,6 +144,7 @@
                     android:textColor="@color/colorAccent"
                     android:background="@drawable/btextfield"
                     android:layout_margin="10dp"
+                    android:enabled="false"
                     /></LinearLayout>
 
             <LinearLayout
@@ -207,6 +222,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="15dp"
+
                     >
                     <RadioButton
                         android:layout_width="wrap_content"

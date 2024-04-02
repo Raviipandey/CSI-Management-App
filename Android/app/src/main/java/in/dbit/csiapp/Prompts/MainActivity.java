@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                String errorMessage = "An error occurred"; // Default message
+                String errorMessage = "Invalid credentials, please try again!"; // Default message
                 try {
                     if (error.networkResponse != null && error.networkResponse.data != null) {
                         String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
