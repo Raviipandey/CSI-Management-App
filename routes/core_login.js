@@ -23,6 +23,7 @@ function generateSessionToken() {
 
 // MySQL Connection
 var mysql = require('mysql');
+const { json } = require('body-parser');
 const connection = mysql.createConnection({
   host: '128.199.23.207',
   user: "csi",
@@ -549,28 +550,54 @@ router.get('/resetpassword/:token', (req, res) => {
 
 
 // Route to handle password reset
+// Route to handle password reset
 router.post('/newpassword', (req, res) => {
-    const token = req.body.token; // Get token from the request body
-    const newPassword = req.body.newPassword;
-  
-    console.log(token , newPassword);
-    // Hash the password using MD5 algorithm
-    const hashedPassword = crypto.createHash('md5').update(newPassword).digest('hex');
-  
-    // Update the hashed password in the database based on the token
-    connection.query('UPDATE core_details SET core_pwd = ? WHERE pass_reset_token = ?', [hashedPassword, token], (error, result) => {
-      if (error) {
-        console.error("Error updating password:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-      } else {
-        if (result.affectedRows > 0) {
-          res.status(200).json({ message: "Password updated" });
-        } else {
-          res.status(404).json({ message: "Invalid or expired token" });
-        }
+  const token = req.body.token; // Get token from the request body
+  const newPassword = req.body.newPassword;
+
+  console.log(token, newPassword);
+  // Hash the password using MD5 algorithm (consider using a more secure hashing algorithm like bcrypt)
+  const hashedPassword = crypto.createHash('md5').update(newPassword).digest('hex');
+
+  // First, ensure the new password is not the same as the last three passwords
+  connection.query('SELECT hashed_password FROM password_history WHERE user_id = (SELECT core_id FROM core_details WHERE pass_reset_token = ?) ORDER BY created_at DESC LIMIT 3', [token], (historyError, historyResult) => {
+      if (historyError) {
+          console.error("Error fetching password history:", historyError);
+          res.status(500).json({ message: "Internal Server Error" });
+          return;
       }
-    });
+
+      // Check if the new password matches any of the last three passwords
+      for (let i = 0; i < historyResult.length; i++) {
+          if (historyResult[i].hashed_password === hashedPassword) {
+              res.status(400).json({ message: "New password must not be the same as the last three passwords." });
+              console.log("New password must not be the same as the last three passwords.");
+              return;
+          }
+      }
+
+      // If the new password is unique, update the password in the core_details table and add it to the password_history table
+      connection.query('UPDATE core_details SET core_pwd = ? WHERE pass_reset_token = ?', [hashedPassword, token], (updateError, updateResult) => {
+          if (updateError) {
+              console.error("Error updating password:", updateError);
+              res.status(500).json({ message: "Internal Server Error" });
+          } else if (updateResult.affectedRows > 0) {
+              // After successfully updating the password, insert the new password into the password_history table
+              connection.query('INSERT INTO password_history (user_id, hashed_password) VALUES ((SELECT core_id FROM core_details WHERE pass_reset_token = ?), ?)', [token, hashedPassword], (insertError, insertResult) => {
+                  if (insertError) {
+                      console.error("Error inserting new password into history:", insertError);
+                      // Handle error appropriately
+                  }
+                  // Respond to the client that the password has been updated
+                  res.status(200).json({ message: "Password updated" });
+              });
+          } else {
+              res.status(404).json({ message: "Invalid or expired token" });
+          }
+      });
+  });
 });
+
 
 
 

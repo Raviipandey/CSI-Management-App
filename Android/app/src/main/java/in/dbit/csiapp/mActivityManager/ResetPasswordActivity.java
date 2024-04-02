@@ -121,6 +121,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
 
             @Override
+
             public void onResponse(Call call, Response response) throws IOException {
                 // Handle response
                 if (!response.isSuccessful()) {
@@ -132,8 +133,25 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 Toast.makeText(ResetPasswordActivity.this, "Password reset token invalid or expired", Toast.LENGTH_SHORT).show();
                             }
                         });
+                    } else if (response.code() == 400) {
+                        // Display error message for 400 response (Bad Request)
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ResetPasswordActivity.this, "New password must not be the same as the last three passwords.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else if (response.code() == 500) {
+                        // Display error message for 500 response (Internal Server Error)
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ResetPasswordActivity.this, "Internal Server Error. Please try again later.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     } else {
-                        throw new IOException("Unexpected code " + response);
+                        // Handle other unexpected response codes
+                        throw new IOException("Unexpected code " + response.code());
                     }
                 } else {
                     // Display success message in the UI
@@ -146,6 +164,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                     });
                 }
             }
+
 
         });
     }
