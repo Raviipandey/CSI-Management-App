@@ -58,7 +58,9 @@ public class AddMinute extends AppCompatActivity {
         Log.i("i07","Entered1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_minute);
+
         getSupportActionBar().setTitle("Add Minute");
+        tableLayout = findViewById(R.id.table);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         Intent intent = getIntent();
@@ -180,14 +182,20 @@ public class AddMinute extends AppCompatActivity {
         mAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TableRow mainRow = findViewById(R.id.row1);
-                mainRow.setVisibility(View.VISIBLE);
-                TableRow tablerow;
-                tableLayout = findViewById(R.id.table);
-                TextView tv1, tv2;
+                String taskDescription = mTask.getText().toString();
+                String assignedPerson = spinner.getSelectedItem().toString();
+                if (taskDescription.isEmpty() || assignedPerson.equals("Select Person")) { // Assuming "Select Person" is your default spinner item
+                    // If task or person is not provided, show a Toast message
+                    Toast.makeText(AddMinute.this, "Please enter a task and select a person.", Toast.LENGTH_LONG).show();
+                } else {
+                    TableRow mainRow = findViewById(R.id.row1);
+                    mainRow.setVisibility(View.VISIBLE);
+                    TableRow tablerow;
+                    tableLayout = findViewById(R.id.table);
+                    TextView tv1, tv2;
 
-                tablerow = new TableRow(AddMinute.this);
-                tablerow.setClickable(true);
+                    tablerow = new TableRow(AddMinute.this);
+                    tablerow.setClickable(true);
                 /*tablerow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -215,50 +223,52 @@ public class AddMinute extends AppCompatActivity {
                     }
                 });*/
 
-                tv1 = new TextView(AddMinute.this);
-                tv2 = new TextView(AddMinute.this);
+                    tv1 = new TextView(AddMinute.this);
+                    tv2 = new TextView(AddMinute.this);
 
-                String sam = mTask.getText().toString();
-                mTask.setText("");
-                tv1.setText(sam);
+                    // Reset the task input field for next input
+                    mTask.setText("");
+                    tv1.setText(taskDescription);
 
-                tv1.setGravity(Gravity.CENTER);
-                tv1.setBackgroundColor(getResources().getColor(R.color.white));
-                tv1.setTextColor(getResources().getColor(R.color.colorPrimary));
-                tv1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
 
-                TableRow.LayoutParams param = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        0.1f
-                );
-                param.setMargins(1, 0, 1, 1);
-                tv1.setLayoutParams(param);
+                    tv1.setGravity(Gravity.CENTER);
+                    tv1.setBackgroundColor(getResources().getColor(R.color.white));
+                    tv1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tv1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
 
-                sam = spinner.getSelectedItem().toString();
-                spinner.setSelection(0);
-                tv2.setText(sam);
+                    TableRow.LayoutParams param = new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            0.1f
+                    );
+                    param.setMargins(1, 0, 1, 1);
+                    tv1.setLayoutParams(param);
 
-                tv2.setGravity(Gravity.CENTER);
-                tv2.setBackgroundColor(getResources().getColor(R.color.white));
-                tv2.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
-                tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    // Use the selected person from the spinner
+                    spinner.setSelection(0); // Reset spinner to default after selection if needed
+                    tv2.setText(assignedPerson);
 
-                TableRow.LayoutParams param1 = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        0.1f
-                );
-                param1.setMargins(0, 0, 1, 1);
-                tv2.setLayoutParams(param1);
+                    tv2.setGravity(Gravity.CENTER);
+                    tv2.setBackgroundColor(getResources().getColor(R.color.white));
+                    tv2.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
+                    tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
 
-                tablerow.addView(tv1);
-                tablerow.addView(tv2);
+                    TableRow.LayoutParams param1 = new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            0.1f
+                    );
+                    param1.setMargins(0, 0, 1, 1);
+                    tv2.setLayoutParams(param1);
 
-                tableLayout.addView(tablerow);
-                //tablerow = (TableRow) tableLayout.getChildAt(1);
-                //tablerow.setClickable(true);
-                Toast.makeText(AddMinute.this, (CharSequence) spinner.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                    tablerow.addView(tv1);
+                    tablerow.addView(tv2);
+
+                    tableLayout.addView(tablerow);
+                    //tablerow = (TableRow) tableLayout.getChildAt(1);
+                    //tablerow.setClickable(true);
+                    Toast.makeText(AddMinute.this, (CharSequence) spinner.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -273,10 +283,28 @@ public class AddMinute extends AppCompatActivity {
         mAddMinute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Log.i("i234","Add Minute");
-                Agenda = mCreateAgenda.getText().toString();
-                Points = mCreatePoints.getText().toString();
-                Absentee = mAbsentee.getText().toString();
+                Agenda = mCreateAgenda.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+                Points = mCreatePoints.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+                Absentee = mAbsentee.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+
+                Log.d("AddMinute", "Child count: " + tableLayout.getChildCount());
+
+                // Check if any of the required fields is empty
+                if(Agenda.isEmpty() || Points.isEmpty() || Absentee.isEmpty()) {
+                    // If any field is empty, show a Toast message and return early without proceeding
+                    Toast.makeText(AddMinute.this, "Please fill in all details: Agenda, Points, and Absent Members.", Toast.LENGTH_LONG).show();
+                    return; // Stop the method execution here
+                }
+
+                // Ensuring tableLayout is not null and checking if at least one task has been added
+                if(tableLayout != null && tableLayout.getChildCount() <= 1) {
+                    Toast.makeText(AddMinute.this, "Please assign at least one task.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
 
                 //createMinuteTesting();
                 createNewMinute();

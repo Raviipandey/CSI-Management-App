@@ -16,8 +16,10 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,6 +63,7 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
     private String server_url, eid;
     private long downloadID;
     private SharedPreferenceConfig preferenceConfig;
+    SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -72,7 +75,10 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
         setContentView(R.layout.activity_report);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
+        swipe();
+
         getSupportActionBar().setTitle("Reports");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mPraposalList = new ArrayList<>();
         rv=findViewById(R.id.recycler_view_report);
@@ -89,6 +95,30 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
             public void onClick(View v) {
                 // Handle download template button click
                 downloadTemplate();
+            }
+        });
+
+
+    }
+    void swipe() {
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresher_P);
+        //swipeRefreshLayout.setColorSchemeResources(R.color.Red,R.color.OrangeRed,R.color.Yellow,R.color.GreenYellow,R.color.BlueViolet);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                swipeRefreshLayout.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+
+                        int min = 65;
+                        int max = 95;
+
+                        parseJSON();
+                    }
+                }, 1000);
             }
         });
     }
@@ -163,6 +193,7 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
         StringRequest stringRequest =new StringRequest(Request.Method.GET,server_url,new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.i("volleyABC" ,"got response    "+response);
 //                Toast.makeText(Creative.this,response ,Toast.LENGTH_SHORT).show();
                 try {
