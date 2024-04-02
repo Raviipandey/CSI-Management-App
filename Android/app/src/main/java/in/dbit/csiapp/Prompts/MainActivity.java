@@ -41,6 +41,7 @@ import in.dbit.csiapp.R;
 
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mActivityManager.Forgetpassword;
+import in.dbit.csiapp.mActivityManager.ResetPasswordActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
