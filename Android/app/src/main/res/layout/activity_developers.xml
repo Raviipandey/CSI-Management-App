@@ -1,220 +1,729 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/BackendTeam"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:layout_weight="0"
-        android:gravity="center_horizontal"
-        android:text="BackEnd Team"
-        android:textColor="@color/colorAccent"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/nav_developers"
+        android:weightSum="10">
 
-    <LinearLayout
-        android:id="@+id/l1h"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="124dp"
-        android:baselineAligned="true"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        <TextView
+            android:id="@+id/Batch2021"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="28dp"
+            android:layout_weight="0"
+            android:gravity="center_horizontal"
+            android:text="Batch 2021"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <GridLayout
+            android:id="@+id/mainGrid"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="60dp"
+            android:layout_width="match_parent"
+            android:layout_height="580dp"
+            android:layout_weight="8"
+            android:alignmentMode="alignMargins"
+            android:columnCount="2"
+            android:columnOrderPreserved="false"
+            android:padding="14dp"
+            android:rowCount="3">
+
+            <!-- Row 1 -->
+
+            <!-- Column 1 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c1"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="ishmeetphoto"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ishmeet" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="0"
+                        android:gravity="center_horizontal"
+                        android:text="Ishmeet Kaur"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Column 2 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c2"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/mushira"
+                        android:contentDescription="mushiraphoto"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Mushira Shaikh"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Row 2 -->
+
+            <!-- Column 1 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c3"
+                android:layout_width="128dp"
+                android:layout_height="150dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+
+
+                <LinearLayout
+                    android:layout_width="131dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="sanketphoto"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/sanket" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Sanket Deshmukh"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Column 2 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c4"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="afifphoto"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/afif" />/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_weight="0"
+                        android:gravity="center_horizontal"
+                        android:text="Afif Shaikh"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Row 3 -->
+
+            <!-- Column 1 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c5"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView13"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="virajphoto"
+                        android:src="@drawable/viraj" />
+
+                    <TextView
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Viraj Tandel"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Column 2 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/c6"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="0dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_margin="4dp"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/saurabh"
+                        android:contentDescription="saurabhphoto"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Saurabh Yadav"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </GridLayout>
+
+        <LinearLayout android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/developers"
+            android:weightSum="10">
 
-            <ImageView
-                android:id="@+id/imageView7"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/ishmeet"
-                android:contentDescription="saurabhphoto" />
-
+            <!--</RelativeLayout>-->
+            <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
             <TextView
-                android:id="@+id/name1"
+                android:id="@+id/Batch2024"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
+                android:layout_marginTop="28dp"
                 android:layout_weight="0"
                 android:gravity="center_horizontal"
-                android:text="Ishmeet Kaur"
+                android:text="Batch 2024"
                 android:textColor="@color/colorAccent"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/image3"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/mushira"
-                android:contentDescription="mushiraphoto" />
-
-            <TextView
-                android:id="@+id/name2"
+            <GridLayout
+                android:id="@+id/mainGrid2"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="60dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:text="Mushira Shaikh"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp"/>
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:alignmentMode="alignMargins"
+                android:columnCount="2"
+                android:columnOrderPreserved="false"
+                android:padding="14dp"
+                android:rowCount="3">
 
+                <!-- Row 1 -->
+
+                <!-- Column 1 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/c7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="0dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_margin="4dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView12"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_horizontal"
+                            android:contentDescription="raviphoto"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/ravi" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:layout_weight="0"
+                            android:gravity="center_horizontal"
+                            android:text="Ravi Pandey"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Column 2 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/c8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="0dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="8dp">
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_margin="4dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView15"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_horizontal"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/vendra" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Vendra Sekar"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Row 2 -->
+
+                <!-- Column 1 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/c9"
+                    android:layout_width="128dp"
+                    android:layout_height="150dp"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="8dp">
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_margin="4dp"
+                        android:orientation="vertical">
+                        <ImageView
+                            android:id="@+id/profile_image"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_horizontal"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/simar"
+                            />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Simar Kaur"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </GridLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/saurabh"
-                android:contentDescription="saurabhphoto" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:text="Saurabh Yadav"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp"/>
-        </LinearLayout>
-
     </LinearLayout>
+</ScrollView>
 
-    <TextView
-        android:id="@+id/FrontendTeam"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:gravity="center_horizontal"
-        android:text="FrontEnd Team"
-        android:textColor="@color/colorAccent"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/l1h"
-        app:layout_constraintVertical_bias="0.7" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:baselineAligned="true"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/l1h">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageView11"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/sanket"
-                android:contentDescription="sanketphoto"/>
+    <!--           << <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--                xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--                xmlns:tools="http://schemas.android.com/tools"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="match_parent"-->
+    <!--                tools:context=".Prompts.MainActivity">-->
+    <!--                change this-->
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:text="Sanket Deshmukh"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp"  />
-        </LinearLayout>
+    <!--                <TextView-->
+    <!--                    android:id="@+id/BackendTeam"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_marginTop="52dp"-->
+    <!--                    android:layout_weight="0"-->
+    <!--                    android:gravity="center_horizontal"-->
+    <!--                    android:text="BackEnd Team"-->
+    <!--                    android:textColor="@color/colorAccent"-->
+    <!--                    android:textSize="24sp"-->
+    <!--                    android:textStyle="bold"-->
+    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                    app:layout_constraintHorizontal_bias="0.0"-->
+    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+    <!--                    app:layout_constraintTop_toTopOf="parent" />-->
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+    <!--                <LinearLayout-->
+    <!--                    android:id="@+id/l1h"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_marginTop="124dp"-->
+    <!--                    android:baselineAligned="true"-->
+    <!--                    android:gravity="center_horizontal|center_vertical"-->
+    <!--                    android:orientation="horizontal"-->
+    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                    app:layout_constraintHorizontal_bias="0.0"-->
+    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+    <!--                    app:layout_constraintTop_toTopOf="parent">-->
 
-            <ImageView
-                android:id="@+id/imageView12"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/afif"
-                android:contentDescription="afifphoto"/>
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
 
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:text="Afif Shaikh"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp" />
-        </LinearLayout>
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/imageView7"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/ishmeet"-->
+    <!--                            android:contentDescription="saurabhphoto" />-->
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/name1"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Ishmeet Kaur"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp"/>-->
+    <!--                    </LinearLayout>-->
 
-            <ImageView
-                android:id="@+id/imageView13"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/viraj"
-                android:contentDescription="virajphoto"/>
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
 
-            <TextView
-                android:id="@+id/textView7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:text="Viraj Tandel"
-                android:textColor="@color/colorAccent"
-                android:textSize="16sp" />
-        </LinearLayout>
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/image3"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/mushira"-->
+    <!--                            android:contentDescription="mushiraphoto" />-->
 
-    </LinearLayout>
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/name2"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Mushira Shaikh"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp"/>-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!--                    </LinearLayout>-->
+
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
+
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/imageView6"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/saurabh"-->
+    <!--                            android:contentDescription="saurabhphoto" />-->
+
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/textView4"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Saurabh Yadav"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp"/>-->
+    <!--                    </LinearLayout>-->
+
+    <!--                </LinearLayout>-->
+
+    <!--                <TextView-->
+    <!--                    android:id="@+id/FrontendTeam"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_weight="0"-->
+    <!--                    android:gravity="center_horizontal"-->
+    <!--                    android:text="FrontEnd Team"-->
+    <!--                    android:textColor="@color/colorAccent"-->
+    <!--                    android:textSize="24sp"-->
+    <!--                    android:textStyle="bold"-->
+    <!--                    app:layout_constraintBottom_toTopOf="@+id/linearLayout2"-->
+    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+    <!--                    app:layout_constraintTop_toBottomOf="@+id/l1h"-->
+    <!--                    app:layout_constraintVertical_bias="0.7" />-->
+
+    <!--                <LinearLayout-->
+    <!--                    android:id="@+id/linearLayout2"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_marginTop="10dp"-->
+    <!--                    android:baselineAligned="true"-->
+    <!--                    android:gravity="center_horizontal|center_vertical"-->
+    <!--                    android:orientation="horizontal"-->
+    <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+    <!--                    app:layout_constraintTop_toBottomOf="@+id/l1h">-->
+
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
+
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/imageView11"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/sanket"-->
+    <!--                            android:contentDescription="sanketphoto"/>-->
+
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/textView5"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Sanket Deshmukh"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp"  />-->
+    <!--                    </LinearLayout>-->
+
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
+
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/imageView12"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/afif"-->
+    <!--                            android:contentDescription="afifphoto"/>-->
+
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/textView6"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Afif Shaikh"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp" />-->
+    <!--                    </LinearLayout>-->
+
+    <!--                    <LinearLayout-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="match_parent"-->
+    <!--                        android:layout_weight="1"-->
+    <!--                        android:orientation="vertical">-->
+
+    <!--                        <ImageView-->
+    <!--                            android:id="@+id/imageView13"-->
+    <!--                            android:layout_width="100dp"-->
+    <!--                            android:layout_height="100dp"-->
+    <!--                            android:layout_gravity="center_horizontal"-->
+    <!--                            android:background="@drawable/viraj"-->
+    <!--                            android:contentDescription="virajphoto"/>-->
+
+    <!--                        <TextView-->
+    <!--                            android:id="@+id/textView7"-->
+    <!--                            android:layout_width="match_parent"-->
+    <!--                            android:layout_height="wrap_content"-->
+    <!--                            android:layout_weight="0"-->
+    <!--                            android:gravity="center_horizontal"-->
+    <!--                            android:text="Viraj Tandel"-->
+    <!--                            android:textColor="@color/colorAccent"-->
+    <!--                            android:textSize="16sp" />-->
+    <!--                    </LinearLayout>-->
+
+    <!--                </LinearLayout>-->
