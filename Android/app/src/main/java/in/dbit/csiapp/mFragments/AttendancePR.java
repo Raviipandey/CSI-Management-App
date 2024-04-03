@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,40 +70,47 @@ public class AttendancePR extends Fragment {
         getActivity().setTitle("Attendance");
         rootView = inflater.inflate(R.layout.activity_attendance_pr,null);
 
-        swipe();
-
-        mRecyclerView = rootView.findViewById(R.id.recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        mRequestList = new ArrayList<>();
-
-        mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-
-        preferenceConfig = new SharedPreferenceConfig(getActivity().getApplicationContext());
+        // Check if the activity is launched from a notification click action
         Intent intent = getActivity().getIntent();
+        if (intent != null && intent.getAction() != null && intent.getAction().equals("AttendancePR_ACTIVITY")) {
+            // Activity is launched from a notification click action
+            // Add your handling code here
+            // For example, you can display a Toast message indicating that the activity is launched from a notification
+            Toast.makeText(getActivity(), "Activity launched from notification click action", Toast.LENGTH_SHORT).show();
+        } else {
+            // Activity is not launched from a notification click action
+            // Proceed with your regular code
+            swipe();
 
-        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
-        uname=preferenceConfig.readNameStatus();
+            mRecyclerView = rootView.findViewById(R.id.recycler_view);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        Log.i("AttPR","Started");
-        parseJSON();  //Get list of requests
+            mRequestList = new ArrayList<>();
 
+            mRequestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
 
-        Button confirm = (Button) rootView.findViewById(R.id.confirm_requests);
-        confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            preferenceConfig = new SharedPreferenceConfig(getActivity().getApplicationContext());
 
-                parsejson2();  //Method to Confirm Requests
-                parsejson3();  //Method to Reject Requests
+            uname = preferenceConfig.readNameStatus();
 
-                Toast.makeText(getActivity(), "Attendance Record Updated", Toast.LENGTH_SHORT).show();
-                Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
-            }
-        });
+            Log.i("AttPR","Started");
+            parseJSON();  //Get list of requests
+
+            Button confirm = (Button) rootView.findViewById(R.id.confirm_requests);
+            confirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parsejson2();  //Method to Confirm Requests
+                    parsejson3();  //Method to Reject Requests
+                    Toast.makeText(getActivity(), "Attendance Record Updated", Toast.LENGTH_SHORT).show();
+                    Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
+                }
+            });
+        }
 
         return rootView;
     }
+
 
 //    private void fetchAllTokens() {
 //        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
@@ -254,16 +262,41 @@ public class AttendancePR extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
                 try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(loginIntent);
+                    getActivity().finish();
                 }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
         if (mRequestListAdapter == null) {
             mRequestListAdapter = new RequestListAdapter(getActivity(), mRequestList);
@@ -275,6 +308,7 @@ public class AttendancePR extends Fragment {
         mRequestQueue.add(stringRequest);
 
     }
+
 
     private void sendAcceptedNotification(String fcmtoken) {
         // Construct the notification payload
@@ -368,6 +402,7 @@ public class AttendancePR extends Fragment {
                 headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
                 return headers;
             }
+
         };
 
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
@@ -401,9 +436,7 @@ public class AttendancePR extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("accepted", jsonArray);
-            if (jsonArray.length() > 0) {
-                sendAcceptedNotification(fcmtoken);
-            }
+
 
         } catch (JSONException e)
         {
@@ -428,15 +461,36 @@ public class AttendancePR extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-//                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
+                if(getActivity() != null) {
+                    String errorMessage = "An error occurred"; // Default message
+                    try {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = new JSONObject(responseBody);
+                            errorMessage = data.optString("error", errorMessage); // Extract custom message
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    if ("Session expired".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                    } else if ("Another device has logged in".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        // Handle logout if session is expired or taken over
+                        preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                        Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(loginIntent);
+                        getActivity().finish();
+                    }
                 }
             }
+
         }){
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -446,6 +500,14 @@ public class AttendancePR extends Fragment {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -493,9 +555,7 @@ public class AttendancePR extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("rejected", jsonArray);
-            if (jsonArray.length() > 0) {
-                sendRejectedNotification(fcmtoken);
-            }
+
 
         } catch (JSONException e)
         {
@@ -520,15 +580,36 @@ public class AttendancePR extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(getActivity(), "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-//                    Toast.makeText(getActivity(), "Check Network",Toast.LENGTH_SHORT).show();
+                if(getActivity() != null) {
+                    String errorMessage = "An error occurred"; // Default message
+                    try {
+                        if (error.networkResponse != null && error.networkResponse.data != null) {
+                            String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = new JSONObject(responseBody);
+                            errorMessage = data.optString("error", errorMessage); // Extract custom message
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    if ("Session expired".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                    } else if ("Another device has logged in".equals(errorMessage)) {
+                        Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        // Handle logout if session is expired or taken over
+                        preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                        Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(loginIntent);
+                        getActivity().finish();
+                    }
                 }
             }
+
         }){
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -538,6 +619,14 @@ public class AttendancePR extends Fragment {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

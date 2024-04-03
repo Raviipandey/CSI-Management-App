@@ -16,8 +16,10 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +27,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -33,7 +36,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mAdapter.PraposalAdapter;
 import in.dbit.csiapp.mAdapter.PraposalItem;
 
@@ -44,7 +49,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Report extends AppCompatActivity implements PraposalAdapter.OnItemClickedListener{
 
@@ -54,6 +62,8 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
     private RequestQueue mRequestQueue;
     private String server_url, eid;
     private long downloadID;
+    private SharedPreferenceConfig preferenceConfig;
+    SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -63,8 +73,12 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
+        swipe();
 
         getSupportActionBar().setTitle("Reports");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mPraposalList = new ArrayList<>();
         rv=findViewById(R.id.recycler_view_report);
@@ -81,6 +95,30 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
             public void onClick(View v) {
                 // Handle download template button click
                 downloadTemplate();
+            }
+        });
+
+
+    }
+    void swipe() {
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresher_P);
+        //swipeRefreshLayout.setColorSchemeResources(R.color.Red,R.color.OrangeRed,R.color.Yellow,R.color.GreenYellow,R.color.BlueViolet);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                swipeRefreshLayout.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+
+                        int min = 65;
+                        int max = 95;
+
+                        parseJSON();
+                    }
+                }, 1000);
             }
         });
     }
@@ -155,6 +193,7 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
         StringRequest stringRequest =new StringRequest(Request.Method.GET,server_url,new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.i("volleyABC" ,"got response    "+response);
 //                Toast.makeText(Creative.this,response ,Toast.LENGTH_SHORT).show();
                 try {
@@ -208,17 +247,41 @@ public class Report extends AppCompatActivity implements PraposalAdapter.OnItemC
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e("volleyABC" ,"Got error in connecting server");
+                String errorMessage = "An error occurred"; // Default message
                 try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Report.this, "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-                    Toast.makeText(Report.this, "Check Network",Toast.LENGTH_SHORT).show();
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Report.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Report.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Report.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Report.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
                 }
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         mRequestQueue.add(stringRequest);
     }
 

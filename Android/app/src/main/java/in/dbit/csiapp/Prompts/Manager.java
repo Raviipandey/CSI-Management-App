@@ -44,7 +44,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
     public static final String EXTRA_UROLE = "com.example.csimanagementsystem.EXTRA_UROLE";
 
 
-    String uid, uname, urole, uProfile , userid , fcmtoken;
+    String uid, uname, urole, uProfile , userid , fcmtoken, sessionToken;
 
     TextView UNAME, UID, UROLE;
     View mView;
@@ -79,7 +79,14 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         fcmtoken = intent.getStringExtra(MainActivity.EXTRA_FCMTOKEN);
         fcmtoken= preferenceConfig.fetchfcmtoken();
-        Log.i("trackinggggg","manager when received "+uid+uname+urole+uProfile+fcmtoken);
+
+        sessionToken = intent.getStringExtra(MainActivity.EXTRA_SESSIONTOKEN);
+        sessionToken= preferenceConfig.readSessionToken();
+
+
+
+
+        Log.i("trackinggggg","manager when received "+uid+uname+urole+uProfile+fcmtoken+sessionToken);
         //get data sent by Mainactivity.java ends
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.server_url_button);
@@ -142,6 +149,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
                 });
 
     }
+
 
     //below mathod id used to close the drawer... if its is open while pressing backpress key
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -306,7 +314,7 @@ public class Manager extends AppCompatActivity implements NavigationView.OnNavig
 
         } else if (id == R.id.log_out) {
             //....6/6/2019
-            preferenceConfig.writeLoginStatus(false,"","","","","","","");
+            preferenceConfig.writeLoginStatus(false,"","","","","","","", "");
             startActivity(new Intent(this, MainActivity.class));
             finish();
             //....6/6/2019

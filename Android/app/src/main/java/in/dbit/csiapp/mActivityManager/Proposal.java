@@ -25,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,12 +55,22 @@ public class Proposal extends AppCompatActivity {
     EditText description;
     String selectedoption;
 
-    String uname;
+
+
+    String sessiontoken;
+
+    String uname , uid;
+
+    String notification_title , notification_body;
+
+    JSONArray idsArray = new JSONArray();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proposal);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
 
         Spinner threetrackspinner;
@@ -73,11 +85,26 @@ public class Proposal extends AppCompatActivity {
         description.setMovementMethod(new ScrollingMovementMethod());
         getSupportActionBar().setTitle("Add Proposal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         Intent intent = getIntent();
+        sessiontoken = intent.getStringExtra(MainActivity.EXTRA_SESSIONTOKEN);
+        if (sessiontoken == null || sessiontoken.isEmpty()) {
+            sessiontoken = preferenceConfig.readSessionToken();
+        }
+
+
+
+
+
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+        Log.i("Fetching name" , uname);
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
+
+        notification_title = "New Proposal Added";
+        notification_body = "A new proposal has been added by " + uname;
 
 //        fcmtoken = intent.getStringExtra(MainActivity.EXTRA_FCMTOKEN);
 //        fcmtoken= preferenceConfig.fetchfcmtoken();
@@ -171,6 +198,8 @@ public class Proposal extends AppCompatActivity {
         });
     }
 
+
+
     // Method to fetch all FCM tokens from the server
     private void fetchAllTokens() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -180,11 +209,34 @@ public class Proposal extends AppCompatActivity {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
                     Log.i("FCM SERVER" , String.valueOf(tokensArray));
+
+                    // Create a JSON array to store IDs
+
+
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse fcm_token
+
+                        // Add core_id to the JSON array
+                        if(!uid.equals(coreId)){
+                            idsArray.put(coreId);
+                        }
+
+
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+
+                    createNotification(notification_title , notification_body , Integer.parseInt(uid), idsArray , "2");
+
+                    // Store the JSON array of IDs or use it as needed
+                    Log.i("IDS_ARRAY", idsArray.toString());
+
+
+
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -192,11 +244,77 @@ public class Proposal extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Proposal.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Proposal.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
+        };
+        requestQueue.add(stringRequest);
+    }
+
+    // Method to create notification by calling the backend endpoint
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
         });
-        requestQueue.add(stringRequest);
+        requestQueue.add(jsonObjectRequest);
     }
+
+
+
+
 
 
 
@@ -207,9 +325,11 @@ public class Proposal extends AppCompatActivity {
         try {
             notification.put("to", fcmtoken); // Using the FCM token obtained earlier
             JSONObject notificationBody = new JSONObject();
-            notificationBody.put("title", "New Proposal Added");
-            notificationBody.put("body", "A new proposal has been added by" + uname);
+            notificationBody.put("title", notification_title);
+            notificationBody.put("body", notification_body);
             notification.put("notification", notificationBody);
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -227,6 +347,7 @@ public class Proposal extends AppCompatActivity {
                 }
             }
 
+
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
@@ -238,6 +359,7 @@ public class Proposal extends AppCompatActivity {
                 headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
                 return headers;
             }
+
         };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -356,15 +478,32 @@ public class Proposal extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Proposal.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Proposal.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-                    Log.i("info123" ,Integer.toString(error.networkResponse.statusCode));
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Proposal.this,"Check Network",Toast.LENGTH_SHORT).show();}
-
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Proposal.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
 
@@ -376,6 +515,14 @@ public class Proposal extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -389,44 +536,49 @@ public class Proposal extends AppCompatActivity {
 
     public void afterSubmit()
     {
+
+        int pcbsInt = 0; // Default values for budgets
+        int ppbsInt = 0;
+        int pguestsInt = 0;
         String preview ="",preSub="";
 
         EditText pname= findViewById(R.id.praposal_name);
-        String pnames = pname.getText().toString();
+        String pnames = pname.getText().toString().trim();
 
         EditText ptheme= findViewById(R.id.ptheme);
-        String pthemes = ptheme.getText().toString();
+        String pthemes = ptheme.getText().toString().trim();
 
         EditText pdesc= findViewById(R.id.pdescription);
-        String pdescs = pdesc.getText().toString();
+        String pdescs = pdesc.getText().toString().trim();
 
         EditText pcb= findViewById(R.id.creativebudget);
-        String pcbs = pcb.getText().toString();
+        String pcbs = pcb.getText().toString().trim();
 
 
         EditText ppb= findViewById(R.id.publicitybdget);
-        String ppbs = ppb.getText().toString();
+        String ppbs = ppb.getText().toString().trim();
 
         EditText pguest= findViewById(R.id.guestp);
-        String pguests = pguest.getText().toString();
+        String pguests = pguest.getText().toString().trim();
 
-        int total = Integer.valueOf(pcbs) + Integer.valueOf(ppbs) + Integer.valueOf(pguests);
+
+//        int total = Integer.valueOf(pcbs) + Integer.valueOf(ppbs) + Integer.valueOf(pguests);
 
 //        21sep
         EditText speaker_e= findViewById(R.id.speaker_p);
-        String speaker_s = speaker_e.getText().toString();
+        String speaker_s = speaker_e.getText().toString().trim();
 
         EditText venue_e= findViewById(R.id.venue_p);
-        String  venue_s= venue_e.getText().toString();
+        String  venue_s= venue_e.getText().toString().trim();
 
         EditText csi_f = findViewById(R.id.fee_csi);
-        String csi_s = csi_f.getText().toString();
+        String csi_s = csi_f.getText().toString().trim();
 
         EditText ncsi_f= findViewById(R.id.fee_non_csi);
-        String  ncsi_s= ncsi_f.getText().toString();
+        String  ncsi_s= ncsi_f.getText().toString().trim();
 
         EditText prize_e= findViewById(R.id.prize_p);
-        String  prize_s= prize_e.getText().toString();
+        String  prize_s= prize_e.getText().toString().trim();
 //        21sep
 
         EditText poth1= findViewById(R.id.other1B);
@@ -451,26 +603,122 @@ public class Proposal extends AppCompatActivity {
             agendas=agenda.getSelectedItem().toString();
         Log.i("info123","Passed here");
 
-        if(pnames.length() <1){Toast.makeText(Proposal.this,"Enter Name ",Toast.LENGTH_SHORT).show();}
-        else if(pthemes.length() <1){Toast.makeText(Proposal.this,"Enter Theme",Toast.LENGTH_SHORT).show();}
-        else if(edate.length() <1){Toast.makeText(Proposal.this,"Enter Event date",Toast.LENGTH_SHORT).show();}
-        else if(speaker_s.length() <1){Toast.makeText(Proposal.this,"Enter Speaker's Detail",Toast.LENGTH_SHORT).show();}
-        else if(venue_s.length() <1){Toast.makeText(Proposal.this,"Enter Venue",Toast.LENGTH_SHORT).show();}
-        else if(csi_s.length() <1){Toast.makeText(Proposal.this,"Enter CSI Members Fee",Toast.LENGTH_SHORT).show();}
-        else if(ncsi_s.length() <1){Toast.makeText(Proposal.this,"Enter Non-CSI Members Fee",Toast.LENGTH_SHORT).show();}
-        else if(prize_s.length() <1){Toast.makeText(Proposal.this,"Enter Prize Money",Toast.LENGTH_SHORT).show();}
-        else if(pdescs.length() <1){Toast.makeText(Proposal.this,"Enter Description",Toast.LENGTH_SHORT).show();}
-        else if(pcbs.length() <1){Toast.makeText(Proposal.this,"Enter Creative Budget",Toast.LENGTH_SHORT).show();}
-        else if(ppbs.length() <1){Toast.makeText(Proposal.this,"Enter Publicity Budget ",Toast.LENGTH_SHORT).show();}
-        else if(pguests.length() <1){Toast.makeText(Proposal.this,"Enter guests ",Toast.LENGTH_SHORT).show();}
+//        if(pnames.length() <1){Toast.makeText(Proposal.this,"Enter Name ",Toast.LENGTH_SHORT).show(); return;}
+        if (pnames.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the proposal name", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+        if (pthemes.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the theme", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
 
-        else if ((poths1.length() >0 && pothFs1.length() ==0) || (poths1.length() ==0 && pothFs1.length() >0)){Toast.makeText(Proposal.this,"Enter 1st other field",Toast.LENGTH_SHORT).show();}
+        if (three_track == null || three_track.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select a track", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
 
-        else if ((poths2.length() >0 && pothFs2.length() ==0)|| (poths2.length() ==0 && pothFs2.length() >0)){Toast.makeText(Proposal.this,"Enter 2nd other field",Toast.LENGTH_SHORT).show();}
 
-        else if ((poths3.length() >0 && pothFs3.length() ==0)||(poths3.length() ==0 && pothFs3.length() >0)){Toast.makeText(Proposal.this,"Enter 3rd other field",Toast.LENGTH_SHORT).show();}
 
-        else if(agendas==null || agendas=="SELECT"){Toast.makeText(Proposal.this,"Enter agenda",Toast.LENGTH_SHORT).show();}
+        if (edate == null || edate.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select the event date", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+
+        if (speaker_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the speaker name", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if (venue_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the venue", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if (csi_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the CSI Members Fee ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if ( ncsi_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the Non CSI Members Fee ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+        if (prize_s.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please enter the Prize Money ", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        if ( pdescs.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please Enter Description", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+        // Validate and parse pcbs
+        if (!pcbs.isEmpty()) {
+            try {
+                pcbsInt = Integer.parseInt(pcbs);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Creative Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Creative Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // Validate and parse ppbs
+        if (!ppbs.isEmpty()) {
+            try {
+                ppbsInt = Integer.parseInt(ppbs);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Publicity Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Publicity Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // Validate and parse pguests
+        if (!pguests.isEmpty()) {
+            try {
+                pguestsInt = Integer.parseInt(pguests);
+            } catch (NumberFormatException e) {
+                Toast.makeText(Proposal.this, "Guests Budget must be a valid number", Toast.LENGTH_SHORT).show();
+                return; // Stop execution if validation fails
+            }
+        } else {
+            Toast.makeText(Proposal.this, "Please enter Guests Budget", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if field is empty
+        }
+
+        // If all validations pass, calculate the total
+        int total = pcbsInt + ppbsInt + pguestsInt;
+
+//        else if(pthemes.length() <1){Toast.makeText(Proposal.this,"Enter Theme",Toast.LENGTH_SHORT).show(); return;}
+//        else if(edate.length() <1){Toast.makeText(Proposal.this,"Enter Event date",Toast.LENGTH_SHORT).show();return;}
+//        else if(speaker_s.length() <1){Toast.makeText(Proposal.this,"Enter Speaker's Detail",Toast.LENGTH_SHORT).show();return;}
+//        else if(venue_s.length() <1){Toast.makeText(Proposal.this,"Enter Venue",Toast.LENGTH_SHORT).show();return;}
+//        else if(csi_s.length() <1){Toast.makeText(Proposal.this,"Enter CSI Members Fee",Toast.LENGTH_SHORT).show();return;}
+//        else if(ncsi_s.length() <1){Toast.makeText(Proposal.this,"Enter Non-CSI Members Fee",Toast.LENGTH_SHORT).show();return;}
+//        else if(prize_s.length() <1){Toast.makeText(Proposal.this,"Enter Prize Money",Toast.LENGTH_SHORT).show();return;}
+//        else if(pdescs.length() <1){Toast.makeText(Proposal.this,"Enter Description",Toast.LENGTH_SHORT).show();return;}
+
+
+        if ((poths1.length() >0 && pothFs1.length() ==0) || (poths1.length() ==0 && pothFs1.length() >0)){Toast.makeText(Proposal.this,"Enter 1st other field",Toast.LENGTH_SHORT).show();return;}
+
+         if ((poths2.length() >0 && pothFs2.length() ==0)|| (poths2.length() ==0 && pothFs2.length() >0)){Toast.makeText(Proposal.this,"Enter 2nd other field",Toast.LENGTH_SHORT).show();return;}
+
+         if ((poths3.length() >0 && pothFs3.length() ==0)||(poths3.length() ==0 && pothFs3.length() >0)){Toast.makeText(Proposal.this,"Enter 3rd other field",Toast.LENGTH_SHORT).show();return;}
+
+        if (date == null || date.isEmpty()) {
+            Toast.makeText(Proposal.this, "Please select the date of meeting", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if validation fails
+        }
+
+         if(agendas==null || agendas=="SELECT"){Toast.makeText(Proposal.this,"Enter agenda",Toast.LENGTH_SHORT).show();return;}
         else{
 
             JSONObject jsub = new JSONObject();

@@ -19,6 +19,7 @@ const fifteenMinutes = 1000 * 60 * 15; // Milliseconds in a minute * 15
 const router = express.Router();
 var flash = require("connect-flash");
 const multer = require('multer');
+app.use(express.json()); 
 
 app.use(flash());
 
@@ -54,6 +55,7 @@ app.use(express.static(__dirname + "/views"));
 
 // Correctly configure the path to your static files
 app.use('/server_uploads', express.static(path.join(__dirname, 'server_uploads')));
+app.use('/.well-known', express.static(path.join(__dirname, '.well-known')));
 app.use('/report', express.static(path.join(__dirname, 'report')));
 app.use('/creative', express.static('./creative'));
 
@@ -71,8 +73,9 @@ var creative=require('./routes/core_creative.js');
 var publicity=require('./routes/core_publicity.js');
 var technical=require("./routes/core_technical.js");
 var reports=require("./routes/core_reports.js");
-const featured_img = require("./routes/featured_img.js")
+const featured_img = require("./routes/featured_img.js");
 const galleryRouter = require('./gallery.js');
+const notification = require('./routes/core_notification.js');
 
 
 app.use('/images', express.static(path.join(__dirname, 'server_uploads', 'images_dynamic')));
@@ -94,6 +97,7 @@ app.use('/technical',technical);
 app.use('/reports',reports); //new report route
 app.use('/images', featured_img);
 app.use('/gallery', galleryRouter);
+app.use('/notification' , notification)
 
 
 //web app view
@@ -174,6 +178,16 @@ app.get('/members/:year', addmembers.fetchCoreMembers);
 app.get('/privacy.html', (req, res) => {
     res.render('pages/privacy');
   });
+
+//middleware
+const validateSessionToken = require('./middleware/ValidateTokens');
+app.use(validateSessionToken);
+
+
+
+  
+
+
 
 
 

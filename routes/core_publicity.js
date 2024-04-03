@@ -7,6 +7,7 @@ const fs = require('fs');
 const request = require('request');
 var bodyParser=require('body-parser');
 const { server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 // Increase payload limit to 50MB
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -86,21 +87,7 @@ router.post("/upload", upload.single("pdfFile"), function (req, res, next) {
     });
 });
 
-router.get("/fetchpr", function (req, res) {
-    const eid = req.query.eid;
-    console.log(eid);
-    // Retrieve the file metadata from the database
-    const query = "SELECT filename, url FROM publicity_files WHERE eid = ?";
-    connection.query(query, [eid], function (error, results, fields) {
-        if (error) return res.status(500).json({ error: "Error retrieving file details from database" });
-        if (!results.length) return res.status(404).json({ error: "File not found" });
 
-        const { filename, url } = results[0];
-
-        // Send the file details as JSON response
-        res.json({ filename, url });
-    });
-});
 
 router.get("/download", function (req, res) {
     const eid = req.query.eid;
@@ -162,7 +149,7 @@ router.post("/delete", function (req, res) {
 });
 
 //Viewing Events
-router.post('/viewEvent', (req, res) => {
+router.post('/viewEvent',validateSessionToken, (req, res) => {
     var eid = req.body.eid;
 
     const sql = "SELECT e.proposals_event_name, e.proposals_event_category, e.proposals_event_date, e.speaker, e.proposals_venue, e.proposals_reg_fee_csi, e.proposals_reg_fee_noncsi, e.proposals_prize, e.proposals_desc, e.proposals_creative_budget, e.proposals_publicity_budget, e.proposals_guest_budget, p.pr_desk_publicity, p.pr_class_publicity, p.pr_member_count, p.pr_comment, p.pr_rcd_amount, p.pr_spent, (SELECT GROUP_CONCAT(pt.pub_tasks) FROM publicity_tasks pt WHERE pt.cpm_id = p.cpm_id) AS tasks,(SELECT GROUP_CONCAT(pt.status) FROM publicity_tasks pt WHERE pt.cpm_id = p.cpm_id) AS status FROM core_proposals_manager e INNER JOIN core_pr_manager p ON e.cpm_id = p.cpm_id WHERE p.cpm_id = ?;"
@@ -187,7 +174,7 @@ router.post('/viewEvent', (req, res) => {
 });
 //Adding checkboxes
 
-router.post('/addcheckbox', (req, res) => {
+router.post('/addcheckbox',validateSessionToken, (req, res) => {
     var eid = req.body.eid;
     console.log(eid);
     var checkedCheckboxes = req.body.checkedCheckboxes;
@@ -229,7 +216,7 @@ router.post('/addcheckbox', (req, res) => {
 });
 
 //Edit form
-router.post('/editPublicity', (req, res) => {
+router.post('/editPublicity',validateSessionToken,(req, res) => {
     var pr_rcd_amount = req.body.pr_rcd_amount;
     var pr_desk_publicity = req.body.pr_desk_publicity;
     var pr_class_publicity = req.body.pr_class_publicity;
@@ -253,7 +240,7 @@ router.post('/editPublicity', (req, res) => {
 });
 
 // Define a route to fetch uploaded files using a POST request
-router.post('/fetch', (req, res) => {
+router.post('/fetch',validateSessionToken, (req, res) => {
     var eid = req.body.eid;
   
     // Query the database to fetch uploaded files associated with the event ID
@@ -278,7 +265,7 @@ router.post('/fetch', (req, res) => {
 
 //Fetching added checkboxes
 
-router.get('/checkboxes', function (req, res) {
+router.get('/checkboxes',validateSessionToken, function (req, res) {
     const status = 1;
     const sql = 'SELECT task FROM `publicity_tasks` WHERE status = 1';
     connection.query(sql, [status], function (error, results, fields) {

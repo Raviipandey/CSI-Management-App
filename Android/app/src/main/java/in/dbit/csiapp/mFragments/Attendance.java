@@ -1,6 +1,7 @@
 package in.dbit.csiapp.mFragments;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -25,6 +27,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -37,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -177,10 +181,14 @@ public class Attendance extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 EditText reason = rootView.findViewById(R.id.reason);
                 rsn = reason.getText().toString();
                 EditText missed = rootView.findViewById(R.id.sub_miss);
                 miss = missed.getText().toString();
+
 
                 if(date==null)  {
                     Toast.makeText(getActivity(),"Enter Date",Toast.LENGTH_SHORT).show(); }
@@ -205,12 +213,21 @@ public class Attendance extends Fragment {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(UID)){
+                            idsArray.put(coreId);
+                        }
+                        // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New request for attendance", uname + " has missed some lectures", Integer.parseInt(UID), idsArray , "3");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -219,9 +236,52 @@ public class Attendance extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Session token is invalid or expired, log the user out
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class); // Assuming LoginActivity is your login activity
+                    startActivity(loginIntent);
+                    getActivity().finish(); // Correctly calling finish() on the activity instance
+                    Toast.makeText(getActivity(), "Session expired, please log in again", Toast.LENGTH_LONG).show();
+                } else {
+                    // Handle other errors
+                    Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
+        requestQueue.add(stringRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getActivity().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
             }
         });
-        requestQueue.add(stringRequest);
+        requestQueue.add(jsonObjectRequest);
     }
 
 
@@ -352,15 +412,32 @@ public class Attendance extends Fragment {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(getActivity(), "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-                    Log.i("info123" ,Integer.toString(error.networkResponse.statusCode));
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(getActivity(),"Check Network",Toast.LENGTH_SHORT).show();}
-
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(loginIntent);
+                    getActivity().finish();
+                }
             }
         }){
 
@@ -372,6 +449,14 @@ public class Attendance extends Fragment {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

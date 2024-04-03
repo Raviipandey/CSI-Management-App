@@ -13,14 +13,18 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.R;
 
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mAdapter.PraposalAdapter;
 import in.dbit.csiapp.mAdapter.PraposalItem;
 
@@ -28,7 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Creative extends AppCompatActivity implements PraposalAdapter.OnItemClickedListener {
 
@@ -37,6 +44,7 @@ public class Creative extends AppCompatActivity implements PraposalAdapter.OnIte
 
     private RecyclerView rv;
     private PraposalAdapter mPraposalAdapter;
+    private SharedPreferenceConfig preferenceConfig;
     private ArrayList<PraposalItem> mPraposalList;
     private RequestQueue mRequestQueue;
     private String server_url, eid;
@@ -46,6 +54,7 @@ public class Creative extends AppCompatActivity implements PraposalAdapter.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_creative);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
         Intent intent = getIntent();
         uRole = intent.getStringExtra("uRole");
@@ -152,17 +161,44 @@ public class Creative extends AppCompatActivity implements PraposalAdapter.OnIte
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e("volleyABC" ,"Got error in connecting server");
+                String errorMessage = "An error occurred"; // Default message
                 try {
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC", Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Creative.this, "Error:-" + statusCode, Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-                } catch(Exception e) {
-                    Toast.makeText(Creative.this, "Check Network",Toast.LENGTH_SHORT).show();
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Creative.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Creative.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Creative.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Creative.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
                 }
             }
-        });
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+        };
         mRequestQueue.add(stringRequest);
     }
     @Override

@@ -14,15 +14,31 @@ var serviceAccount = require('../../firebase/ServiceAccount.json');
 
 const roleMapping = {
     'Chairperson': 3,
+    'chairperson' : 3,
     'Vice Chairperson': 4,
+    'vice chairperson': 4,
     'Event Head': 5,
+    'event head':5,
     'Technical Head': 6,
+    'Tech Head': 6,
+    'technical head': 6,
     'Web Development Head': 7,
+    'Wed-d Head':7,
+    'web development head':7,
+    'web-d head':7,
     'Public Relations Head': 8,
+    'public relations head':8,
+    'PR Head':8,
+    'pr head':8,
+    'Pr Head':8,
     'Creative Head': 9,
+    'creative head':9,
     'Secretary': 10,
+    'secretrary':10,
     'Documentation Head': 11,
+    'documentation head':11,
     'Test Login': 12,
+    'test login':12
 };
 
 const capitalize = (str) => str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
@@ -93,6 +109,12 @@ const convertBranchName = (branchName) => {
     return branchName.trim().toUpperCase();
 };
 
+function hashPassword(password) {
+    return crypto.createHash('md5').update(password).digest('hex');
+}
+
+
+
 function validateRow(row) {
     const errors = [];
     // Define regex for email validation
@@ -104,6 +126,7 @@ function validateRow(row) {
 
     // Add checks for each required field
     if (!row.role || row.role.trim() === '') errors.push('Role is missing or invalid.');
+    
     if (!row.first_name || row.first_name.trim() === '') errors.push('First name is missing.');
     if (!row.last_name || row.last_name.trim() === '') errors.push('Last name is missing.');
     if (!row.roll_no || row.roll_no.trim() === '') errors.push('Roll number is missing.');
@@ -121,6 +144,29 @@ function validateRow(row) {
     else if (convertDate(row.mem_strt) === '') errors.push(`Invalid membership start date format: ${row.mem_strt}`);
     if (!row.mem_end || row.mem_end.trim() === '') errors.push('Membership end date is missing.');
     else if (convertDate(row.mem_end) === '') errors.push(`Invalid membership end date format: ${row.mem_end}`);
+
+     // Convert dates from strings to Date objects
+     const memStart = new Date(convertDate(row.mem_strt));
+     const memEnd = new Date(convertDate(row.mem_end));
+ 
+     // Check if conversion was successful
+     if (isNaN(memStart.getTime()) || isNaN(memEnd.getTime())) {
+         errors.push('One or both dates are invalid.');
+     } else {
+         // Check that mem_end is after mem_start and at least in the next calendar year
+         if (memEnd <= memStart) {
+             errors.push('Membership end date must be after the start date.');
+         } else {
+             // Extract years from dates
+             const startYear = memStart.getFullYear();
+             const endYear = memEnd.getFullYear();
+ 
+             // Ensure mem_end year is greater than mem_start year
+             if (endYear <= startYear) {
+                 errors.push('Membership end date must be in a year after the start date.');
+             }
+         }
+     }
 
     return errors;
 }
@@ -265,6 +311,11 @@ module.exports = {
                     row.mem_end = convertDate(row.mem_end);
                     row.email = validateAndFormatEmail(row.email);
                     row.mob_no = validateAndFormatPhone(row.mob_no);
+                     // Hash the password
+    const originalPassword = row.password;
+    const hashedPassword = hashPassword(originalPassword);
+    row.password = hashedPassword; // Update the password in the row to its hashed version
+                    
     
                     // Validate row and accumulate errors
                     const rowErrors = validateRow(row);
@@ -290,6 +341,11 @@ module.exports = {
                    // Process the fileRows array
                    fileRows.forEach(row => {
                     const { role, first_name, last_name, roll_no, mob_no, email, password, branch, class_name, mem_strt, mem_end, acad, gender } = row;
+
+                    const userRecord = admin.auth().createUser({
+                        email: email,
+                        password: password
+                    });
                     
                     // Step 1: Insert data into core_details to get core_id
                     connection.query(

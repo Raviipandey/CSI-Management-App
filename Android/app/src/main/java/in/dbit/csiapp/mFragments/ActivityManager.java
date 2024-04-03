@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
@@ -15,6 +17,9 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -29,6 +34,8 @@ import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.ViewPagerAdapter;
 import in.dbit.csiapp.mActivityManager.Creative;
+import in.dbit.csiapp.mActivityManager.NotificationManager;
+import in.dbit.csiapp.mActivityManager.Publicity;
 import in.dbit.csiapp.mActivityManager.Report;
 import in.dbit.csiapp.mActivityManager.Technical;
 import in.dbit.csiapp.mActivityManager.praposal_recycler;
@@ -76,15 +83,18 @@ public class ActivityManager extends Fragment  {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.WRITE_EXTERNAL_STORAGE},100);
             }
         }
+
         rootView = inflater.inflate(R.layout.manager_activity,container,false);
 //        ScrollView sv = new ScrollView(this);
 //        sv.addView(rootView);
         getActivity().setTitle("Activity Manager");
+
         mainGrid = (GridLayout) rootView.findViewById(R.id.mainGrid);
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewPager);
         viewPager.setPageTransformer(true, new DepthPageTransformer());
 
+        setHasOptionsMenu(true);
         Bundle bundle = getArguments();
         Log.i("Sanket_testing",bundle.toString());
         roll_text = this.getArguments().getString("uRole");
@@ -103,6 +113,48 @@ public class ActivityManager extends Fragment  {
         return rootView;
 
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        // Find the menu item by ID
+        MenuItem menuItem = menu.findItem(R.id.action_icon);
+        // Get the action view of the menu item
+        View actionView = menuItem.getActionView();
+        // Find the ImageView within the action view
+        ImageView iconView = actionView.findViewById(R.id.menu_icon);
+
+        // Set click listener for the action view
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Apply scale animation when clicked
+                iconView.animate().scaleX(0.9f).scaleY(0.9f).setDuration(10).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Handle the click event here (e.g., start a new activity)
+                        startActivity(new Intent(getActivity(), NotificationManager.class));
+                        // Reset the scale animation after a short delay
+                        iconView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(10);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_icon:
+                // Handle click event for the icon
+                startActivity(new Intent(getActivity(), Publicity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void fetchImageUrls() {

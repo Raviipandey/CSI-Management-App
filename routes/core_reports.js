@@ -7,6 +7,7 @@ const fs = require('fs');
 const request = require('request');
 var bodyParser=require('body-parser');
 const { server_url} = require('../serverconfig');
+const validateSessionToken  = require('../middleware/ValidateTokens');
 
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -49,9 +50,9 @@ const upload = multer({
 });
 
 /////----------Route to list events for report -------------//
-router.get('/list',(req,res)=>{
+router.get('/list',validateSessionToken,(req,res)=>{
 
-	connection.query('SELECT * FROM core_proposals_manager',function(err,result){
+	connection.query('SELECT cpm_id,proposals_event_name,proposals_event_category,proposals_event_date FROM core_proposals_manager where proposals_status = 3 order by cpm_id DESC;',function(err,result){
 		if(err){
 			console.log("Report listing error");
 			res.sendStatus(400);
@@ -103,7 +104,7 @@ router.get("/fetchreport", function (req, res) {
     const eid = req.query.eid;
     console.log(eid);
     // Retrieve the file metadata from the database
-    const query = "SELECT filename, url FROM reports WHERE eid = ?";
+    const query = "SELECT filename, url FROM reports WHERE eid = ? ";
     connection.query(query, [eid], function (error, results, fields) {
         if (error) return res.status(500).json({ error: "Error retrieving file details from database" });
         if (!results.length) return res.status(404).json({ error: "File not found" });
@@ -135,7 +136,7 @@ router.get("/download", function (req, res) {
 });
 
 /////----------Route to delete reports-------------//
-router.post("/delete", function (req, res) {
+router.post("/delete" ,function (req, res) {
     const eid = req.body.eid;
 
     const querySelect = "SELECT filepath, url FROM reports WHERE eid = ?";

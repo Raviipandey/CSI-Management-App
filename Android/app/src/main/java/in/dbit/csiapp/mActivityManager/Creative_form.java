@@ -2,6 +2,7 @@ package in.dbit.csiapp.mActivityManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
@@ -48,8 +49,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mAdapter.MediaPagerAdapter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -65,8 +68,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -78,15 +84,18 @@ public class Creative_form extends AppCompatActivity {
 
     String poster_url = "";
     String video_url = "";
-    String uRole;
+    String uRole , uid , uname;
     private static final int REQUEST_CODE_FILE_PICKER = 1;
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_VIDEO = 1;
     private Context context;
 
+    private SharedPreferenceConfig preferenceConfig;
+
     private File mSelectedFile;
 //    private String filePath;
     private LinearLayout mPreviewLayout;
+
     ImageView imagePreview;
     private Button floatingButton;
     private View newLayout;
@@ -122,8 +131,6 @@ public class Creative_form extends AppCompatActivity {
     }
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,8 +139,9 @@ public class Creative_form extends AppCompatActivity {
         mPreviewLayout = findViewById(R.id.preview_layout);
 
 
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
-
+        TextView defaultmsg = findViewById(R.id.defaultmsg);
 
         Log.i("sanket testing", "entered");
         //Toast.makeText(this, "creative form", Toast.LENGTH_SHORT).show();
@@ -157,6 +165,14 @@ public class Creative_form extends AppCompatActivity {
         uRole = intent.getStringExtra("uRole");
         Log.i("cpm_id",eid);
 
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
+        uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
+
+        mediaPagerAdapter = new MediaPagerAdapter(this, mediaUrls);
         insertSrv();
 
         progress = new ProgressDialog(Creative_form.this);
@@ -167,6 +183,8 @@ public class Creative_form extends AppCompatActivity {
         uploadVideo = (Button) findViewById(R.id.uploadVideo);
         submit = (Button) findViewById(R.id.submit_praposal);
 
+        LinearLayout uploadlayout = findViewById(R.id.fileuploadlayout);
+
 
 
         if(!uRole.equals("Creative Head")) {
@@ -174,6 +192,7 @@ public class Creative_form extends AppCompatActivity {
             uploadVideo.setVisibility(View.GONE);
             submit.setVisibility(View.GONE);
 
+            uploadlayout.setVisibility(View.GONE);
             TextView upload_text = findViewById(R.id.upload_text);
             upload_text.setVisibility(View.GONE);
 
@@ -257,39 +276,79 @@ public class Creative_form extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         // Parse the JSON response and get image URLs
                         List<String> mediaUrls = parseResponse(response);
-                        Log.i("Media ke urlsss", String.valueOf(mediaUrls));
+                        Log.i("Media ke urlsss", mediaUrls.get(0));
+                        // Check if mediaUrls is empty
+                        if (mediaUrls.size() == 1 && mediaUrls.get(0) == "null") {
+                            // If mediaUrls is empty, hide the ViewPager
 
-                        // Set up ViewPager with the fetched media URLs
-                        setupViewPager(mediaUrls);
+                            viewPager.setVisibility(View.GONE);
+                        } else {
+                            // If mediaUrls is not empty, set up ViewPager with the fetched media URLs
+                            defaultmsg.setVisibility(View.GONE);
+                            mediaUrls.remove(0);
+                            setupViewPager(mediaUrls);
 
-                        // Set up GestureDetector inside the response listener
-                        GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
-                            @Override
-                            public void onLongPress(MotionEvent e) {
-                                // Handle long press event
-                                int currentItem = viewPager.getCurrentItem();
-                                if (currentItem >= 0 && currentItem < mediaUrls.size()) {
-                                    String videoUrl = mediaUrls.get(currentItem);
+                            // Set up GestureDetector inside the response listener
+                            GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
+                                @Override
+                                public void onLongPress(MotionEvent e) {
+                                    int currentItem = viewPager.getCurrentItem();
+                                    if (currentItem >= 0 && currentItem < mediaUrls.size()) {
+                                        String videoUrl = mediaUrls.get(currentItem);
 
-                                    // Start the download process
-                                    downloadVideo(videoUrl);
+                                        // Start the download process
+                                        downloadVideo(videoUrl);
+                                    }
                                 }
-                            }
-                        });
+                            });
 
-                        viewPager.setOnTouchListener((v, event) -> {
-                            gestureDetector.onTouchEvent(event);
-                            return false;
-                        });
+                            viewPager.setOnTouchListener((v, event) -> {
+                                gestureDetector.onTouchEvent(event);
+                                return false;
+                            });
+                        }
                     }
+
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle error
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
                 }
-        );
+        ){@Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
 // Add the request to the Volley request queue
         Volley.newRequestQueue(this).add(jsonObjectRequest);
@@ -324,7 +383,6 @@ public class Creative_form extends AppCompatActivity {
     }
 
 
-
     private List<String> parseResponse(JSONObject response) {
 //        List<String> mediaUrls = new ArrayList<>();
 
@@ -341,7 +399,7 @@ public class Creative_form extends AppCompatActivity {
         return mediaUrls;
     }
 
-
+//---------------------------------------
     private void setupViewPager(List<String> mediaUrls) {
 
         if (mediaUrls.isEmpty()) {
@@ -349,15 +407,10 @@ public class Creative_form extends AppCompatActivity {
             mediaUrls.add(getApplicationContext().getResources().getString(R.string.server_url) + "/creative/default_image.png");
         }
 
-        mediaPagerAdapter = new MediaPagerAdapter(this, mediaUrls);
+
         viewPager.setAdapter(mediaPagerAdapter);
         indicator.setViewPager(viewPager);
     }
-
-
-
-
-
 
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -387,6 +440,7 @@ public class Creative_form extends AppCompatActivity {
         return builder.create();
     }
 
+
     private Activity getActivity(Context context) {
         this.context = context;
         return (Activity) context;
@@ -400,70 +454,126 @@ public class Creative_form extends AppCompatActivity {
     }
 
 
-
-    private void submitProposal() {
-        //creating jsonobject starts
-        final JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("cpm_id", eid);
-            jsonObject.put("poster", poster_url);
-            jsonObject.put("video", video_url);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-        //creating jsonobject ends
-
-        //checking data inserted into json object
-        final String requestBody = jsonObject.toString();
-        Log.i("volleyABC123", requestBody);
-
-        //getting response from server starts
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,getApplicationContext().getResources().getString(R.string.server_url) + "/creative/submit",new Response.Listener<String>(){
+    private void fetchAllTokens() {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
-                Log.i("volleyABC4985" ,"got response    "+response);
-                Toast.makeText(Creative_form.this, "Data Submitted", Toast.LENGTH_SHORT).show();
+                try {
+                    JSONArray tokensArray = new JSONArray(response);
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
+                    for (int i = 0; i < tokensArray.length(); i++) {
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                        // Store core_id in idsArray
+                        // Call the method to send notification for each FCM token
+                        sendNotification(fcmToken);
+                    }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New File uploaded", uname + " just uploaded some media for " + eventName.getText().toString(), Integer.parseInt(uid), idsArray , "4");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        },new Response.ErrorListener()  {
-
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Creative_form.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
-
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Creative_form.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                error.printStackTrace();
             }
-        }){
-            //sending JSONOBJECT String to server starts
+        });
+        requestQueue.add(stringRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+    }
+
+
+
+
+    // Method to send notification after successful proposal submission
+    private void sendNotification(String fcmtoken) {
+        // Construct the notification payload
+        JSONObject notification = new JSONObject();
+        try {
+            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
+            JSONObject notificationBody = new JSONObject();
+            notificationBody.put("title", "New File uploaded");
+            notificationBody.put("body", uname + " just uploaded some media for " + eventName.getText().toString());
+            notification.put("priority", "high");
+            notification.put("notification", notificationBody);
+
+            // Add intent to open MainActivity when notification is clicked
+            JSONObject data = new JSONObject();
+            data.put("click_action", ".Publicity"); // Change MainActivity to your actual main activity class if needed
+            notification.put("data", data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
+                response -> Log.d("FCM", "Notification sent successfully"),
+                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
+
             @Override
             public byte[] getBody() throws AuthFailureError {
                 try {
-                    return requestBody.getBytes("utf-8");
+                    return notification.toString().getBytes("utf-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                     return null;
                 }
             }
 
+
+
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
             }
-        };
-        //sending JSONOBJECT String to server ends
 
-        RequestQueue requestQueue= Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest); // get response from server
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
+                return headers;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
+
+    private void submitProposal() {
+        startActivity(new Intent(Creative_form.this , Creative.class));
+    }
 
 
     private void insertSrv()
@@ -553,16 +663,32 @@ public class Creative_form extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Creative_form.this, "Invalid Credentials", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
 
-
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Creative_form.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -574,6 +700,15 @@ public class Creative_form extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -655,11 +790,6 @@ public class Creative_form extends AppCompatActivity {
 
         enable_video_button();
     }
-
-
-
-
-
 
 
 
@@ -753,6 +883,7 @@ public class Creative_form extends AppCompatActivity {
                     };
                     // Call the uploadFile() function with the file path and uiUpdateCallback
                     uploadFile(filePath, uiUpdateCallback);
+                    fetchAllTokens();
                 }
             });
         } catch (IOException e) {
@@ -783,47 +914,93 @@ public class Creative_form extends AppCompatActivity {
                         List<String> mediaUrls = parseResponse(response);
                         Log.i("Fetched Media URLs", String.valueOf(mediaUrls));
 
+                        // Check if the first entry is null and remove it
+                        if (mediaUrls != null && !mediaUrls.isEmpty() && mediaUrls.get(0) == "null") {
+                            mediaUrls.remove(0); // Remove the first null entry
+                        }
+
                         // Update the UI with the fetched media URLs
                         updateUIWithMediaUrls(mediaUrls);
                     }
+
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle error
-                        Log.e("Fetch Media URLs", "Error: " + error.getMessage());
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(Creative_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(Creative_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(Creative_form.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
                 }
-        );
+        ){@Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
 
         // Add the request to the Volley request queue
         Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
 
     private void updateUIWithMediaUrls(List<String> mediaUrls) {
-        // Set up ViewPager with the fetched media URLs
-        setupViewPager(mediaUrls);
+        if (mediaUrls.size() == 1 && mediaUrls.get(0) == "null") {
+            // If mediaUrls contains only one element and it's null, hide the ViewPager
+            viewPager.setVisibility(View.GONE);
+        } else {
+            // Set up ViewPager with the fetched media URLs
+            viewPager.setVisibility(View.VISIBLE);
+            mediaUrls.remove(0);
+            setupViewPager(mediaUrls);
 
-        // Set up GestureDetector inside the response listener
-        GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public void onLongPress(MotionEvent e) {
-                // Handle long press event
-                int currentItem = viewPager.getCurrentItem();
-                if (currentItem >= 0 && currentItem < mediaUrls.size()) {
-                    String videoUrl = mediaUrls.get(currentItem);
+            // Set up GestureDetector inside the response listener
+            GestureDetector gestureDetector = new GestureDetector(Creative_form.this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    // Handle long press event
+                    int currentItem = viewPager.getCurrentItem();
+                    if (currentItem >= 0 && currentItem < mediaUrls.size()) {
+                        String videoUrl = mediaUrls.get(currentItem);
 
-                    // Start the download process
-                    downloadVideo(videoUrl);
+                        // Start the download process
+                        downloadVideo(videoUrl);
+                    }
                 }
-            }
-        });
+            });
 
-        viewPager.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return false;
-        });
+            viewPager.setOnTouchListener((v, event) -> {
+                gestureDetector.onTouchEvent(event);
+                return false;
+            });
+        }
     }
+
+
 
 
     public void uploadFile(String filePath , Runnable uiUpdateCallback) {
@@ -917,24 +1094,7 @@ public class Creative_form extends AppCompatActivity {
         });
         t.start();
     }
-
-
-
-
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
-            return fileName.substring(dotIndex + 1);
-        }
-        return "";
-    }
-
-    private String getMimeType(String path) {
-
-        String extention = path.substring(path.lastIndexOf("."));
-        String mimeTypeMap = MimeTypeMap.getFileExtensionFromUrl(extention);
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(mimeTypeMap);
-    }
+//------------------------------------------
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         // TODO Auto-generated method sub

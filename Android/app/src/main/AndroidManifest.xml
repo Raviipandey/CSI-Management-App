@@ -4,17 +4,19 @@
     package="in.dbit.csiapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
         android:minSdkVersion="33" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"
         android:minSdkVersion="33" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"
-        android:minSdkVersion="33"  />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"
+        android:minSdkVersion="33" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
     <application
@@ -27,12 +29,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name="in.dbit.csiapp.mActivityManager.Forgetpassword"
-            android:theme="@style/AppTheme2"/>
+        <activity
+            android:name="in.dbit.csiapp.mActivityManager.Forgetpassword"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/outline"></activity>
 
 
-        <activity android:name="in.dbit.csiapp.mActivityManager.ReportDisplay"
-            android:theme="@style/AppTheme2"/>
+        <activity
+            android:name="in.dbit.csiapp.mActivityManager.ReportDisplay"
+            android:theme="@style/AppTheme2" />
         <activity android:name="in.dbit.csiapp.mActivityManager.CreativePosterFull" />
         <activity
             android:name="in.dbit.csiapp.mActivityManager.publcity_recycler"
@@ -68,6 +73,10 @@
         <activity
             android:name="in.dbit.csiapp.mActivityManager.Report"
             android:theme="@style/AppTheme2" />
+
+        <activity
+            android:name=".mActivityManager.NotificationManager"
+            android:theme="@style/AppTheme2" />
         <activity android:name="in.dbit.csiapp.mActivityManager.Gallery" />
         <activity
             android:name="in.dbit.csiapp.mActivityManager.Technical"
@@ -88,13 +97,16 @@
             android:name="in.dbit.csiapp.Prompts.Manager"
             android:label="@string/title_activity_manager"
             android:theme="@style/AppTheme.NoActionBar" />
+
+
         <activity android:name="in.dbit.csiapp.Prompts.role_intent" />
         <activity
             android:name="in.dbit.csiapp.Prompts.AddMinute"
             android:theme="@style/AppTheme2" />
 
-        <activity android:name=".mActivityManager.Reportmanager"
-            android:theme="@style/AppTheme2"/>
+        <activity
+            android:name=".mActivityManager.Reportmanager"
+            android:theme="@style/AppTheme2" />
 
 
         <activity
@@ -106,14 +118,43 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="pop" />
+                <data android:host="csiapp.dbit.in" />
+                <data android:path="/login/newpassword/*" />
+            </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".mActivityManager.ResetPasswordActivity"
+            android:exported="true"
+            android:theme="@style/outline"
+            android:windowSoftInputMode="adjustResize">
+
+            <tools:validation testUrl="http://csiapp.dbit.in/app" />
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="csiapp.dbit.in" />
+                <data android:pathPrefix="/app" />
+            </intent-filter>
         </activity>
 
 
-
         <!--        <service android:name=".Notificationservice" android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="com.google.firebase.MESSAGING_EVENT"/>-->
+        <!--            </intent-filter>-->
+        <!--        </service>-->
     </application>
 </manifest>

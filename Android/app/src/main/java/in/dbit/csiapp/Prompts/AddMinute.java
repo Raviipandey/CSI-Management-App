@@ -23,16 +23,19 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import in.dbit.csiapp.R;
 import in.dbit.csiapp.SharedPreferenceConfig;
 
+import org.checkerframework.checker.units.qual.A;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,7 +48,7 @@ public class AddMinute extends AppCompatActivity {
 
     AutoCompleteTextView mCreateAgenda;
     Button mAddMinute, mAddTask;
-    String Agenda, Points, Creator, Absentee, server_url, date, time, uname;
+    String Agenda, Points, Creator, Absentee, server_url, date, time, uname , uid;
     EditText  mCreatePoints, mTask, mAbsentee;
     Spinner spinner;
     TableLayout tableLayout;
@@ -55,7 +58,9 @@ public class AddMinute extends AppCompatActivity {
         Log.i("i07","Entered1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_minute);
+
         getSupportActionBar().setTitle("Add Minute");
+        tableLayout = findViewById(R.id.table);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         Intent intent = getIntent();
@@ -64,6 +69,9 @@ public class AddMinute extends AppCompatActivity {
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -128,11 +136,45 @@ public class AddMinute extends AppCompatActivity {
                     }
                 },
                 new Response.ErrorListener() {
+
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Handle the error
+                        String errorMessage = "An error occurred"; // Default message
+                        try {
+                            if (error.networkResponse != null && error.networkResponse.data != null) {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                JSONObject data = new JSONObject(responseBody);
+                                errorMessage = data.optString("error", errorMessage); // Extract custom message
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if ("Session expired".equals(errorMessage)) {
+                            Toast.makeText(AddMinute.this, "Session expired", Toast.LENGTH_LONG).show();
+                        } else if ("Another device has logged in".equals(errorMessage)) {
+                            Toast.makeText(AddMinute.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(AddMinute.this, errorMessage, Toast.LENGTH_LONG).show();
+                        }
+
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                            // Handle logout if session is expired or taken over
+                            preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                            Intent loginIntent = new Intent(AddMinute.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        }
                     }
-                });
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }};
 
         mQueue.add(request);
 
@@ -140,14 +182,20 @@ public class AddMinute extends AppCompatActivity {
         mAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TableRow mainRow = findViewById(R.id.row1);
-                mainRow.setVisibility(View.VISIBLE);
-                TableRow tablerow;
-                tableLayout = findViewById(R.id.table);
-                TextView tv1, tv2;
+                String taskDescription = mTask.getText().toString();
+                String assignedPerson = spinner.getSelectedItem().toString();
+                if (taskDescription.isEmpty() || assignedPerson.equals("Select Person")) { // Assuming "Select Person" is your default spinner item
+                    // If task or person is not provided, show a Toast message
+                    Toast.makeText(AddMinute.this, "Please enter a task and select a person.", Toast.LENGTH_LONG).show();
+                } else {
+                    TableRow mainRow = findViewById(R.id.row1);
+                    mainRow.setVisibility(View.VISIBLE);
+                    TableRow tablerow;
+                    tableLayout = findViewById(R.id.table);
+                    TextView tv1, tv2;
 
-                tablerow = new TableRow(AddMinute.this);
-                tablerow.setClickable(true);
+                    tablerow = new TableRow(AddMinute.this);
+                    tablerow.setClickable(true);
                 /*tablerow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -175,50 +223,52 @@ public class AddMinute extends AppCompatActivity {
                     }
                 });*/
 
-                tv1 = new TextView(AddMinute.this);
-                tv2 = new TextView(AddMinute.this);
+                    tv1 = new TextView(AddMinute.this);
+                    tv2 = new TextView(AddMinute.this);
 
-                String sam = mTask.getText().toString();
-                mTask.setText("");
-                tv1.setText(sam);
+                    // Reset the task input field for next input
+                    mTask.setText("");
+                    tv1.setText(taskDescription);
 
-                tv1.setGravity(Gravity.CENTER);
-                tv1.setBackgroundColor(getResources().getColor(R.color.white));
-                tv1.setTextColor(getResources().getColor(R.color.colorPrimary));
-                tv1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
 
-                TableRow.LayoutParams param = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        0.1f
-                );
-                param.setMargins(1, 0, 1, 1);
-                tv1.setLayoutParams(param);
+                    tv1.setGravity(Gravity.CENTER);
+                    tv1.setBackgroundColor(getResources().getColor(R.color.white));
+                    tv1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tv1.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
 
-                sam = spinner.getSelectedItem().toString();
-                spinner.setSelection(0);
-                tv2.setText(sam);
+                    TableRow.LayoutParams param = new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            0.1f
+                    );
+                    param.setMargins(1, 0, 1, 1);
+                    tv1.setLayoutParams(param);
 
-                tv2.setGravity(Gravity.CENTER);
-                tv2.setBackgroundColor(getResources().getColor(R.color.white));
-                tv2.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
-                tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    // Use the selected person from the spinner
+                    spinner.setSelection(0); // Reset spinner to default after selection if needed
+                    tv2.setText(assignedPerson);
 
-                TableRow.LayoutParams param1 = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        TableRow.LayoutParams.WRAP_CONTENT,
-                        0.1f
-                );
-                param1.setMargins(0, 0, 1, 1);
-                tv2.setLayoutParams(param1);
+                    tv2.setGravity(Gravity.CENTER);
+                    tv2.setBackgroundColor(getResources().getColor(R.color.white));
+                    tv2.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tableborder, 0, 0, 0);
+                    tv2.setTextColor(getResources().getColor(R.color.colorPrimary));
 
-                tablerow.addView(tv1);
-                tablerow.addView(tv2);
+                    TableRow.LayoutParams param1 = new TableRow.LayoutParams(
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            TableRow.LayoutParams.WRAP_CONTENT,
+                            0.1f
+                    );
+                    param1.setMargins(0, 0, 1, 1);
+                    tv2.setLayoutParams(param1);
 
-                tableLayout.addView(tablerow);
-                //tablerow = (TableRow) tableLayout.getChildAt(1);
-                //tablerow.setClickable(true);
-                Toast.makeText(AddMinute.this, (CharSequence) spinner.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                    tablerow.addView(tv1);
+                    tablerow.addView(tv2);
+
+                    tableLayout.addView(tablerow);
+                    //tablerow = (TableRow) tableLayout.getChildAt(1);
+                    //tablerow.setClickable(true);
+                    Toast.makeText(AddMinute.this, (CharSequence) spinner.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -233,10 +283,28 @@ public class AddMinute extends AppCompatActivity {
         mAddMinute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Log.i("i234","Add Minute");
-                Agenda = mCreateAgenda.getText().toString();
-                Points = mCreatePoints.getText().toString();
-                Absentee = mAbsentee.getText().toString();
+                Agenda = mCreateAgenda.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+                Points = mCreatePoints.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+                Absentee = mAbsentee.getText().toString().trim(); // Use trim() to remove any leading or trailing spaces
+
+                Log.d("AddMinute", "Child count: " + tableLayout.getChildCount());
+
+                // Check if any of the required fields is empty
+                if(Agenda.isEmpty() || Points.isEmpty() || Absentee.isEmpty()) {
+                    // If any field is empty, show a Toast message and return early without proceeding
+                    Toast.makeText(AddMinute.this, "Please fill in all details: Agenda, Points, and Absent Members.", Toast.LENGTH_LONG).show();
+                    return; // Stop the method execution here
+                }
+
+                // Ensuring tableLayout is not null and checking if at least one task has been added
+                if(tableLayout != null && tableLayout.getChildCount() <= 1) {
+                    Toast.makeText(AddMinute.this, "Please assign at least one task.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
 
                 //createMinuteTesting();
                 createNewMinute();
@@ -249,6 +317,7 @@ public class AddMinute extends AppCompatActivity {
     }
 
     // Method to fetch all FCM tokens from the server
+    // Method to fetch all FCM tokens and core_ids from the server
     private void fetchAllTokens() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getApplicationContext().getResources().getString(R.string.server_url)+"/proposal/getalltoken", new Response.Listener<String>() {
@@ -256,12 +325,21 @@ public class AddMinute extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                         // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New Minutes of meet added", uname + " has added the minutes of recent meeting.", Integer.parseInt(uid), idsArray , "1");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -271,8 +349,40 @@ public class AddMinute extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
-        });
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
         requestQueue.add(stringRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
 
@@ -302,7 +412,9 @@ public class AddMinute extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+
             }
+
 
             @Override
             public String getBodyContentType() {
@@ -387,17 +499,32 @@ public class AddMinute extends AppCompatActivity {
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e("volleyABC" ,"Got error in connecting server");
-                try{
-                    String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("i234" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(AddMinute.this,"Error:-"+statusCode,Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("i234" ,"Error uploading data");
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(AddMinute.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(AddMinute.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(AddMinute.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(AddMinute.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }) {
 
@@ -410,7 +537,14 @@ public class AddMinute extends AppCompatActivity {
                     return null;
                 }
             }
-
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";

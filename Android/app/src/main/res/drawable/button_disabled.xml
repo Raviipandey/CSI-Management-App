@@ -1,0 +1,6 @@
+<!-- res/drawable/button_disabled.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#9A9797" /> <!-- Example gray color for disabled state -->
+    <!-- Customize this shape as needed to match your disabled state's visual design -->
+</shape>

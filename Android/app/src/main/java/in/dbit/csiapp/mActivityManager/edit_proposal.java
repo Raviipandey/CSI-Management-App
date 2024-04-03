@@ -20,18 +20,25 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import in.dbit.csiapp.Prompts.MainActivity;
 import in.dbit.csiapp.Prompts.Manager;
 import in.dbit.csiapp.R;
+import in.dbit.csiapp.SharedPreferenceConfig;
 import in.dbit.csiapp.mFragments.datePickerFrag_min;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class edit_proposal extends AppCompatActivity {
 
     EditText e_name,e_theme,e_desc,e_edate,e_cb,e_pb,e_gb;
+    private SharedPreferenceConfig preferenceConfig;
     TextView edate_s;
     Button edit;
     String eid,date=null;
@@ -40,6 +47,7 @@ public class edit_proposal extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_proposal);
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         getSupportActionBar().setTitle("Edit Proposal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -168,15 +176,32 @@ public class edit_proposal extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try{
-                    //String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(edit_proposal.this,error.networkResponse.statusCode,Toast.LENGTH_SHORT).show();//it will not occur as authenticating at start
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("volleyABC" ,"exception");
-                    Toast.makeText(edit_proposal.this,"Check Network",Toast.LENGTH_SHORT).show();} //occur if connection not get estabilished
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(edit_proposal.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(edit_proposal.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(edit_proposal.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(edit_proposal.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
 
         }){
@@ -188,6 +213,14 @@ public class edit_proposal extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override

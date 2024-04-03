@@ -42,9 +42,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import in.dbit.csiapp.SharedPreferenceConfig;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -56,6 +60,7 @@ public class ProfileEdit extends AppCompatActivity {
     //String server_url="http://192.168.43.84:8080/profile/edit";
     String position_s, UProfile;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private SharedPreferenceConfig preferenceConfig;
 
 
     ImageView imageButton;
@@ -239,18 +244,25 @@ public class ProfileEdit extends AppCompatActivity {
         getSupportActionBar().setTitle("Edit Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
 
 
 
 
         //declaring variables
         Button save_button = findViewById(R.id.save_button);
+        final TextView role = findViewById(R.id.role);
         final TextView id = findViewById(R.id.id_E);
         final TextView name = findViewById(R.id.profile_name_E);
         final EditText email = findViewById(R.id.email_E);
         final EditText phn = findViewById(R.id.phn_E);
         final RadioGroup yr = findViewById(R.id.year_E);
+
         final RadioGroup branch = findViewById(R.id.branch_E);
+        for (int i = 0; i < branch.getChildCount(); i++) {
+            branch.getChildAt(i).setEnabled(false);
+        }
         final EditText rol = findViewById(R.id.rollNo_E);
         //final RadioGroup batch = findViewById(R.id.batch_E);
         SelectableRoundedImageView imageView = findViewById(R.id.profile_photo_E);
@@ -259,6 +271,7 @@ public class ProfileEdit extends AppCompatActivity {
         //getting data from profile
 
         UProfile = getIntent().getStringExtra("core_profilepic_url");
+        role.setText(getIntent().getStringExtra("role_name"));
 
         id.setText(getIntent().getStringExtra("core_id"));
         name.setText(getIntent().getStringExtra("core_en_fname"));
@@ -443,17 +456,34 @@ public class ProfileEdit extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                try{
-                    //String statusCode = String.valueOf(error.networkResponse.statusCode);
-                    Log.i("volleyABC" ,"edit"+Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(ProfileEdit.this,"Invalid Username or Password",Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Log.i("volleyABC" ,"edit exception");
-                    Toast.makeText(ProfileEdit.this,"Check Network",Toast.LENGTH_SHORT).show();}
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(ProfileEdit.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(ProfileEdit.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ProfileEdit.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(ProfileEdit.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
+
         }){
 
             @Override
@@ -465,6 +495,15 @@ public class ProfileEdit extends AppCompatActivity {
                     return null;
                 }
             }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
+            }
+
 
             @Override
             public String getBodyContentType() {

@@ -1,6 +1,7 @@
 package in.dbit.csiapp.mActivityManager;
 
 import android.Manifest;
+import android.app.DownloadManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -64,6 +65,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +82,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 
 public class Technical_form extends AppCompatActivity {
-    private String urole1 , BoxStatus , uname;
+    private String urole1 , BoxStatus , uname, uid;
     private static String eid;
     LinearLayout tech_lay;
     private SharedPreferenceConfig preferenceConfig;
@@ -119,6 +121,9 @@ public class Technical_form extends AppCompatActivity {
 
         uname = intent.getStringExtra(MainActivity.EXTRA_UNAME);
         uname=preferenceConfig.readNameStatus();
+
+        uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+        uid=preferenceConfig.readLoginStatus();
         tech_lay = findViewById(R.id.tech_pl);
 //        linearLayout = (LinearLayout) findViewById(R.id.linear_layout);
 
@@ -270,12 +275,21 @@ public class Technical_form extends AppCompatActivity {
             public void onResponse(String response) {
                 try {
                     JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER" , String.valueOf(tokensArray));
+                    Log.i("FCM SERVER", String.valueOf(tokensArray));
+                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
                     for (int i = 0; i < tokensArray.length(); i++) {
-                        String fcmToken = tokensArray.getString(i); // Parse each token as a string
+                        JSONObject tokenObject = tokensArray.getJSONObject(i);
+                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
+                        String coreId = tokenObject.getString("core_id"); // Parse core_id
+                        if(!coreId.equals(uid)){
+                            idsArray.put(coreId);
+                        }
+                        // Store core_id in idsArray
                         // Call the method to send notification for each FCM token
                         sendNotification(fcmToken);
                     }
+                    Log.i("Core IDs", idsArray.toString());
+                    createNotification("New Technical Doc uploaded", uname + " just uploaded technical doc for " + name.getText().toString(), Integer.parseInt(uid), idsArray , "6");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -283,10 +297,68 @@ public class Technical_form extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Technical_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Technical_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
+            }
+        }){ @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String sessionToken = preferenceConfig.readSessionToken();
+            Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+            headers.put("Authorization", "Bearer " + sessionToken);
+            return headers;
+        }};
+        requestQueue.add(stringRequest);
+    }
+
+    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nd_title", title);
+            jsonBody.put("nd_body", body);
+            jsonBody.put("nd_sender_id", senderId);
+            jsonBody.put("nd_receiver_ids", receiverIds);
+            jsonBody.put("nc_id" , cat_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getApplicationContext().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
         });
-        requestQueue.add(stringRequest);
+        requestQueue.add(jsonObjectRequest);
     }
 
 
@@ -431,75 +503,28 @@ public class Technical_form extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Build the download request
-                OkHttpClient client = new OkHttpClient();
-                okhttp3.Request downloadRequest = new okhttp3.Request.Builder()
-                        .url(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid)
-                        .build();
+                // Create a DownloadManager instance
+                DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
-                // Execute the download request asynchronously
-                client.newCall(downloadRequest).enqueue(new Callback() {
-                    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull okhttp3.Response response) throws IOException {
+                // Create a DownloadManager.Request object
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(getApplicationContext().getResources().getString(R.string.server_url) + "/technical/download?eid=" + eid));
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setTitle(eid + "_"+ name.getText().toString() + "_technical");
+                request.setDescription("Downloading file...");
 
-                        if (!response.isSuccessful()) {
-                            throw new IOException("Unexpected code " + response);
-                        }
+                // Set the destination directory
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                } else {
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                }
 
-                        String contentDisposition = response.header("Content-Disposition");
-                        String fileName = extractFileName(contentDisposition);
-
-                        // Create a file with the downloaded content
-                        byte[] bytes = response.body().bytes();
-
-                        // Get the content resolver
-                        ContentResolver resolver = getContentResolver();
-
-                        // Set up the ContentValues to insert into the MediaStore
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-
-                        // For Android Q and above, use the Downloads directory
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-                        }
-
-                        // Insert the file into the MediaStore
-                        Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
-
-                        if (uri != null) {
-                            try (OutputStream outputStream = resolver.openOutputStream(uri)) {
-                                outputStream.write(bytes);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(Technical_form.this, "File downloaded successfully", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(Technical_form.this, "Error saving file", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-
-
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(Technical_form.this, "Error downloading file", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                // Enqueue the download request
+                downloadManager.enqueue(request);
             }
         });
     }
+
 
     private void handleFileNotFound(String error) {
         // File not found, update UI accordingly
@@ -954,17 +979,32 @@ public class Technical_form extends AppCompatActivity {
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Technical_form.this, "Invalid request", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Technical_form.this,"Check Network",Toast.LENGTH_SHORT).show();
-
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Technical_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Technical_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         }){
             //sending JSONOBJECT String to server starts
@@ -976,6 +1016,14 @@ public class Technical_form extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
@@ -1107,18 +1155,32 @@ public class Technical_form extends AppCompatActivity {
         },new Response.ErrorListener()  {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                try{
-                    Log.i("volleyABC" ,Integer.toString(error.networkResponse.statusCode));
-                    Toast.makeText(Technical_form.this, "Invalid request", Toast.LENGTH_SHORT).show(); //This method is used to show pop-up on the screen if user gives wrong uid
-                    error.printStackTrace();}
-                catch (Exception e)
-                {
-                    Toast.makeText(Technical_form.this,"Check Network",Toast.LENGTH_SHORT).show();
-
+                String errorMessage = "An error occurred"; // Default message
+                try {
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                        JSONObject data = new JSONObject(responseBody);
+                        errorMessage = data.optString("error", errorMessage); // Extract custom message
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-//                finish();
 
+                if ("Session expired".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Session expired", Toast.LENGTH_LONG).show();
+                } else if ("Another device has logged in".equals(errorMessage)) {
+                    Toast.makeText(Technical_form.this, "Another device has logged in", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(Technical_form.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+
+                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                    // Handle logout if session is expired or taken over
+                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
+                    Intent loginIntent = new Intent(Technical_form.this, MainActivity.class);
+                    startActivity(loginIntent);
+                    finish();
+                }
             }
         })
 
@@ -1132,6 +1194,14 @@ public class Technical_form extends AppCompatActivity {
                     e.printStackTrace();
                     return null;
                 }
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String sessionToken = preferenceConfig.readSessionToken();
+                Log.d("RequestHeaders", "Sending token: " + sessionToken); // Add this line
+                headers.put("Authorization", "Bearer " + sessionToken);
+                return headers;
             }
 
             @Override
