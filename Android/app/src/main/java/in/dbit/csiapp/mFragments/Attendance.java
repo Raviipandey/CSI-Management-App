@@ -206,135 +206,11 @@ public class Attendance extends Fragment {
         return rootView;
     }
 
-    private void fetchAllTokens() {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, getActivity().getResources().getString(R.string.server_url)+"/proposal/getcvctoken", new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONArray tokensArray = new JSONArray(response);
-                    Log.i("FCM SERVER", String.valueOf(tokensArray));
-                    JSONArray idsArray = new JSONArray(); // Array to store core_ids
-                    for (int i = 0; i < tokensArray.length(); i++) {
-                        JSONObject tokenObject = tokensArray.getJSONObject(i);
-                        String fcmToken = tokenObject.getString("fcm_token"); // Parse FCM token
-                        String coreId = tokenObject.getString("core_id"); // Parse core_id
-                        if(!coreId.equals(UID)){
-                            idsArray.put(coreId);
-                        }
-                        // Store core_id in idsArray
-                        // Call the method to send notification for each FCM token
-                        sendNotification(fcmToken);
-                    }
-                    Log.i("Core IDs", idsArray.toString());
-                    createNotification("New request for attendance", uname + " has missed some lectures", Integer.parseInt(UID), idsArray , "3");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
-                    // Session token is invalid or expired, log the user out
-                    preferenceConfig.writeLoginStatus(false, "", "", "", "", "", "", "", "");
-                    Intent loginIntent = new Intent(getActivity(), MainActivity.class); // Assuming LoginActivity is your login activity
-                    startActivity(loginIntent);
-                    getActivity().finish(); // Correctly calling finish() on the activity instance
-                    Toast.makeText(getActivity(), "Session expired, please log in again", Toast.LENGTH_LONG).show();
-                } else {
-                    // Handle other errors
-                    Toast.makeText(getActivity(), "An error occurred", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }){ @Override
-        public Map<String, String> getHeaders() throws AuthFailureError {
-            Map<String, String> headers = new HashMap<>();
-            String sessionToken = preferenceConfig.readSessionToken();
-            headers.put("Authorization", "Bearer " + sessionToken);
-            return headers;
-        }};
-        requestQueue.add(stringRequest);
-    }
-
-    private void createNotification(String title, String body, int senderId, JSONArray receiverIds , String cat_id) {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("nd_title", title);
-            jsonBody.put("nd_body", body);
-            jsonBody.put("nd_sender_id", senderId);
-            jsonBody.put("nd_receiver_ids", receiverIds);
-            jsonBody.put("nc_id" , cat_id);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getActivity().getResources().getString(R.string.server_url)+"/notification/createnotification", jsonBody, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.i("CREATE_NOTIFICATION", "Notification created successfully");
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
-    }
 
 
 
-    // Method to send notification after successful proposal submission
-    private void sendNotification(String fcmtoken) {
-        // Construct the notification payload
-        JSONObject notification = new JSONObject();
-        try {
-            notification.put("to", fcmtoken); // Using the FCM token obtained earlier
-            JSONObject notificationBody = new JSONObject();
-            notificationBody.put("title", "New request for attendance");
 
-            notificationBody.put("body", uname + " has missed some lectures");
-            notification.put("notification", notificationBody);
 
-            // Add intent to open TechnicalForm activity when notification is clicked
-            JSONObject data = new JSONObject();
-            data.put("click_action", ".Technical_form"); // Adjust with your TechnicalForm activity class name
-            notification.put("data", data);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://fcm.googleapis.com/fcm/send",
-                response -> Log.d("FCM", "Notification sent successfully"),
-                error -> Log.e("FCM", "Failed to send notification: " + error.getMessage())) {
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return notification.toString().getBytes("utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "key=AAAA-xbkyRA:APA91bF2uRduQA3hfb72XF9B7sjfw0vU1AN1YyrbutqPn34Fbn7fF6fGrj8xgfdCR6au12lFrafusW03uZjVwUXmFV6DPlixorLCIVZuv-r6YyyEOVWj8d6cOfna7FcG96d3_-hbSx3B");
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        requestQueue.add(stringRequest);
-    }
 
     public String toString() {
         return "Attendance";
@@ -492,7 +368,7 @@ public class Attendance extends Fragment {
                         if(setJason()==1)
                         {
                             sendrequest();
-                            fetchAllTokens();
+
                         }
 
                         Log.i("info123", String.valueOf(jsonObject));

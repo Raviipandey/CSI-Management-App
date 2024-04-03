@@ -10,7 +10,7 @@ const validateSessionToken  = require('../middleware/ValidateTokens');
 
 var admin = require('firebase-admin');
 const { server_url} = require('../serverconfig');
-// var serviceAccount = require('../firebase/ServiceAccount.json');
+var serviceAccount = require('../firebase/ServiceAccount.json');
 
 
 
@@ -33,46 +33,104 @@ connection.connect(function(err){
 });
 
 //Attendance Request
-router.post('/request',validateSessionToken,(req,res)=>{
-    var ad_id=req.body.ad_id;
-	var id=req.body.id; //core_id
-	var date=req.body.date;
-	var s1 = req.body.s1;
-	var s2 = req.body.s2;
-	var s3 = req.body.s3;
-	var s4 = req.body.s4;
-	var s5 = req.body.s5;
-	var s6 = req.body.s6;
-	var s7 = req.body.s7;
-//	var timeslot=req.body.timeslot;
+const fetch = require('node-fetch');
 
-	var missed = req.body.missed;
-	var reason=req.body.reason;
+router.post('/request', validateSessionToken, (req, res) => {
+    var ad_id = req.body.ad_id;
+    var id = req.body.id; //core_id
+    var date = req.body.date;
+    var s1 = req.body.s1;
+    var s2 = req.body.s2;
+    var s3 = req.body.s3;
+    var s4 = req.body.s4;
+    var s5 = req.body.s5;
+    var s6 = req.body.s6;
+    var s7 = req.body.s7;
+    var missed = req.body.missed;
+    var reason = req.body.reason;
 
-	//fetching name from users table
-	connection.query('SELECT core_en_fname,core_class FROM core_details WHERE core_details.core_id=?',[id],function(err,rest){
-		console.log(rest)
-		if (err){
-			console.log(err);
-			res.sendStatus(400);
-		}
-		else{
-			//pushing into request(attendance_details) table
-			//INSERT INTO attendance_details (core_id,core_date,s1,s2,s3,s4,s5,s6,s7,core_timeslot,core_lecsmissed_sub,core_reason) VALUES(5,'2023-10-19',1,0,0,0,0,0,1,'11:00:00',"BI","test s");
-			connection.query('INSERT INTO attendance_details(core_id,core_date,s1,s2,s3,s4,s5,s6,s7,core_lecsmissed_sub,core_reason) VALUES(?,?,?,?,?,?,?,?,?,?,?)',[id,date,s1,s2,s3,s4,s5,s6,s7,missed,reason],function(err,results,fields){
-				if(err){
-					console.log(err);
-					res.sendStatus(400);
-				}
-				else{
-					console.log("Data Inserted");
-					res.sendStatus(200);
-					
-				}
-			});
-		}
-	});
+    // Fetching name from users table
+    connection.query('SELECT core_en_fname, core_class FROM core_details WHERE core_details.core_id=?', [id], function(err, rest) {
+        if (err) {
+            console.log(err);
+            res.sendStatus(400);
+        } else {
+            var uname = rest[0].core_en_fname; // Extracting username from the result
+            // Inserting into request(attendance_details) table
+            connection.query('INSERT INTO attendance_details(core_id, core_date, s1, s2, s3, s4, s5, s6, s7, core_lecsmissed_sub, core_reason) VALUES(?,?,?,?,?,?,?,?,?,?,?)', [id, date, s1, s2, s3, s4, s5, s6, s7, missed, reason], function(err, results, fields) {
+                if (err) {
+                    console.log(err);
+                    res.sendStatus(400);
+                } else {
+                    console.log("Data Inserted");
+                    // Fetch FCM tokens for core_role_id 3 and 4
+                    connection.query('SELECT cd.fcm_token , cd.core_id FROM csiApp2022.core_details cd WHERE cd.core_role_id IN (3, 4)', function(err, tokens) {
+                        if (err) {
+                            console.log(err);
+                            res.sendStatus(400);
+                        } else {
+                            // Extract FCM tokens from the results
+                            const fcmTokens = tokens.map(result => result.fcm_token);
+                            const coreIds = tokens.map(result => result.core_id);
+
+                            // Send notifications to each FCM token
+                            fcmTokens.forEach(token => {
+                                const message = {
+                                    notification: {
+                                        title: 'New request for attendance',
+                                        body: uname + ' has missed some lectures',
+                                    },
+                                    token: token,
+                                    android: {
+                                        notification: {
+                                            click_action: 'AttendancePR_ACTIVITY' // Set the intent action to open AttendancePR activity
+                                        }
+                                    }
+                                };
+
+                                admin.messaging().send(message)
+                                    .then(response => {
+                                        console.log('Successfully sent new request message:', response);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error sending new request message:', error);
+                                    });
+                            });
+
+                            const notificationData = {
+                                nd_title: 'New request for attendance',
+                                nd_body: `${uname} has missed some lectures`,
+                                nd_sender_id: id, // Assuming sender ID is 3, update with actual sender ID
+                                nd_receiver_ids: coreIds, // Pass coreIds as receiver_ids
+                                nc_id: '3' // Assuming notification category ID is 3, update with actual notification category ID
+                            };
+
+                            // Send a POST request to create notification
+                            fetch(`${server_url}/notification/createnotification`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(notificationData)
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Handle response from create notification endpoint if needed
+                                    console.log('Notification created successfully:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error creating notification:', error);
+                                });
+
+                            res.sendStatus(200);
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
+
 
 router.post('/fetchtokenbyid', (req, res) => {
     var ad_ids = req.body.ad_ids; // Assuming ad_ids is an array of request IDs sent by the client
@@ -112,43 +170,11 @@ router.post('/requestlist',validateSessionToken,(req,res)=>{
 //Accept json array,move the record from request to final_list
 // Route to update the status of attendance requests
 
-router.post('/finallist',validateSessionToken, (req, res) => {
-	console.log(req.body); // Check the incoming data
-	// Extract the 'accepted' array from the request body
-	const acceptedIds = req.body.accepted;
-  
-	if (!acceptedIds || acceptedIds.length === 0) {
-	  return res.status(400).send({ message: 'No accepted IDs provided.' });
-	}
-  
-	// Keep track of completed queries
-	let completedQueries = 0;
-	const totalQueries = acceptedIds.length;
-	let encounteredError = false;
-  
-	// Update each accepted ID in the database
-	acceptedIds.forEach(ad_id => {
-	  connection.query('UPDATE attendance_details SET status = "ACCEPTED" WHERE ad_id = ?', [ad_id], (error, results) => {
-		completedQueries++;
-		if (error) {
-		  encounteredError = true;
-		  console.error('Failed to update ad_id:', ad_id, error);
-		  // Send an error response only once
-		  if (!res.headersSent) {
-			res.status(500).send({ message: 'Error updating attendance status.' });
-		  }
-		}
-		// If all queries have been processed and no error response has been sent, send a success response
-		if (completedQueries === totalQueries && !encounteredError && !res.headersSent) {
-		  res.status(200).send({ message: 'All attendance statuses updated successfully.' });
-		}
-	  });
-	});
-  });
 
-router.post('/finallist', (req, res) => {
+router.post('/finallist', validateSessionToken, (req, res) => {
     // Extract the accepted IDs from the request body
     const acceptedIds = req.body.accepted;
+    const id = req.body.id;
     console.log("Response here", acceptedIds);
 
     // Check if acceptedIds is not an array or is empty
@@ -218,7 +244,7 @@ router.post('/finallist', (req, res) => {
                 const notificationData = {
                     nd_title: 'Attendance accepted',
                     nd_body: 'Your attendance request has been accepted',
-                    nd_sender_id: '3', // Update with actual sender ID
+                    nd_sender_id: id, // Update with actual sender ID
                     nd_receiver_ids: coreIds, // Pass coreIds as receiver_ids
                     nc_id: '3' // Update with actual notification category ID
                 };
