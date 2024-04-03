@@ -32,7 +32,7 @@
         <activity
             android:name="in.dbit.csiapp.mActivityManager.Forgetpassword"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme2" />
+            android:theme="@style/outline"></activity>
 
 
         <activity
@@ -134,15 +134,17 @@
         <activity
             android:name=".mActivityManager.ResetPasswordActivity"
             android:exported="true"
+            android:theme="@style/outline"
             android:windowSoftInputMode="adjustResize">
 
+            <tools:validation testUrl="http://csiapp.dbit.in/app" />
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data android:host="csiapp.dbit.in" />
                 <data android:pathPrefix="/app" />
             </intent-filter>
