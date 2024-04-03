@@ -24,6 +24,8 @@ const roleMapping = {
     'Web Development Head': 7,
     'Wed-d Head':7,
     'web development head':7,
+    'web dev head':7,
+    'Web dev head':7,
     'web-d head':7,
     'Public Relations Head': 8,
     'public relations head':8,
