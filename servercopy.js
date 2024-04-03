@@ -180,14 +180,6 @@ app.get('/privacy.html', (req, res) => {
   });
 
 //middleware
-const validateSessionToken = require('./middleware/ValidateTokens');
-app.use(validateSessionToken);
-
-
-
-  
-
-
 
 
 
@@ -202,6 +194,7 @@ app.get("/",(req,res)=>{
             });
         }
 });
+
 
 // And in your server setup, handle the route to render the error page
 app.get('/error', (req, res) => {
@@ -219,6 +212,9 @@ app.get("/logout", (req, res, next)=>{
 // app.get("/",(req,res)=>{
 // return res.send("Welcome to CSI-DBIT");
 // });
+
+const validateSessionToken = require('./middleware/ValidateTokens');
+app.use(validateSessionToken);
 
 //Port Listening
 app.listen(9000,(req,res)=>{

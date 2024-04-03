@@ -11,7 +11,6 @@ const admin = require('firebase-admin');
 const upload = multer({ dest: 'server_uploads/csv_upload' });
 var serviceAccount = require('../../firebase/ServiceAccount.json');
 
-
 const roleMapping = {
     'Chairperson': 3,
     'chairperson' : 3,
@@ -25,6 +24,8 @@ const roleMapping = {
     'Web Development Head': 7,
     'Wed-d Head':7,
     'web development head':7,
+    'web dev head':7,
+    'Web dev head':7,
     'web-d head':7,
     'Public Relations Head': 8,
     'public relations head':8,
@@ -376,8 +377,4 @@ module.exports = {
                 });
         });
     },
-    
-    
-    
-    
 };

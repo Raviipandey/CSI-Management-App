@@ -72,10 +72,11 @@ router.get('/fetchnotifications', function(req, res) {
 
     // SQL query to fetch notifications with profile picture URL
     const sql = `SELECT nd.nd_id, nd.nd_title, nd.nd_body, nd.nc_id, cd.core_profilepic_url AS url 
-                 FROM csiApp2022.notification_details nd 
-                 JOIN csiApp2022.notification_audience na ON nd.nd_id = na.nd_id 
-                 JOIN csiApp2022.core_details cd ON nd.nd_sender_id = cd.core_id 
-                 WHERE na.core_id = ?`;
+    FROM csiApp2022.notification_details nd 
+    JOIN csiApp2022.notification_audience na ON nd.nd_id = na.nd_id 
+    JOIN csiApp2022.core_details cd ON nd.nd_sender_id = cd.core_id 
+    WHERE na.core_id = ?
+    ORDER BY nd.nd_id DESC;`;
 
     // Execute the query
     connection.query(sql, [userId], function(err, results) {
