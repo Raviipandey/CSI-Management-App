@@ -54,9 +54,11 @@ public class AttendancePR extends Fragment {
     private RequestQueue mRequestQueue;
     SwipeRefreshLayout swipeRefreshLayout;
 
-    private String uname , fcmtoken , name;
-
     private SharedPreferenceConfig preferenceConfig;
+
+    private String uname , fcmtoken , name , uid;
+
+
 
     StringBuffer sb = null;
 
@@ -72,6 +74,7 @@ public class AttendancePR extends Fragment {
 
         // Check if the activity is launched from a notification click action
         Intent intent = getActivity().getIntent();
+
         if (intent != null && intent.getAction() != null && intent.getAction().equals("AttendancePR_ACTIVITY")) {
             // Activity is launched from a notification click action
             // Add your handling code here
@@ -92,6 +95,9 @@ public class AttendancePR extends Fragment {
             preferenceConfig = new SharedPreferenceConfig(getActivity().getApplicationContext());
 
             uname = preferenceConfig.readNameStatus();
+
+            uid = intent.getStringExtra(MainActivity.EXTRA_USERID);
+            uid=preferenceConfig.readLoginStatus();
 
             Log.i("AttPR","Started");
             parseJSON();  //Get list of requests
@@ -436,6 +442,7 @@ public class AttendancePR extends Fragment {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("accepted", jsonArray);
+            jsonObject.put("id" , uid);
 
 
         } catch (JSONException e)
