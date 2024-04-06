@@ -1,14 +1,10 @@
 const mysql = require('mysql');
+require("dotenv").config();
 const connection = mysql.createPool({
-
-    // host: "localhost",
-    // user: "root",
-    // password: "",
-    // database: "csi_demo",
-    host: '128.199.23.207',
-	user: "csi",
-	password: "csi",
-	database: 'csiApp2022',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database:process.env.DB_NAME,
     connectionLimit : 100,
 });
 connection.getConnection((err)=>{

@@ -24,7 +24,7 @@ connection.connect(function(err) {
 router.post('/',(req,res)=>{
      	var id=req.body.id;
      	var password=req.body.password;
-
+console.log("inside juna login");
 	//Query to select the tuple of the user
      	connection.query('SELECT * FROM profile WHERE id = ?',[id],function(error,result){
      		if(error){

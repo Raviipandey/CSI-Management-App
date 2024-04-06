@@ -1,13 +1,15 @@
 const mysql = require('mysql');
+require("dotenv").config();
+let connection = require('./Database/dbConnect');
+const connection1 = mysql.createConnection({
 
-const connection = mysql.createConnection({
-    host: '128.199.23.207',
-    user: 'csi',
-    password: 'csi',
-    database: 'csiApp2022'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database:process.env.DB_NAME,
 });
 
-connection.connect(function(err) {
+connection.getConnection(function(err) {
     if (err) {
         console.log('Not Connected to MySql! dbConfig.js');
     } else {

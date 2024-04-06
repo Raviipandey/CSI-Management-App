@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
     var password = req.body.password;
     
     var fcmtoken = req.body.fcmtoken;
-    console.log(mobno, password, fcmtoken);
+    // console.log("mobno: ",mobno, "password: ",password, "fcmtoken: ",fcmtoken);
 
     const newSessionToken = generateSessionToken(); 
     

@@ -25,10 +25,10 @@ const connection=mysql.createConnection({
 
 connection.connect(function(err){
     	if(!err){
-        	console.log('Connected to MySql! core Attendance');
+        	console.log('Connected to MySql! core Core_Attendance');
     	}
 	else{	
-        	console.log("Not Connected To Mysql! Attendance");
+        	console.log("Not Connected To Mysql! Core_Attendance");
     	}
 });
 
